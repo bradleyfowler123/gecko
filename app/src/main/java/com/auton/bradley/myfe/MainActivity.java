@@ -1,5 +1,7 @@
 package com.auton.bradley.myfe;
 
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -32,12 +34,12 @@ public class MainActivity extends AppCompatActivity {
 
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.mainTabs);
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 1"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
+      //  TabLayout tabLayout = (TabLayout) findViewById(R.id.mainTabs);
+       // tabLayout.addTab(tabLayout.newTab().setText("Tab 1"));
+       // tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
+       // tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
 
-        tabLayout.setupWithViewPager(mViewPager);
+       // tabLayout.setupWithViewPager(mViewPager);
     }
 
 
