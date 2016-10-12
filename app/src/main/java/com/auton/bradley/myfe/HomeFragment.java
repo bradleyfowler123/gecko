@@ -33,8 +33,8 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);
 
         //final String[] weekForecast = getResources().getStringArray(R.array.testArray);
-        int[] images={R.drawable.ic_friend_feed_grey,R.drawable.ic_search_grey,R.drawable.ic_home_grey};
-        final String[] titles={"1","2","3"};
+        int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};
+        final String[] titles = getResources().getStringArray(R.array.testArray);
 
        // ListAdapter adapter = new ArrayAdapter<>(getActivity(),R.layout.home_list_item, weekForecast);
         ListView home_list = (ListView) rootView.findViewById(R.id.home_list);
@@ -45,7 +45,8 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(),titles[i],Toast.LENGTH_SHORT);
+                Toast.makeText(getContext(),"Navigating to the website",Toast.LENGTH_SHORT).show();
+
             }
         });
 

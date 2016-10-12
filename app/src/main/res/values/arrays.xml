@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="testArray">
-        <item>first</item>
-        <item>second</item>
-        <item>third</item>
-        <item>fourth</item>
-        <item>fifth</item>
+        <item>Alton Towers</item>
+        <item>Cambridge Climbing</item>
+        <item>Local Gym</item>
+        <item>Alton Towers</item>
     </array>
 </resources>
