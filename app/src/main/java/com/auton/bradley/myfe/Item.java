@@ -4,21 +4,18 @@ import java.util.ArrayList;
 
 /**
  * Created by Bradley on 13/10/2016.
+ * Custom Class used for search elv
  */
 
-public class Item {
-
-    public String Option;
-    public String Selected = new String();
-    public ArrayList<String> elements=new ArrayList<String>();
-
-    public Item(String Option) {
-        this.Option=Option;
+                            // class definition
+class Item {
+                            // parameter declarations
+    String Option;                                                                                  // Contains the title of the list group
+    String Selected;                                                                                // Used to recorded the current element selection
+    ArrayList<String> elements=new ArrayList<>();                                                   // array containing all of the elements within a list group
+                            // function used to declare an Item object with a list group title and default selection
+    Item(String option, String selected) {                                                          // Item(ListGroupTitle, defaultSelection)
+        this.Option=option;
+        this.Selected=selected;
     }
-
-    @Override
-    public String toString() {
-        return Option;
-    }
-
 }
