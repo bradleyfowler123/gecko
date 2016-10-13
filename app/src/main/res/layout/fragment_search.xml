@@ -6,11 +6,21 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="40sp"
+        android:id="@+id/search_welcome_textView"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_centerInParent="true"
-        android:text="idk" />
+        android:text="@string/search_top_message"
+        android:textAlignment="center" />
+
+    <ExpandableListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/search_welcome_textView"
+        android:id="@+id/search_list" >
+    </ExpandableListView>
 
 </RelativeLayout>
+
