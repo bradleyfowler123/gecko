@@ -13,15 +13,7 @@
         android:layout_alignParentStart="true"
         android:id="@+id/search_element_list_item_text"
         android:textSize="12sp"
+        android:textAlignment="center"
         />
-
-    <ImageView
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/search_element_list_item_img"
-        android:layout_below="@id/search_element_list_item_text"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter" />
 
 </RelativeLayout>

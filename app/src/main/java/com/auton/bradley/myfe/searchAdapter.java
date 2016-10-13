@@ -42,11 +42,11 @@ public class searchAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPos, int childPos, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView==null) {
-            convertView=inflater.inflate(R.layout.search_option_list_item,null);
+            convertView=inflater.inflate(R.layout.search_element_list_item,null);
         }
 
         String  child=(String) getChild(groupPos, childPos);
-        TextView optionTitle = (TextView) convertView.findViewById(R.id.search_option_list_item_text);
+        TextView optionTitle = (TextView) convertView.findViewById(R.id.search_element_list_item_text);
 
         optionTitle.setText(child);
 

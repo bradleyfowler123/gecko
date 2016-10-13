@@ -54,11 +54,15 @@ public class SearchFragment extends Fragment {
     }
 
     private ArrayList<Item> getData() {
-        Item i1=new Item("item one");
-        i1.elements.add("ele 1");
-        i1.elements.add("ele 2");
+        Item i1=new Item("Cost");
+        i1.elements.add("Free");
+        i1.elements.add("Upto £20");
+        i1.elements.add("Upto £50");
+        i1.elements.add("Upto £200");
+        i1.elements.add("Any");
+        i1.elements.add("Custom");
 
-        Item i2=new Item("item two");
+        Item i2=new Item("Categories");
         i2.elements.add("ele 2.1");
         i2.elements.add("ele 2.2");
 
