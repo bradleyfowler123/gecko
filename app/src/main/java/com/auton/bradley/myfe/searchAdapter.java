@@ -50,6 +50,16 @@ public class searchAdapter extends BaseExpandableListAdapter {
 
         optionElement.setText(child);
 
+        Item i=(Item) getGroup(groupPos);
+        String selected = i.Selected;
+        if(selected.equals(child)) {
+            convertView.setBackgroundColor(Color.BLUE);
+        }
+        else {
+            convertView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+
 
         return convertView;
     }
