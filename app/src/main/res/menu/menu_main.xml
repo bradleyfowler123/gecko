@@ -4,7 +4,12 @@
     tools:context="com.auton.bradley.myfe.MainActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_settings_grey"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_about_help"
+        android:title="@string/action_about_help"
+        app:showAsAction="never"
+        />
 </menu>

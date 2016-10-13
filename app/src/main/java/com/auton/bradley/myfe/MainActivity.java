@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_home_grey,
             R.drawable.ic_search_grey,
             R.drawable.ic_friend_feed_grey,
-            R.drawable.ic_settings_grey
+            R.drawable.ic_planner
     };
 
     @Override
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new HomeFragment(), "Home");
         adapter.addFragment(new SearchFragment(), "Search");
         adapter.addFragment(new friendFragment(), "Friend");
-        adapter.addFragment(new SettingsFragment(), "Settings");
+        adapter.addFragment(new PlannerFragment(), "Planner");
         viewPager.setAdapter(adapter);                                                              // set the adapter to the container
     }
 
