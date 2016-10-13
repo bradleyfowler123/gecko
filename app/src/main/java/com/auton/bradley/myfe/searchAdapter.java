@@ -46,9 +46,9 @@ public class searchAdapter extends BaseExpandableListAdapter {
         }
 
         String  child=(String) getChild(groupPos, childPos);
-        TextView optionTitle = (TextView) convertView.findViewById(R.id.search_element_list_item_text);
+        TextView optionElement = (TextView) convertView.findViewById(R.id.search_element_list_item_text);
 
-        optionTitle.setText(child);
+        optionElement.setText(child);
 
 
         return convertView;
@@ -94,9 +94,13 @@ public class searchAdapter extends BaseExpandableListAdapter {
         Item i=(Item) getGroup(groupPosition);
 
         TextView optionTitle = (TextView) convertView.findViewById(R.id.search_option_list_item_text);
+        TextView selectedTitle = (TextView) convertView.findViewById(R.id.search_option_list_item_text_element);
 
         String option = i.Option;
+        String selected = i.Selected;
+
         optionTitle.setText(option);
+        selectedTitle.setText(selected);
 
         convertView.setBackgroundColor(Color.LTGRAY);
 

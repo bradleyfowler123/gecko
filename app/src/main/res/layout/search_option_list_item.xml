@@ -24,7 +24,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignEnd="@id/search_option_list_item_text"
-        android:text="sample"
+        android:id="@+id/search_option_list_item_text_element"
         android:textSize="12sp"
         android:paddingEnd="10dp"/>
 </RelativeLayout>

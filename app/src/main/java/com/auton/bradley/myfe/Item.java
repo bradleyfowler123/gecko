@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Item {
 
     public String Option;
+    public String Selected = new String();
     public ArrayList<String> elements=new ArrayList<String>();
 
     public Item(String Option) {
