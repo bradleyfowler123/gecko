@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
-
+                                    // fragment that handle the search tab
 public class SearchFragment extends Fragment {
 
     public SearchFragment() {        // Required empty public constructor
@@ -48,9 +48,9 @@ public class SearchFragment extends Fragment {
     private ArrayList<Item> getData() {                                                             // generates an array containing 3 Item class objects
         Item i1=new Item("Cost","Any");                                                             // Define an Item object call i1
         i1.elements.add("Free");                                                                    // child elements below
-        i1.elements.add("Upto £20");
-        i1.elements.add("Upto £50");
-        i1.elements.add("Upto £200");
+        i1.elements.add("Up to £20");
+        i1.elements.add("Up to £50");
+        i1.elements.add("Up to £200");
         i1.elements.add("Any");
         i1.elements.add("Custom");
 

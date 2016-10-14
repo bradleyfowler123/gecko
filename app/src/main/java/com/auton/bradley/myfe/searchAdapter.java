@@ -37,7 +37,8 @@ class searchAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPos, int childPos, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView==null) {
-            convertView=inflater.inflate(R.layout.search_element_list_item,null);
+            final ViewGroup nullParent = null;
+            convertView=inflater.inflate(R.layout.search_element_list_item,nullParent);
         }
                                     // populate a child element within a list group
         String child = (String) getChild(groupPos, childPos);                                               // return name of a particular child element
@@ -60,7 +61,8 @@ class searchAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if(convertView == null) {
-            convertView=inflater.inflate(R.layout.search_option_list_item,null);
+            final ViewGroup nullParent = null;
+            convertView=inflater.inflate(R.layout.search_option_list_item,nullParent);
         }
                                     // variable declarations
         Item i=(Item) getGroup(groupPosition);                                                                      // return a list group's data

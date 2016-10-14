@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="testArray">
+    <array name="recommendationsArray">
         <item>Alton Towers</item>
         <item>Cambridge Climbing</item>
         <item>Local Gym</item>

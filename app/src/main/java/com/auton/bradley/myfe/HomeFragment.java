@@ -1,24 +1,17 @@
 package com.auton.bradley.myfe;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
+                                    // fragment that handles the home tab
 public class HomeFragment extends Fragment {
 
-    public HomeFragment() {
-        // Required empty public constructor
+    public HomeFragment() {        // Required empty public constructor
     }
 
     @Override
@@ -26,22 +19,19 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+                                   // function that generates the view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_home,container,false);
-
-        //final String[] weekForecast = getResources().getStringArray(R.array.testArray);
-        int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};
-        final String[] titles = getResources().getStringArray(R.array.testArray);
-
-       // ListAdapter adapter = new ArrayAdapter<>(getActivity(),R.layout.home_list_item, weekForecast);
-        ListView home_list = (ListView) rootView.findViewById(R.id.home_list);
-
+                                   // variable declarations
+        View rootView = inflater.inflate(R.layout.fragment_home,container,false);                           // enables easy access to the root search xml
+        ListView home_list = (ListView) rootView.findViewById(R.id.home_list);                              // locate the list object in the home tab
+        int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
+        final String[] titles = getResources().getStringArray(R.array.recommendationsArray);                // get the names of the recommendations to display
+                                   // populate the list
         homeAdapter adapter = new homeAdapter(getActivity(),titles,images);
         home_list.setAdapter(adapter);
-
+                                   // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -50,6 +40,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        return rootView;
+        return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 }
