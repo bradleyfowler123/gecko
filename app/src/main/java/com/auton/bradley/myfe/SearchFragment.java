@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,15 @@ public class SearchFragment extends Fragment {
                 }
                 else {
                     listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item for single selection group
+
+                    if(listGroup.elements.size()==childPos+1) {
+                        if(groupPos==0) {
+
+                        }
+                        Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
+                    }
+
+
                     elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                 }
                 return false;
