@@ -47,21 +47,20 @@ class searchAdapter extends BaseExpandableListAdapter {
         optionElement.setText(child);                                                                       // set the name of a particular child element using the given data
                                     // highlight that child element if it is selected
         Item i=(Item) getGroup(groupPos);                                                           // return the list group object the child element is part of
-        String selected = i.Selected;                                                               // return the selected value for that list group
-        if(i.MultiSelect) {
+        if(i.MultiSelect) {                                                                         // if the list group is a multi-select one
             if(i.mSelected.contains(child)) {
-                convertView.setBackgroundColor(Color.BLUE);
+                convertView.setBackgroundColor(Color.BLUE);                                         // set all selected elements to blue
             }
             else {
-                convertView.setBackgroundColor(Color.TRANSPARENT);                                      // else no colour
+                convertView.setBackgroundColor(Color.TRANSPARENT);                                  // and everything else to transparent
             }
         }
-        else {
+        else {                                                                                      // if the list group was a single select one
             if(i.Selected.equals(child)) {
-                convertView.setBackgroundColor(Color.BLUE);
+                convertView.setBackgroundColor(Color.BLUE);                                         // set the selected item to blue
             }
             else {
-                convertView.setBackgroundColor(Color.TRANSPARENT);                                      // else no colour
+                convertView.setBackgroundColor(Color.TRANSPARENT);                                  // else no colour
             }
         }
                                     // return the updated view
@@ -81,16 +80,21 @@ class searchAdapter extends BaseExpandableListAdapter {
         TextView selectedTitle = (TextView) convertView.findViewById(R.id.search_option_list_item_text_element);
                                     // data extraction
         String option = i.Option;                                                                   // list group title
-        String selected;
+        String selected;                                                                            // used to contain the preview selection in banner
         if(i.MultiSelect) {
-            selected = TextUtils.join(", ",i.mSelected);
+            if(i.mSelected.size() > 2) {                                                            // when more than two items selected in multi-select
+                selected = TextUtils.join(", ",i.mSelected.subList(0,2)) + ", ...";                 // truncate preview
+            }
+            else {
+                selected = TextUtils.join(", ",i.mSelected);
+            }
         }
         else {
             selected = i.Selected;
-        }                                                                       // list group's element selection
+        }                                                                                           // list group's element selection for single selection group
                                     // update view
-        optionTitle.setText(option);
-        selectedTitle.setText(selected);
+        optionTitle.setText(option);                                                                // set the banner name
+        selectedTitle.setText(selected);                                                            // set preview text
         convertView.setBackgroundColor(Color.LTGRAY);                                               // set colour of group banner
                                     // return the updated view
         return convertView;

@@ -8,7 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
-                                    // fragment that handle the search tab
+import java.util.Arrays;
+import java.util.Collections;
+
+// fragment that handle the search tab
 public class SearchFragment extends Fragment {
 
     public SearchFragment() {        // Required empty public constructor
@@ -28,7 +31,7 @@ public class SearchFragment extends Fragment {
         final ExpandableListView elv=(ExpandableListView) rootView.findViewById(R.id.search_list);  // locate the elv in this view
         final ArrayList<Item> item=getData();                                                       // generate data which will be used to populate the el
                                     // generate the elv
-        searchAdapter adapter = new searchAdapter(getActivity(),item);                              // define the adapter to be used to generate elv
+        final searchAdapter adapter = new searchAdapter(getActivity(),item);                              // define the adapter to be used to generate elv
         elv.setAdapter(adapter);                                                                    // assign this adapter to the elv
                                     // handle clicks on the elv
         elv.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {                 // setup function to listen for a click on the child elements
@@ -43,21 +46,21 @@ public class SearchFragment extends Fragment {
                     else {
                         listGroup.mSelected.add(listGroup.elements.get(childPos));                  // else add it to the selection
                     }
+                    adapter.notifyDataSetChanged();                                                 // inform to update the elv display
                 }
                 else {
-                    listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item within the elv data
+                    listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item for single selection group
+                    elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                 }
-                elv.collapseGroup(groupPos);                                                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                 return false;
             }
         });
-
         return rootView;                                                                            // return the search view (and everything below) to the main activity so it can be shown
     }
 
                                     // function that generates the elv data
     private ArrayList<Item> getData() {                                                             // generates an array containing 3 Item class objects
-        Item i1=new Item("Cost","Any",false);                                                             // Define an Item object call i1
+        Item i1=new Item("Cost", new ArrayList<>(Collections.singletonList("Any")),false);          // Define an Item object call i1
         i1.elements.add("Free");                                                                    // child elements below
         i1.elements.add("Up to £20");
         i1.elements.add("Up to £50");
@@ -65,29 +68,30 @@ public class SearchFragment extends Fragment {
         i1.elements.add("Any");
         i1.elements.add("Custom");
 
-        Item i2=new Item("Categories","Sport",true);                                                     // Item.Option is set by the arg1 and Item.Selected is set by arg 2
+        Item i2=new Item("Categories", new ArrayList<>(Arrays.asList("Sport","Events")),true);      // Item.Option is set by the arg1 and default selection is set by arg 2
         i2.elements.add("Sport");
         i2.elements.add("Events");
         i2.elements.add("Food / Drink");
         i2.elements.add("Entertainment");
         i2.elements.add("Arts & Craft");
 
-        Item i3=new Item("When","Today",false);                                                           // ie Item(ListGroupTitle, defaultSelection)
+        Item i3=new Item("When",new ArrayList<>(Collections.singletonList("Today")),false);         // ie Item(ListGroupTitle, defaultSelection)
         i3.elements.add("Today");
         i3.elements.add("Tomorrow");
         i3.elements.add("Select Day(s)");
 
-        Item i4=new Item("Location","Current",false);
+        Item i4=new Item("Location",new ArrayList<>(Collections.singletonList("Current")),false);
         i4.elements.add("Current");
         i4.elements.add("Set Location");
 
-        Item i5=new Item("Distance","< 10 miles",false);
+        Item i5=new Item("Distance",new ArrayList<>(Collections.singletonList("< 10 miles")),false);
         i5.elements.add("< 2 miles");
         i5.elements.add("< 10 miles");
         i5.elements.add("< 30 miles");
         i5.elements.add("Set Distance");
 
-        Item i6=new Item("Other","Indoor",true);
+        ArrayList<String> temp = new ArrayList<>();
+        Item i6=new Item("Other", temp,true);
         i6.elements.add("Family Friendly");
         i6.elements.add("Indoor");
 
