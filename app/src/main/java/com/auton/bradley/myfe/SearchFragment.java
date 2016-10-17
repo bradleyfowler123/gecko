@@ -37,6 +37,7 @@ public class SearchFragment extends Fragment {
             //    Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
                 item.get(groupPos).Selected = item.get(groupPos).elements.get(childPos);            // set the new selected item within the elv data
                 elv.collapseGroup(groupPos);                                                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                item.get(groupPos).mSelected.add(item.get(groupPos).elements.get(childPos));
                 return false;
             }
         });
@@ -46,7 +47,7 @@ public class SearchFragment extends Fragment {
 
                                     // function that generates the elv data
     private ArrayList<Item> getData() {                                                             // generates an array containing 3 Item class objects
-        Item i1=new Item("Cost","Any");                                                             // Define an Item object call i1
+        Item i1=new Item("Cost","Any",false);                                                             // Define an Item object call i1
         i1.elements.add("Free");                                                                    // child elements below
         i1.elements.add("Up to £20");
         i1.elements.add("Up to £50");
@@ -54,18 +55,39 @@ public class SearchFragment extends Fragment {
         i1.elements.add("Any");
         i1.elements.add("Custom");
 
-        Item i2=new Item("Categories","Sport");                                                     // Item.Option is set by the arg1 and Item.Selected is set by arg 2
+        Item i2=new Item("Categories","Sport",true);                                                     // Item.Option is set by the arg1 and Item.Selected is set by arg 2
         i2.elements.add("Sport");
-        i2.elements.add("ele 2.2");
+        i2.elements.add("Events");
+        i2.elements.add("Food / Drink");
+        i2.elements.add("Entertainment");
+        i2.elements.add("Arts & Craft");
 
-        Item i3=new Item("item three","one");                                                       // ie Item(ListGroupTitle, defaultSelection)
-        i3.elements.add("one");
-        i3.elements.add("ele 3.2");
+        Item i3=new Item("When","Today",false);                                                           // ie Item(ListGroupTitle, defaultSelection)
+        i3.elements.add("Today");
+        i3.elements.add("Tomorrow");
+        i3.elements.add("Select Day(s)");
+
+        Item i4=new Item("Location","Current",false);
+        i4.elements.add("Current");
+        i4.elements.add("Set Location");
+
+        Item i5=new Item("Distance","< 10 miles",false);
+        i5.elements.add("< 2 miles");
+        i5.elements.add("< 10 miles");
+        i5.elements.add("< 30 miles");
+        i5.elements.add("Set Distance");
+
+        Item i6=new Item("Other","Indoor",true);
+        i6.elements.add("Family Friendly");
+        i6.elements.add("Indoor");
 
         ArrayList<Item> allItems=new ArrayList<>();                                                 // append all Item objects into an ArrayList
         allItems.add(i1);
         allItems.add(i2);
         allItems.add(i3);
+        allItems.add(i4);
+        allItems.add(i5);
+        allItems.add(i6);
 
         return allItems;
     }

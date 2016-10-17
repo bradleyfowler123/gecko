@@ -7,6 +7,7 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,13 @@ class searchAdapter extends BaseExpandableListAdapter {
         TextView selectedTitle = (TextView) convertView.findViewById(R.id.search_option_list_item_text_element);
                                     // data extraction
         String option = i.Option;                                                                   // list group title
-        String selected = i.Selected;                                                               // list group's element selection
+        String selected;
+        if(i.MultiSelect) {
+            selected = TextUtils.join(", ",i.mSelected);
+        }
+        else {
+            selected = i.Selected;
+        }                                                                       // list group's element selection
                                     // update view
         optionTitle.setText(option);
         selectedTitle.setText(selected);
