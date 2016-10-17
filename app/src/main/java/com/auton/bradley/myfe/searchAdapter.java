@@ -48,11 +48,21 @@ class searchAdapter extends BaseExpandableListAdapter {
                                     // highlight that child element if it is selected
         Item i=(Item) getGroup(groupPos);                                                           // return the list group object the child element is part of
         String selected = i.Selected;                                                               // return the selected value for that list group
-        if(selected.equals(child)) {
-            convertView.setBackgroundColor(Color.BLUE);                                             // colour blue if selected
+        if(i.MultiSelect) {
+            if(i.mSelected.contains(child)) {
+                convertView.setBackgroundColor(Color.BLUE);
+            }
+            else {
+                convertView.setBackgroundColor(Color.TRANSPARENT);                                      // else no colour
+            }
         }
         else {
-            convertView.setBackgroundColor(Color.TRANSPARENT);                                      // else no colour
+            if(i.Selected.equals(child)) {
+                convertView.setBackgroundColor(Color.BLUE);
+            }
+            else {
+                convertView.setBackgroundColor(Color.TRANSPARENT);                                      // else no colour
+            }
         }
                                     // return the updated view
         return convertView;

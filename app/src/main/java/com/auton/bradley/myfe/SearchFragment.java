@@ -35,9 +35,19 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPos, int childPos, long id) {   // functions specifies what happens upon a child element click
             //    Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
-                item.get(groupPos).Selected = item.get(groupPos).elements.get(childPos);            // set the new selected item within the elv data
+                Item listGroup = item.get(groupPos);
+                if(listGroup.MultiSelect) {                                                         // if group is multi select one
+                    if(listGroup.mSelected.contains(listGroup.elements.get(childPos))){             // if item is already selected
+                        listGroup.mSelected.remove(listGroup.elements.get(childPos));               // remove from selection
+                    }
+                    else {
+                        listGroup.mSelected.add(listGroup.elements.get(childPos));                  // else add it to the selection
+                    }
+                }
+                else {
+                    listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item within the elv data
+                }
                 elv.collapseGroup(groupPos);                                                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
-                item.get(groupPos).mSelected.add(item.get(groupPos).elements.get(childPos));
                 return false;
             }
         });

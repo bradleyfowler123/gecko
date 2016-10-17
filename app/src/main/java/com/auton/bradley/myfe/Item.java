@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Bradley on 13/10/2016.
@@ -18,7 +19,14 @@ class Item {
                             // function used to declare an Item object with a list group title and default selection
     Item(String option, String selected, boolean multiSelect) {                                                          // Item(ListGroupTitle, defaultSelection)
         this.Option=option;
-        this.Selected=selected;
+        if(multiSelect) {
+            ArrayList<String> temp = new ArrayList<>();
+            temp.add(selected);
+            this.mSelected = temp;
+        }
+        else {
+            this.Selected=selected;
+        }
         this.MultiSelect=multiSelect;
     }
 }
