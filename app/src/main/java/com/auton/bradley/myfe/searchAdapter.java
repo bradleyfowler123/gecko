@@ -91,7 +91,7 @@ class searchAdapter extends BaseExpandableListAdapter {
         }
         else {                                                                                      // if single selection
             if (i.elements.get(i.elements.size()-1).equals(i.Selected)) {                           // if it was a custom on
-                selected = i.CustomValue.toString();                                                // set the preview selection to the custom value
+                selected = i.CustomValuePreview;                                                    // set the preview selection to the custom value
             }
             else {
                 selected = i.Selected;                                                              // set the preview selection to the selected child name

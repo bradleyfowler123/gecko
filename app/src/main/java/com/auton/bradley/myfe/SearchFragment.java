@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +44,6 @@ public class SearchFragment extends Fragment {
         elv.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {                 // setup function to listen for a click on the child elements
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, final int groupPos, final int childPos, long id) {   // functions specifies what happens upon a child element click
-            //    Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
                 final Item listGroup = item.get(groupPos);
                 if(listGroup.MultiSelect) {                                                         // if group is multi select one
                     if(listGroup.mSelected.contains(listGroup.elements.get(childPos))){             // if item is already selected
@@ -57,22 +57,26 @@ public class SearchFragment extends Fragment {
                 else {                                                                              // if group is single select
                     if(listGroup.elements.size()==childPos+1) {                                     // handle custom requests
                         int inputType;                                                              // dialog input data type
-                        final String dialogMessage;                                                 // dialog title message
+                        final String dialogMessage, before, after;                                  // dialog title message, elv preview variables for custom entry
                         if(groupPos==0) {
                             inputType = 2;
                             dialogMessage = "Enter your maximum price of items";
+                            before = "Up to £"; after = "";
                         }
                         else if (groupPos==2) {
                             inputType = 2;
                             dialogMessage = "Enter the day(s) for which you would like to find items";
+                            before = ""; after = "";
                         }
                         else if (groupPos==3) {
                             inputType = 1;
                             dialogMessage = "Enter your desired location for the search";
+                            before = ""; after = "";
                         }
                         else {
                             inputType = 2;
                             dialogMessage = "Set the maximum distance range of the search";
+                            before = "< "; after = " miles";
                         }
 
                         final ViewGroup nullParent = null;
@@ -92,6 +96,7 @@ public class SearchFragment extends Fragment {
                                             public void onClick(DialogInterface dialog,int id) {
                                                 listGroup.Selected = listGroup.elements.get(childPos);  // update the selected child item
                                                 listGroup.CustomValue = userInput.getText();        // get the users entered text and save it
+                                                listGroup.CustomValuePreview = before + listGroup.CustomValue.toString() + after; // store the preview text to be shown on list group
                                                 elv.collapseGroup(groupPos);                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                                             }
                                         })
@@ -114,13 +119,12 @@ public class SearchFragment extends Fragment {
                 return false;
             }
         });
-
+                                        // search button at bottom of tab
         Button button = (Button) rootView.findViewById(R.id.search_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                Toast.makeText(getContext(),"Searching!",Toast.LENGTH_SHORT).show();
             }
         });
 
