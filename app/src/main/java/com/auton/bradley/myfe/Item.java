@@ -13,6 +13,7 @@ class Item {
     String Option;                                                                                  // Contains the title of the list group
     String Selected;                                                                                // Used to recorded the current element selection
     boolean MultiSelect;
+    Object CustomValue;
     ArrayList<String> mSelected=new ArrayList<>();
     ArrayList<String> elements=new ArrayList<>();                                                   // array containing all of the elements within a list group
                             // function used to declare an Item object with a list group title and default selection

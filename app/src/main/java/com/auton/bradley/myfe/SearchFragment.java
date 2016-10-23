@@ -30,7 +30,7 @@ public class SearchFragment extends Fragment {
 
                                     // Function that generates the view
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
                                     // variable declarations
         final View rootView = inflater.inflate(R.layout.fragment_search, container, false);         // enables easy access to the root search xml
@@ -43,9 +43,9 @@ public class SearchFragment extends Fragment {
                                     // handle clicks on the elv
         elv.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {                 // setup function to listen for a click on the child elements
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPos, int childPos, long id) {   // functions specifies what happens upon a child element click
+            public boolean onChildClick(ExpandableListView parent, View v, final int groupPos, int childPos, long id) {   // functions specifies what happens upon a child element click
             //    Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
-                Item listGroup = item.get(groupPos);
+                final Item listGroup = item.get(groupPos);
                 if(listGroup.MultiSelect) {                                                         // if group is multi select one
                     if(listGroup.mSelected.contains(listGroup.elements.get(childPos))){             // if item is already selected
                         listGroup.mSelected.remove(listGroup.elements.get(childPos));               // remove from selection
@@ -56,17 +56,55 @@ public class SearchFragment extends Fragment {
                     adapter.notifyDataSetChanged();                                                 // inform to update the elv display
                 }
                 else {
-                    listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item for single selection group
-
                     if(listGroup.elements.size()==childPos+1) {
+                        String message = "";
                         if(groupPos==0) {
 
+
+                            int inputType = 2;
+
+
+                            final ViewGroup nullParent = null;
+                            View promptsView = inflater.inflate(R.layout.input_prompt, nullParent);                    // get prompts.xml view
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                            alertDialogBuilder.setView(promptsView);                                             // set prompts.xml to alertdialog builder
+
+                            final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
+                            userInput.setInputType(inputType);
+
+                            // set dialog message
+                            alertDialogBuilder
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog,int id) {
+                                                    // get user input and set it to result
+                                                    // edit text
+                                                    listGroup.Selected = "Custom";
+                                                    listGroup.CustomValue = userInput.getText();                        // get the users entered text return data
+                                                    elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                                                }
+                                            })
+                                    .setNegativeButton("Cancel",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog,int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+                            // create alert dialog
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            // show it
+                            alertDialog.show();
+
+
+
                         }
-                        Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
+                     //   Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected " + message,Toast.LENGTH_SHORT).show();
                     }
-
-
-                    elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                    else {
+                        listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item for single selection group
+                        elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                    }
                 }
                 return false;
             }
@@ -76,43 +114,8 @@ public class SearchFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // get prompts.xml view
-                LayoutInflater li = LayoutInflater.from(getContext());
-                View promptsView = li.inflate(R.layout.number_prompt, null);
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        getContext());
 
-                // set prompts.xml to alertdialog builder
-                alertDialogBuilder.setView(promptsView);
-
-                final EditText userInput = (EditText) promptsView
-                        .findViewById(R.id.editTextDialogUserInput);
-
-                // set dialog message
-                alertDialogBuilder
-                        .setCancelable(false)
-                        .setPositiveButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
-                                        // get user input and set it to result
-                                        // edit text
-                                        TextView result = (TextView) rootView.findViewById(R.id.search_welcome_textView);
-                                        result.setText(userInput.getText());
-                                    }
-                                })
-                        .setNegativeButton("Cancel",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                // create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                // show it
-                alertDialog.show();
             }
         });
 
