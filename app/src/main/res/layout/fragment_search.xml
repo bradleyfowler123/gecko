@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="55dp"
     tools:context="com.auton.bradley.myfe.SearchFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -14,12 +15,21 @@
         android:text="@string/search_top_message"
         android:textAlignment="center" />
 
-    <ExpandableListView
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:id="@+id/search_button"
+        android:text="@string/search_button"
+        style="@android:style/Widget.DeviceDefault.Button" />
+
+    <ExpandableListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/search_welcome_textView"
-        android:id="@+id/search_list" >
+        android:layout_above="@id/search_button"
+        android:id="@+id/search_list">
     </ExpandableListView>
 
 </RelativeLayout>

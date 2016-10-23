@@ -1,11 +1,16 @@
 package com.auton.bradley.myfe;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,6 +36,7 @@ public class SearchFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_search, container, false);         // enables easy access to the root search xml
         final ExpandableListView elv=(ExpandableListView) rootView.findViewById(R.id.search_list);  // locate the elv in this view
         final ArrayList<Item> item=getData();                                                       // generate data which will be used to populate the el
+  //  elv.setVerticalFadingEdgeEnabled(true);
                                     // generate the elv
         final searchAdapter adapter = new searchAdapter(getActivity(),item);                              // define the adapter to be used to generate elv
         elv.setAdapter(adapter);                                                                    // assign this adapter to the elv
@@ -65,6 +71,52 @@ public class SearchFragment extends Fragment {
                 return false;
             }
         });
+
+        Button button = (Button) rootView.findViewById(R.id.search_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // get prompts.xml view
+                LayoutInflater li = LayoutInflater.from(getContext());
+                View promptsView = li.inflate(R.layout.number_prompt, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        getContext());
+
+                // set prompts.xml to alertdialog builder
+                alertDialogBuilder.setView(promptsView);
+
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editTextDialogUserInput);
+
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        // get user input and set it to result
+                                        // edit text
+                                        TextView result = (TextView) rootView.findViewById(R.id.search_welcome_textView);
+                                        result.setText(userInput.getText());
+                                    }
+                                })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+            }
+        });
+
+
         return rootView;                                                                            // return the search view (and everything below) to the main activity so it can be shown
     }
 
