@@ -89,8 +89,13 @@ class searchAdapter extends BaseExpandableListAdapter {
                 selected = TextUtils.join(", ",i.mSelected);
             }
         }
-        else {
-            selected = i.Selected;
+        else {                                                                                      // if single selection
+            if (i.elements.get(i.elements.size()-1).equals(i.Selected)) {                           // if it was a custom on
+                selected = i.CustomValue.toString();                                                // set the preview selection to the custom value
+            }
+            else {
+                selected = i.Selected;                                                              // set the preview selection to the selected child name
+            }
         }                                                                                           // list group's element selection for single selection group
                                     // update view
         optionTitle.setText(option);                                                                // set the banner name

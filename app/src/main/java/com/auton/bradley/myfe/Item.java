@@ -12,8 +12,8 @@ class Item {
                             // parameter declarations
     String Option;                                                                                  // Contains the title of the list group
     String Selected;                                                                                // Used to recorded the current element selection
-    boolean MultiSelect;
-    Object CustomValue;
+    boolean MultiSelect;                                                                            // identifies whether or not a list group is a multi select one
+    Object CustomValue;                                                                             // used to store the custom value
     ArrayList<String> mSelected=new ArrayList<>();
     ArrayList<String> elements=new ArrayList<>();                                                   // array containing all of the elements within a list group
                             // function used to declare an Item object with a list group title and default selection

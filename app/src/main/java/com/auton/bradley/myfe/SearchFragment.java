@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ public class SearchFragment extends Fragment {
                                     // handle clicks on the elv
         elv.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {                 // setup function to listen for a click on the child elements
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, final int groupPos, int childPos, long id) {   // functions specifies what happens upon a child element click
+            public boolean onChildClick(ExpandableListView parent, View v, final int groupPos, final int childPos, long id) {   // functions specifies what happens upon a child element click
             //    Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected",Toast.LENGTH_SHORT).show();
                 final Item listGroup = item.get(groupPos);
                 if(listGroup.MultiSelect) {                                                         // if group is multi select one
@@ -55,54 +54,45 @@ public class SearchFragment extends Fragment {
                     }
                     adapter.notifyDataSetChanged();                                                 // inform to update the elv display
                 }
-                else {
-                    if(listGroup.elements.size()==childPos+1) {
-                        int inputType=1;
-                        final String dialogMessage, customChildName;
+                else {                                                                              // if group is single select
+                    if(listGroup.elements.size()==childPos+1) {                                     // handle custom requests
+                        int inputType;                                                              // dialog input data type
+                        final String dialogMessage;                                                 // dialog title message
                         if(groupPos==0) {
                             inputType = 2;
-                            dialogMessage = "Price";
-                            customChildName = "Custom";
+                            dialogMessage = "Enter your maximum price of items";
                         }
                         else if (groupPos==2) {
                             inputType = 2;
-                            dialogMessage = "Days";
-                            customChildName = "Select Day(s)";
+                            dialogMessage = "Enter the day(s) for which you would like to find items";
                         }
                         else if (groupPos==3) {
-                            inputType = 2;
-                            dialogMessage = "Loc";
-                            customChildName = "Set Location";
+                            inputType = 1;
+                            dialogMessage = "Enter your desired location for the search";
                         }
                         else {
                             inputType = 2;
-                            dialogMessage = "Dist";
-                            customChildName = "Set Distance";
+                            dialogMessage = "Set the maximum distance range of the search";
                         }
 
-
-
                         final ViewGroup nullParent = null;
-                        View promptsView = inflater.inflate(R.layout.input_prompt, nullParent);                    // get prompts.xml view
+                        View promptsView = inflater.inflate(R.layout.input_prompt, nullParent);     // get input_prompts.xml view
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-                        alertDialogBuilder.setView(promptsView);                                             // set prompts.xml to alertdialog builder
+                        alertDialogBuilder.setView(promptsView);                                    // set input_prompts.xml to alert dialog builder
 
                         final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
-                        userInput.setInputType(inputType);
-                        TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage); // enable easy access to object
-                        promptMessage.setText(dialogMessage);
-
-                        // set dialog message
+                        userInput.setInputType(inputType);                                          // set the dialog input data type
+                        TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage);
+                        promptMessage.setText(dialogMessage);                                       // set the dialog prompt message
+                                            // create the dialog
                         alertDialogBuilder
                                 .setCancelable(false)
-                                .setPositiveButton("OK",
+                                .setPositiveButton("Enter",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog,int id) {
-                                                // get user input and set it to result
-                                                // edit text
-                                                listGroup.Selected = customChildName;
-                                                listGroup.CustomValue = userInput.getText();                        // get the users entered text return data
-                                                elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                                                listGroup.Selected = listGroup.elements.get(childPos);  // update the selected child item
+                                                listGroup.CustomValue = userInput.getText();        // get the users entered text and save it
+                                                elv.collapseGroup(groupPos);                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                                             }
                                         })
                                 .setNegativeButton("Cancel",
@@ -111,19 +101,14 @@ public class SearchFragment extends Fragment {
                                                 dialog.cancel();
                                             }
                                         });
-                        // create alert dialog
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        // show it
-                        alertDialog.show();
 
-
-
-
+                        AlertDialog alertDialog = alertDialogBuilder.create();                      // create alert dialog
+                        alertDialog.show();                                                         // show it
                      //   Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected " + message,Toast.LENGTH_SHORT).show();
                     }
-                    else {
-                        listGroup.Selected = listGroup.elements.get(childPos);                          // set the new selected item for single selection group
-                        elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                    else {                                                                          // if it's not the custom selection
+                        listGroup.Selected = listGroup.elements.get(childPos);                      // set the new selected item for single selection group
+                        elv.collapseGroup(groupPos);                                                // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                     }
                 }
                 return false;
@@ -138,7 +123,6 @@ public class SearchFragment extends Fragment {
 
             }
         });
-
 
         return rootView;                                                                            // return the search view (and everything below) to the main activity so it can be shown
     }
