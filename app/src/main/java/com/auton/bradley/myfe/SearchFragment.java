@@ -57,48 +57,68 @@ public class SearchFragment extends Fragment {
                 }
                 else {
                     if(listGroup.elements.size()==childPos+1) {
-                        String message = "";
+                        int inputType=1;
+                        final String dialogMessage, customChildName;
                         if(groupPos==0) {
-
-
-                            int inputType = 2;
-
-
-                            final ViewGroup nullParent = null;
-                            View promptsView = inflater.inflate(R.layout.input_prompt, nullParent);                    // get prompts.xml view
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-                            alertDialogBuilder.setView(promptsView);                                             // set prompts.xml to alertdialog builder
-
-                            final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
-                            userInput.setInputType(inputType);
-
-                            // set dialog message
-                            alertDialogBuilder
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog,int id) {
-                                                    // get user input and set it to result
-                                                    // edit text
-                                                    listGroup.Selected = "Custom";
-                                                    listGroup.CustomValue = userInput.getText();                        // get the users entered text return data
-                                                    elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
-                                                }
-                                            })
-                                    .setNegativeButton("Cancel",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog,int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-                            // create alert dialog
-                            AlertDialog alertDialog = alertDialogBuilder.create();
-                            // show it
-                            alertDialog.show();
-
-
-
+                            inputType = 2;
+                            dialogMessage = "Price";
+                            customChildName = "Custom";
                         }
+                        else if (groupPos==2) {
+                            inputType = 2;
+                            dialogMessage = "Days";
+                            customChildName = "Select Day(s)";
+                        }
+                        else if (groupPos==3) {
+                            inputType = 2;
+                            dialogMessage = "Loc";
+                            customChildName = "Set Location";
+                        }
+                        else {
+                            inputType = 2;
+                            dialogMessage = "Dist";
+                            customChildName = "Set Distance";
+                        }
+
+
+
+                        final ViewGroup nullParent = null;
+                        View promptsView = inflater.inflate(R.layout.input_prompt, nullParent);                    // get prompts.xml view
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                        alertDialogBuilder.setView(promptsView);                                             // set prompts.xml to alertdialog builder
+
+                        final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
+                        userInput.setInputType(inputType);
+                        TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage); // enable easy access to object
+                        promptMessage.setText(dialogMessage);
+
+                        // set dialog message
+                        alertDialogBuilder
+                                .setCancelable(false)
+                                .setPositiveButton("OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog,int id) {
+                                                // get user input and set it to result
+                                                // edit text
+                                                listGroup.Selected = customChildName;
+                                                listGroup.CustomValue = userInput.getText();                        // get the users entered text return data
+                                                elv.collapseGroup(groupPos);                                                    // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                                            }
+                                        })
+                                .setNegativeButton("Cancel",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog,int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                        // create alert dialog
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        // show it
+                        alertDialog.show();
+
+
+
+
                      //   Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected " + message,Toast.LENGTH_SHORT).show();
                     }
                     else {
