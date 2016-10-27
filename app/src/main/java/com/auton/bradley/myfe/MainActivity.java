@@ -10,8 +10,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     private TabLayout tabLayout;
+    private Menu mOptionsMenu;
     ViewPager viewPager;
     private int[] tabIcons = {
             R.drawable.ic_home_grey,
@@ -27,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_friend_feed_grey,
             R.drawable.ic_planner
     };
-    public ArrayList<String> userData;
+    public User user = new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +51,12 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if(intent.getExtras()!=null) {
+            String email = intent.getStringExtra("email");
+            String password = intent.getStringExtra("password");
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
-            userData.add("1");
-            userData.add("2");
+            user.LogIn(email,password,name,dob);
         }
-
-
-    }
-
-    public ArrayList<String> getUserData() {
-        return userData;
     }
 
     private void setupTabIcons() {
@@ -110,7 +110,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        mOptionsMenu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        if(user.loggedIn) {
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(true);
+        }
+        else {
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(false);
+        }
         return true;
     }
                             // respond to action bar item press
@@ -120,12 +129,22 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_logout:
+                user.LogOut();
+                mOptionsMenu.getItem(1).setVisible(true);
+                mOptionsMenu.getItem(2).setVisible(false);
+                //need to refresh!!!!!!!!!!!!!
+                return true;
+            case R.id.action_login:
+                mOptionsMenu.getItem(1).setVisible(false);
+                mOptionsMenu.getItem(2).setVisible(true);
+                Intent intent2 = new Intent(this, LoginActivity.class);
+                startActivity(intent2);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

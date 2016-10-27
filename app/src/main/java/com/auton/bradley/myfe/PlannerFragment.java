@@ -28,16 +28,22 @@ public class PlannerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        final View rootView = inflater.inflate(R.layout.fragment_planner, container, false);         // enables easy access to the root search xml
 
-
-        TextView tvName = (TextView) getActivity().findViewById(R.id.textView);
-        TextView tvDob = (TextView) getActivity().findViewById(R.id.textView2);
+        TextView tvName = (TextView) rootView.findViewById(R.id.textView);
+        TextView tvDob = (TextView) rootView.findViewById(R.id.textView2);
 
         MainActivity activity = (MainActivity) getActivity();
-        ArrayList<String> userData = activity.getUserData();
-        tvName.setText(userData.get(0));
-        tvDob.setText(userData.get(1));
+        if(activity.user.loggedIn) {
+            tvName.setText("Hey " + activity.user.name +"! You were born on " + activity.user.dob);
+            tvDob.setText(activity.user.email);
+        }
+        else {
+            tvName.setText("You should Sign Up");
+            tvDob.setText("");
+        }
 
-        return inflater.inflate(R.layout.fragment_planner, container, false);
+
+        return rootView;
     }
 }

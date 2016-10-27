@@ -48,11 +48,12 @@ public class LoginActivity extends AppCompatActivity {
                                 String dob = jsonResponse.getString("dob");
 
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("email", email);
+                                intent.putExtra("password", password);
                                 intent.putExtra("name", name);
                                 intent.putExtra("dob", dob);
-                                LoginActivity.this.startActivity(intent);
 
-                                Toast.makeText(getBaseContext(),"Hi " + name + ", you were born on " + dob,Toast.LENGTH_SHORT).show();
+                                LoginActivity.this.startActivity(intent);
 
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
