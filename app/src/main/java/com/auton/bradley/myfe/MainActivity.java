@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_friend_feed_grey,
             R.drawable.ic_planner
     };
+    public ArrayList<String> userData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,20 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
+
+        Intent intent = getIntent();
+        if(intent.getExtras()!=null) {
+            String name = intent.getStringExtra("name");
+            String dob = intent.getStringExtra("dob");
+            userData.add("1");
+            userData.add("2");
+        }
+
+
+    }
+
+    public ArrayList<String> getUserData() {
+        return userData;
     }
 
     private void setupTabIcons() {

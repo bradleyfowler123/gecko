@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  Toast.makeText(getBaseContext(),"Searching!",Toast.LENGTH_SHORT).show();
 
                 final String email = etEmail.getText().toString();
                 final String password = etPassword.getText().toString();
@@ -43,15 +42,15 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");
-                         //   Toast.makeText(getBaseContext(),"Test",Toast.LENGTH_SHORT).show();
-                            if(success) {
 
-                              //  Toast.makeText(getBaseContext(),"Your in!",Toast.LENGTH_SHORT).show();
+                            if(success) {
                                 String name = jsonResponse.getString("name");
                                 String dob = jsonResponse.getString("dob");
 
-                                //Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                                //LoginActivity.this.startActivity(intent);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.putExtra("name", name);
+                                intent.putExtra("dob", dob);
+                                LoginActivity.this.startActivity(intent);
 
                                 Toast.makeText(getBaseContext(),"Hi " + name + ", you were born on " + dob,Toast.LENGTH_SHORT).show();
 
