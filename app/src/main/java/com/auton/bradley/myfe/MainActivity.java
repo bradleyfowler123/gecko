@@ -135,13 +135,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_logout:
                 user.LogOut();
-                mOptionsMenu.getItem(1).setVisible(true);
-                mOptionsMenu.getItem(2).setVisible(false);
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                //    mOptionsMenu.getItem(1).setVisible(true);
+            //    mOptionsMenu.getItem(2).setVisible(false);
                 //need to refresh!!!!!!!!!!!!!
                 return true;
             case R.id.action_login:
-                mOptionsMenu.getItem(1).setVisible(false);
-                mOptionsMenu.getItem(2).setVisible(true);
+            //    mOptionsMenu.getItem(1).setVisible(false);
+            //    mOptionsMenu.getItem(2).setVisible(true);
                 Intent intent2 = new Intent(this, LoginActivity.class);
                 startActivity(intent2);
                 return true;
