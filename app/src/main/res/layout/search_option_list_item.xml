@@ -15,6 +15,7 @@
         android:textSize="16sp"
         android:textAlignment="textStart"
         android:paddingStart="25dp"
+        android:paddingEnd="5dp"
 
         />
 
@@ -26,5 +27,6 @@
         android:layout_alignEnd="@id/search_option_list_item_text"
         android:id="@+id/search_option_list_item_text_element"
         android:textSize="12sp"
-        android:paddingEnd="10dp"/>
+        android:paddingEnd="10dp"
+        android:paddingStart="5dp"/>
 </RelativeLayout>

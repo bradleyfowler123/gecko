@@ -10,21 +10,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+                            // declarations
     Toolbar toolbar;
     private TabLayout tabLayout;
-    private Menu mOptionsMenu;
     ViewPager viewPager;
     private int[] tabIcons = {
             R.drawable.ic_home_grey,
@@ -48,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
-
+                                    // store user data if any
         Intent intent = getIntent();
         if(intent.getExtras()!=null) {
             String email = intent.getStringExtra("email");
@@ -109,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
                             // create options menu in action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        mOptionsMenu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
         if(user.loggedIn) {
             menu.getItem(1).setVisible(false);
@@ -137,13 +130,8 @@ public class MainActivity extends AppCompatActivity {
                 user.LogOut();
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
-                //    mOptionsMenu.getItem(1).setVisible(true);
-            //    mOptionsMenu.getItem(2).setVisible(false);
-                //need to refresh!!!!!!!!!!!!!
                 return true;
             case R.id.action_login:
-            //    mOptionsMenu.getItem(1).setVisible(false);
-            //    mOptionsMenu.getItem(2).setVisible(true);
                 Intent intent2 = new Intent(this, LoginActivity.class);
                 startActivity(intent2);
                 return true;

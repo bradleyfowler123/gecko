@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Created by Bradley on 27/10/2016.
- *
+ * class used to send login request data nicely
  */
 
 class LoginRequest extends StringRequest {

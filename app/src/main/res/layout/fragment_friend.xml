@@ -3,29 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.auton.bradley.myfe.friendFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="55dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:text="Feed"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/feed_button"
-            tools:text="Feed" />
-
-        <Button
-            android:text="Map"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/map_button"
-            tools:text="Map" />
-
-    </LinearLayout>
 
 </LinearLayout>
