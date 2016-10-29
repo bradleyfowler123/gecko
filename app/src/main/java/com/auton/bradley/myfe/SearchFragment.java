@@ -109,8 +109,7 @@ public class SearchFragment extends Fragment {
 
                         AlertDialog alertDialog = alertDialogBuilder.create();                      // create alert dialog
                         alertDialog.show();                                                         // show it
-                     //   Toast.makeText(getContext(),item.get(groupPos).elements.get(childPos)+" Selected " + message,Toast.LENGTH_SHORT).show();
-                    }
+                     }
                     else {                                                                          // if it's not the custom selection
                         listGroup.Selected = listGroup.elements.get(childPos);                      // set the new selected item for single selection group
                         elv.collapseGroup(groupPos);                                                // collapse the list view which causes the view to be regenerated and so new selected item will be shown

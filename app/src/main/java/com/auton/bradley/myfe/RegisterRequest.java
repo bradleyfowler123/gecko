@@ -12,7 +12,7 @@ import com.android.volley.toolbox.StringRequest;
  */
 
 class RegisterRequest extends StringRequest {
-    private  static final String REGISTER_REQUEST_URL = "https://myfe.000webhostapp.com/Register_User.php";
+    private  static final String REGISTER_REQUEST_URL = "https://myfe.000webhostapp.com/Register_User2.php";
     private Map<String, String> params;
 
     RegisterRequest(String email, String password, String name, String dob, Response.Listener<String> listener) {

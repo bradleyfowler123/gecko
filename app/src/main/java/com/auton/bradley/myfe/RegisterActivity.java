@@ -1,5 +1,6 @@
 package com.auton.bradley.myfe;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -54,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 RegisterActivity.this.startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
-                                builder.setMessage("Register Failed")
+                                builder.setMessage("Register Failed! Email already registered")
                                         .setNegativeButton("Retry", null)
                                         .create()
                                         .show();
