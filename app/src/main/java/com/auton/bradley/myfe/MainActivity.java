@@ -1,13 +1,7 @@
 package com.auton.bradley.myfe;
 
-import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -18,7 +12,6 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,18 +32,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-                                        // check for existing user
-        AccountManager am = AccountManager.get(this); // "this" references the current Context
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-            Account[] myfeAccount = am.getAccountsByType("com.mfe");
-            if(myfeAccount.length == 1) {
-                String name = myfeAccount[0].name;
-                Toast.makeText(getBaseContext(),name,Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-
                                             // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
                                             // load action bar
