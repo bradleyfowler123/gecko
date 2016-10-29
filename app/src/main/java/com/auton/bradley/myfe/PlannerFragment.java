@@ -7,8 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-// fragment that handles the planner tab
+                                // fragment that handles the planner tab
 public class PlannerFragment extends Fragment {
 
     public PlannerFragment() {        // Required empty public constructor
@@ -19,11 +18,11 @@ public class PlannerFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+                                    // function that generates the view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        final View rootView = inflater.inflate(R.layout.fragment_planner, container, false);         // enables easy access to the root search xml
+        final View rootView = inflater.inflate(R.layout.fragment_planner, container, false);        // enables easy access to the root search xml
 
         TextView tvName = (TextView) rootView.findViewById(R.id.textView);
         TextView tvDob = (TextView) rootView.findViewById(R.id.textView2);

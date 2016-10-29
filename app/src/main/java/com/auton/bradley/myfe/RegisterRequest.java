@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest;
 
 /**
  * Created by Bradley on 27/10/2016.
- *
+ *class used to send register request data nicely
  */
 
 class RegisterRequest extends StringRequest {

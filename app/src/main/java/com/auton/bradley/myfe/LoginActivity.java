@@ -16,7 +16,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
+                                    // activity that handles login screen
 public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     @Override
