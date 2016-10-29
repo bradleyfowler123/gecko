@@ -3,13 +3,13 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:padding="10dp"
-    android:theme="@style/Theme.AppCompat.Dialog">
+    android:padding="10dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/InputPromptMessage"
+        android:text="@string/test"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center" />
 

@@ -1,7 +1,12 @@
 package com.auton.bradley.myfe;
 
+import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +55,20 @@ public class RegisterActivity extends AppCompatActivity {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");                   // check whether database accepted our data
                             if (success) {
+
+
+
+                                AccountManager am = AccountManager.get(getBaseContext()); // "this" references the current Context
+                                if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+                                    Account myfeAccount = new Account(email,"com.myfe");
+
+                                    Bundle userdata = new Bundle();
+                                    userdata.putString("Age", "20");
+                                    //AccountManager
+                                    am.addAccountExplicitly(myfeAccount, password, userdata);
+                                }
+
+
                                     // start login screen
                                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                 RegisterActivity.this.startActivity(intent);
