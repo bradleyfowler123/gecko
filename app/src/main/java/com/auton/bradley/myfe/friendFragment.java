@@ -21,16 +21,16 @@ private FragmentTabHost mTabHost;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-     //   View rootView = (View) inflater.inflate(R.layout.fragment_friend, container, false);
+      //  View rootView = (View) inflater.inflate(R.layout.fragment_friend, container, false);
         // Inflate the layout for this fragment
 
         mTabHost = new FragmentTabHost(getActivity());
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.layout.fragment_friend);
 
-        mTabHost.addTab(mTabHost.newTabSpec("Tab1").setIndicator("Frag Tab1"),
+        mTabHost.addTab(mTabHost.newTabSpec("Tab1").setIndicator("Feed"),
                 ProfileAgendaTab.class, null);
 
-        mTabHost.addTab(mTabHost.newTabSpec("Tab2").setIndicator("Frag Tab2"),
+        mTabHost.addTab(mTabHost.newTabSpec("Tab2").setIndicator("Map"),
                 ProfilePhotosTab.class, null);
 
         return mTabHost;
