@@ -30,8 +30,8 @@ public class PlannerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+     //   FragmentTabHost tabHost;
         final View rootView = inflater.inflate(R.layout.fragment_planner, container, false);        // enables easy access to the root search xml
-        FragmentTabHost mTabHost;
         TextView tvName = (TextView) rootView.findViewById(R.id.tv_profile_name);
         ImageView profilePic = (ImageView) rootView.findViewById(R.id.img_profile_pic);
 
@@ -40,22 +40,14 @@ public class PlannerFragment extends Fragment {
             tvName.setText(activity.user.name);
             profilePic.setVisibility(View.VISIBLE);
 
-            mTabHost = (FragmentTabHost) getActivity().findViewById(R.id.tabhost1);
+     /*       View v = inflater.inflate(R.layout.fragment_planner, container, false);
 
-            mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.TabContent);
+            mTabHost = (FragmentTabHost) v.findViewById(android.R.id.tabhost);
+            mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabs);
 
-            Bundle arg1 = new Bundle();
-            arg1.putString("Arg for Frag1", "a");
+            mTabHost.addTab(mTabHost.newTabSpec("tab1").setIndicator("Tab 1"), ProfileAgendaTab.class, null);
 
-            Bundle arg2 = new Bundle();
-            arg2.putString("Arg for Frag2", "b");
-
-            mTabHost.addTab(mTabHost.newTabSpec("a").setIndicator("a") ,ProfileAgendaTab.class, arg1);
-            mTabHost.addTab(mTabHost.newTabSpec("b").setIndicator("b"), ProfileAgendaTab.class, arg2);
-
-/*
-
-
+            mTabHost.addTab(mTabHost.newTabSpec("tab2").setIndicator("Tab 2"), ProfilePhotosTab.class, null);
 
 
             host.setup(getActivity(),getChildFragmentManager());
@@ -63,7 +55,6 @@ public class PlannerFragment extends Fragment {
             host.addTab(host.newTabSpec("first").setIndicator("First").setContent(new Intent(getActivity()  ,ProfileAgendaTab.class )));
             host.addTab(host.newTabSpec("second").setIndicator("Second").setContent(new Intent(getActivity(), ProfilePhotosTab.class )));
             host.setCurrentTab(0);
-
 
 */
 
