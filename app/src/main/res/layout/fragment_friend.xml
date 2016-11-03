@@ -1,28 +1,42 @@
-<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <FrameLayout
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout_friend"
-            style="@style/AppTheme"
+        <TextView
+            android:text="TextView"
+            android:id="@+id/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textSize="20sp"/>
+
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="3dp"
-            app:tabMode="fixed"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            android:layout_below="@id/temp"
+            android:padding="50dp">
 
-    </FrameLayout>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout_friend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabIndicatorHeight="3dp"
+                app:tabMode="fixed"
+                app:theme="@style/ThemeOverlay.AppCompat.Light"
+                android:background="@android:color/holo_green_light"/>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        </FrameLayout>
+
+    </RelativeLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_friend"
@@ -30,4 +44,4 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white" />
 
-</android.support.design.widget.AppBarLayout>
+</LinearLayout>
