@@ -4,10 +4,10 @@
     android:id="@+id/activity_profile_agenda_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.auton.bradley.myfe.ProfileAgendaTab">
+    tools:context="com.auton.bradley.myfe.FriendFeedFragment">
 
     <TextView
-        android:text="My Sample Agenda"
+        android:text="My Map"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView" />

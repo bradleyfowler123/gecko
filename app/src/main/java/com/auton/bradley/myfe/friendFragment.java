@@ -36,8 +36,8 @@ public class friendFragment extends Fragment {
 
     public void setupViewpagerChild(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new ProfileAgendaTab(), "Agenda");
-        adapter.addFragment(new ProfilePhotosTab(), "Photos");
+        adapter.addFragment(new FriendFeedFragment(), "Feed");
+        adapter.addFragment(new FriendMapFragment(), "Map");
         viewPager.setAdapter(adapter);
     }
 
