@@ -8,13 +8,13 @@
         android:layout_height="wrap_content">
 
         <android.support.design.widget.TabLayout
-            android:id="@+id/tabLayout_child"
+            android:id="@+id/tabLayout_friend"
             style="@style/AppTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabGravity="center"
             app:tabIndicatorHeight="3dp"
-            app:tabMode="scrollable"
+            app:tabMode="fixed"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     </FrameLayout>
@@ -25,7 +25,7 @@
         android:background="@android:color/darker_gray"/>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager_child"
+        android:id="@+id/viewpager_friend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white" />
