@@ -33,6 +33,7 @@ import java.util.Map;
                                 // activity that handles login screen
 class LoginActivity extends AppCompatActivity {
     Button loginButton;
+    public int currentTab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +42,10 @@ class LoginActivity extends AppCompatActivity {
         loginButton = (Button) findViewById(R.id.login_button);
         final EditText etEmail = (EditText) findViewById(R.id.editText_login_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_login_password);
+        Intent intent = getIntent();
+        if(intent.getExtras()!=null) { currentTab = intent.getIntExtra("tab",0);}
+        else { currentTab = 0;}
+
         // handle login button click
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +69,7 @@ class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("password", password);
                                 intent.putExtra("name", name);
                                 intent.putExtra("dob", dob);
+                                intent.putExtra("tab", currentTab);
                                 LoginActivity.this.startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -105,6 +111,7 @@ class LoginActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_close:                                                                 // start main activity with no user data if closed clicked
                 Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("tab", currentTab);
                 startActivity(intent);
                 return true;
         }

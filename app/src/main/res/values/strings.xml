@@ -13,7 +13,7 @@
     <string name="register_dob">Date of Birth</string>
     <string name="register_button">Create Account</string>
     <string name="register_failed">Register Failed! Email already registered</string>
-    <string name="register_ok_button">Ok</string>
+    <string name="register_ok_button">OK</string>
 
     <string name="login_button">Login</string>
     <string name="login_email">Email</string>
@@ -36,7 +36,7 @@
     <string name="search_previewDistanceBefore">&lt; </string>
     <string name="search_previewDistanceAfter"> miles</string>
 
-    <string name="profile_signIp">You should Sign Up</string>
+    <string name="profile_signIp">Sign up to see your agenda and more! </string>
     <string name="profile_contentDescription">Your Profile Picture</string>
     <string name="profileAgenda_tabName">Agenda</string>
     <string name="profilePhotos_tabName">Photos</string>

@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_planner
     };
     public User user = new User();
+    int currentTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +40,15 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();                                                                            // add icons to tabs
                                     // store user data if any
         Intent intent = getIntent();
-        if(intent.getExtras()!=null) {
+        currentTab = intent.getIntExtra("tab",0);
+        if(intent.getStringExtra("email")!=null) {
             String email = intent.getStringExtra("email");
             String password = intent.getStringExtra("password");
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
             user.LogIn(email,password,name,dob);
         }
+        viewPager.setCurrentItem(currentTab);
     }
 
     private void setupTabIcons() {
@@ -92,11 +95,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_logout:
                 user.LogOut();
+                currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("tab",viewPager.getCurrentItem());
                 startActivity(intent);
                 return true;
             case R.id.action_login:
+                currentTab = viewPager.getCurrentItem();
                 Intent intent2 = new Intent(this, LoginActivity.class);
+                intent2.putExtra("tab",viewPager.getCurrentItem());
                 startActivity(intent2);
                 return true;
         }
