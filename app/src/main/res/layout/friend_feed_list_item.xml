@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip"
+    android:orientation="horizontal"
+    android:id="@+id/friend_feed_list_item">
+
+    <ImageView
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:id="@+id/ff_list_item_image"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:contentDescription="desc" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text="@string/test"
+            android:id="@+id/ff_list_item_friends"
+            android:textSize="12sp"
+            />
+        <TextView
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text="@string/test"
+            android:id="@+id/ff_list_item_activity"
+            android:textSize="12sp"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="30 mins ago"
+        android:id="@+id/ff_list_item_timeAgo"
+        android:textSize="12sp"
+        />
+
+
+
+
+</LinearLayout>

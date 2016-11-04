@@ -6,9 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.auton.bradley.myfe.FriendFeedFragment">
 
-    <TextView
-        android:text="Friend Feed!!"
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView" />
+        android:id="@+id/friend_feed_list"
+        >
+    </ListView>
+
 </LinearLayout>

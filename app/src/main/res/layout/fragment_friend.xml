@@ -5,15 +5,6 @@
     android:orientation="vertical">
 
 
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"/>
-
-
-
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayout_friend"
         android:layout_width="match_parent"
@@ -21,7 +12,7 @@
         app:tabIndicatorHeight="3dp"
         app:tabMode="fixed"
         android:theme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="@android:color/holo_green_light"/>
+        android:background="@android:color/holo_blue_dark"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_friend"

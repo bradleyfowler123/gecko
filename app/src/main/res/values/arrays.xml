@@ -7,6 +7,25 @@
         <item>Alton Towers</item>
     </array>
 
+    <array name="friendNames">
+        <item>Bradley Fowler</item>
+        <item>Darren Norton</item>
+        <item>Dawn Welburn</item>
+        <item>Andrew Phillips</item>
+    </array>
+    <array name="activityDescriptions">
+        <item>Posted a picture at ALTON TOWERS</item>
+        <item>Is going to SWAINS GO KARTING at 1:00pm</item>
+        <item>Has visited FLY MANCHESTER</item>
+        <item>Is going to ANN\'S POTTERY CLASS at 11:30am</item>
+    </array>
+    <array name="timeAgo">
+        <item>2 mins ago</item>
+        <item>10 mins ago</item>
+        <item>1 hour ago</item>
+        <item>2 days ago</item>
+    </array>
+
     <array name="elvCustomDialogMessages">
         <item>Enter your maximum price of items</item>
         <item>Enter the day(s) for which you would like to find items</item>

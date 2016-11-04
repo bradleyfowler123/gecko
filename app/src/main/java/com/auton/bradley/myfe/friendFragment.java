@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-// fragment that handles the friends tab
+                                // fragment that handles the friends tab
 public class FriendFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
