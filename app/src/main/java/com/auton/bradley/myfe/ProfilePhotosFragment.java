@@ -20,7 +20,7 @@ public class ProfilePhotosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View rootView = inflater.inflate(R.layout.activity_profile_photos_tab, container, false);        // enables easy access to the root search xml
+        View rootView = inflater.inflate(R.layout.fragment_profile_photos, container, false);        // enables easy access to the root search xml
         return rootView;
     }
 }

@@ -20,7 +20,7 @@ public class ProfileAgendaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.activity_profile_agenda_tab, container, false);        // enables easy access to the root search xml
+        final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         return rootView;
     }
 }
