@@ -1,7 +1,6 @@
 package com.auton.bradley.myfe;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +18,6 @@ public class friendFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
     View rootView;
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
                                 // get friend tab layout
@@ -42,28 +40,7 @@ public class friendFragment extends Fragment {
     }
 
     private void setupTabTitles() {
-        tabLayout.getTabAt(0).setText("Agenda");
-        tabLayout.getTabAt(1).setText("Photos");
+        tabLayout.getTabAt(0).setText("Feed");
+        tabLayout.getTabAt(1).setText("Map");
     }
-}
-
-class ViewPagerAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
-    private final List<String> mFragmentTitleList = new ArrayList<>();
-
-    ViewPagerAdapter(FragmentManager manager) { super(manager);}
-
-    @Override
-    public Fragment getItem(int position) { return mFragmentList.get(position);}
-
-    @Override
-    public int getCount() { return mFragmentList.size(); }
-
-    void addFragment(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) { return null;}
 }

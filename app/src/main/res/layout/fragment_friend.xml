@@ -5,38 +5,23 @@
     android:orientation="vertical">
 
 
-    <RelativeLayout
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
+
+
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout_friend"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="TextView"
-            android:id="@+id/temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:textSize="20sp"/>
-
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/temp"
-            android:padding="50dp">
-
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabLayout_friend"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabIndicatorHeight="3dp"
-                app:tabMode="fixed"
-                app:theme="@style/ThemeOverlay.AppCompat.Light"
-                android:background="@android:color/holo_green_light"/>
-
-        </FrameLayout>
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        app:tabIndicatorHeight="3dp"
+        app:tabMode="fixed"
+        android:theme="@style/ThemeOverlay.AppCompat.Light"
+        android:background="@android:color/holo_green_light"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_friend"

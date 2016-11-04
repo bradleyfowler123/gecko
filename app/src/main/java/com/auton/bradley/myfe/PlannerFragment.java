@@ -26,14 +26,6 @@ public class PlannerFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
     View rootView;
-    public PlannerFragment() {        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
                                     // function that generates the view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,9 +40,9 @@ public class PlannerFragment extends Fragment {
             profilePic.setVisibility(View.VISIBLE);
 
             // load tab bar and tab data into friend layout
-            viewPager = (ViewPager) rootView.findViewById(R.id.viewpager_friend);
+            viewPager = (ViewPager) rootView.findViewById(R.id.viewpager_profile);
             setupViewpagerChild(viewPager);
-            tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_friend);
+            tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_profile);
             tabLayout.setupWithViewPager(viewPager);
             setupTabTitles();
 
@@ -64,7 +56,7 @@ public class PlannerFragment extends Fragment {
     }
 
     public void setupViewpagerChild(ViewPager viewPager) {
-        ViewPagerAdapter2 adapter = new ViewPagerAdapter2(getChildFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new ProfileAgendaTab(), "Agenda");
         adapter.addFragment(new ProfilePhotosTab(), "Photos");
         viewPager.setAdapter(adapter);
@@ -74,25 +66,4 @@ public class PlannerFragment extends Fragment {
         tabLayout.getTabAt(0).setText("Agenda");
         tabLayout.getTabAt(1).setText("Photos");
     }
-}
-
-class ViewPagerAdapter2 extends FragmentPagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
-    private final List<String> mFragmentTitleList = new ArrayList<>();
-
-    ViewPagerAdapter2(FragmentManager manager) { super(manager);}
-
-    @Override
-    public Fragment getItem(int position) { return mFragmentList.get(position);}
-
-    @Override
-    public int getCount() { return mFragmentList.size(); }
-
-    void addFragment(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) { return null;}
 }
