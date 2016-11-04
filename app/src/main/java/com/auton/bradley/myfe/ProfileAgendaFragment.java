@@ -6,9 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ProfileAgendaTab extends Fragment {
+public class ProfileAgendaFragment extends Fragment {
 
-    public ProfileAgendaTab() {}
+    public ProfileAgendaFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -6,9 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ProfilePhotosTab extends Fragment {
+public class ProfilePhotosFragment extends Fragment {
 
-    public ProfilePhotosTab() {}
+    public ProfilePhotosFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -4,7 +4,7 @@
     android:id="@+id/activity_profile_agenda_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.auton.bradley.myfe.ProfileAgendaTab">
+    tools:context="com.auton.bradley.myfe.ProfileAgendaFragment">
 
     <TextView
         android:text="My Sample Agenda"

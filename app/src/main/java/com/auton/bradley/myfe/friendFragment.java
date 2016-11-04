@@ -3,18 +3,14 @@ package com.auton.bradley.myfe;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
 
-// fragment that handles the friends tab
-public class friendFragment extends Fragment {
+                                    // fragment that handles the friends tab
+public class FriendFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
     View rootView;

@@ -4,7 +4,7 @@
     android:id="@+id/activity_profile_agenda_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.auton.bradley.myfe.ProfilePhotosTab">
+    tools:context="com.auton.bradley.myfe.ProfilePhotosFragment">
 
     <TextView
         android:text="Some of my photos"

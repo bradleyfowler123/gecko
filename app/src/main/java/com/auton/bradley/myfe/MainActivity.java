@@ -5,16 +5,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // declarations
@@ -65,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
         adapter.addFragment(new HomeFragment(), "Home");
         adapter.addFragment(new SearchFragment(), "Search");
-        adapter.addFragment(new friendFragment(), "Friend");
-        adapter.addFragment(new PlannerFragment(), "Planner");
+        adapter.addFragment(new FriendFragment(), "Friend");
+        adapter.addFragment(new ProfileFragment(), "Profile");
         viewPager.setAdapter(adapter);                                                              // set the adapter to the container
     }
 

@@ -29,8 +29,8 @@
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".LoginActivity" />
-        <activity android:name=".ProfileAgendaTab" />
-        <activity android:name=".ProfilePhotosTab"></activity>
+        <activity android:name=".ProfileAgendaFragment" />
+        <activity android:name=".ProfilePhotosFragment"></activity>
     </application>
 
 </manifest>
