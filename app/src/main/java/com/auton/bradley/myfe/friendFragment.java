@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-                                    // fragment that handles the friends tab
+// fragment that handles the friends tab
 public class FriendFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
@@ -36,7 +36,12 @@ public class FriendFragment extends Fragment {
     }
 
     private void setupTabTitles() {
-        tabLayout.getTabAt(0).setText("Feed");
-        tabLayout.getTabAt(1).setText("Map");
+        try {
+            tabLayout.getTabAt(0).setText(getString(R.string.friendFeed_tabName));
+            tabLayout.getTabAt(1).setText(getString(R.string.friendMap_tabName));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+
+        }
     }
 }

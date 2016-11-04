@@ -65,28 +65,29 @@ public class SearchFragment extends Fragment {
                     adapter.notifyDataSetChanged();                                                 // inform to update the elv display
                 }
                 else {                                                                              // if group is single select
+                    String[] dialogMessages = getResources().getStringArray(R.array.elvCustomDialogMessages);
                     if(listGroup.elements.size()==childPos+1) {                                     // handle custom requests
                         int inputType;                                                              // dialog input data type
                         final String dialogMessage, before, after;                                  // dialog title message, elv preview variables for custom entry
-                        if(groupPos==0) {
+                        if(groupPos==0) {           // cost
                             inputType = 2;
-                            dialogMessage = "Enter your maximum price of items";
-                            before = "Up to £"; after = "";
+                            dialogMessage = dialogMessages[0];
+                            before = getString(R.string.search_previewCost); after = "";
                         }
-                        else if (groupPos==2) {
+                        else if (groupPos==2) {     // when
                             inputType = 2;
-                            dialogMessage = "Enter the day(s) for which you would like to find items";
+                            dialogMessage = dialogMessages[1];
                             before = ""; after = "";
                         }
-                        else if (groupPos==3) {
+                        else if (groupPos==3) {     // location
                             inputType = 1;
-                            dialogMessage = "Enter your desired location for the search";
+                            dialogMessage = dialogMessages[2];
                             before = ""; after = "";
                         }
-                        else {
+                        else {                      // distance
                             inputType = 2;
-                            dialogMessage = "Set the maximum distance range of the search";
-                            before = "< "; after = " miles";
+                            dialogMessage = dialogMessages[3];
+                            before = getString(R.string.search_previewDistanceBefore); after = getString(R.string.search_previewDistanceAfter);
                         }
 
                         final ViewGroup nullParent = null;
@@ -101,7 +102,7 @@ public class SearchFragment extends Fragment {
                                             // create the dialog
                         alertDialogBuilder
                                 .setCancelable(false)
-                                .setPositiveButton("Enter",
+                                .setPositiveButton(getString(R.string.search_dialog_enter),
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog,int id) {
                                                 listGroup.Selected = listGroup.elements.get(childPos);  // update the selected child item
@@ -110,7 +111,7 @@ public class SearchFragment extends Fragment {
                                                 elv.collapseGroup(groupPos);                        // collapse the list view which causes the view to be regenerated and so new selected item will be shown
                                             }
                                         })
-                                .setNegativeButton("Cancel",
+                                .setNegativeButton(getString(R.string.search_dialog_cancel),
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog,int id) {
                                                 dialog.cancel();
@@ -142,40 +143,46 @@ public class SearchFragment extends Fragment {
 
                                     // function that generates the elv data
     private ArrayList<Item> getData() {                                                             // generates an array containing 3 Item class objects
-        Item i1=new Item("Cost", new ArrayList<>(Collections.singletonList("Any")),false);          // Define an Item object call i1
-        i1.elements.add("Free");                                                                    // child elements below
-        i1.elements.add("Up to £20");
-        i1.elements.add("Up to £50");
-        i1.elements.add("Up to £200");
-        i1.elements.add("Any");
-        i1.elements.add("Custom");
+        String[] cost = getResources().getStringArray(R.array.elvCostItems);
+        Item i1=new Item(cost[0], new ArrayList<>(Collections.singletonList(cost[5])),false);          // Define an Item object call i1
+        i1.elements.add(cost[1]);                                                                    // child elements below
+        i1.elements.add(cost[2]);
+        i1.elements.add(cost[3]);
+        i1.elements.add(cost[4]);
+        i1.elements.add(cost[5]);
+        i1.elements.add(cost[6]);
 
-        Item i2=new Item("Categories", new ArrayList<>(Arrays.asList("Sport","Events")),true);      // Item.Option is set by the arg1 and default selection is set by arg 2
-        i2.elements.add("Sport");
-        i2.elements.add("Events");
-        i2.elements.add("Food / Drink");
-        i2.elements.add("Entertainment");
-        i2.elements.add("Arts & Craft");
+        String[] category = getResources().getStringArray(R.array.elvCategoryItems);
+        Item i2=new Item(category[0], new ArrayList<>(Arrays.asList(category[1],category[2])),true);      // Item.Option is set by the arg1 and default selection is set by arg 2
+        i2.elements.add(category[1]);
+        i2.elements.add(category[2]);
+        i2.elements.add(category[3]);
+        i2.elements.add(category[4]);
+        i2.elements.add(category[5]);
 
-        Item i3=new Item("When",new ArrayList<>(Collections.singletonList("Today")),false);         // ie Item(ListGroupTitle, defaultSelection)
-        i3.elements.add("Today");
-        i3.elements.add("Tomorrow");
-        i3.elements.add("Select Day(s)");
+        String[] when = getResources().getStringArray(R.array.elvWhenItems);
+        Item i3=new Item(when[0],new ArrayList<>(Collections.singletonList(when[1])),false);         // ie Item(ListGroupTitle, defaultSelection)
+        i3.elements.add(when[1]);
+        i3.elements.add(when[2]);
+        i3.elements.add(when[3]);
 
-        Item i4=new Item("Location",new ArrayList<>(Collections.singletonList("Current")),false);
-        i4.elements.add("Current");
-        i4.elements.add("Set Location");
+        String[] location = getResources().getStringArray(R.array.elvLocationItems);
+        Item i4=new Item(location[0],new ArrayList<>(Collections.singletonList(location[1])),false);
+        i4.elements.add(location[1]);
+        i4.elements.add(location[2]);
 
-        Item i5=new Item("Distance",new ArrayList<>(Collections.singletonList("< 10 miles")),false);
-        i5.elements.add("< 2 miles");
-        i5.elements.add("< 10 miles");
-        i5.elements.add("< 30 miles");
-        i5.elements.add("Set Distance");
+        String[] distance = getResources().getStringArray(R.array.elvDistanceItems);
+        Item i5=new Item(distance[0],new ArrayList<>(Collections.singletonList(distance[2])),false);
+        i5.elements.add(distance[1]);
+        i5.elements.add(distance[2]);
+        i5.elements.add(distance[3]);
+        i5.elements.add(distance[4]);
 
+        String[] other = getResources().getStringArray(R.array.elvOtherItems);
         ArrayList<String> temp = new ArrayList<>();
-        Item i6=new Item("Other", temp,true);
-        i6.elements.add("Family Friendly");
-        i6.elements.add("Indoor");
+        Item i6=new Item(other[0], temp,true);
+        i6.elements.add(other[1]);
+        i6.elements.add(other[2]);
 
         ArrayList<Item> allItems=new ArrayList<>();                                                 // append all Item objects into an ArrayList
         allItems.add(i1);

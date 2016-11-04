@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_profile_name"
         android:textSize="36sp"
-        android:layout_width="wrap_content"
-        android:text="Brad"
+        android:layout_width="match_parent"
+        android:layout_marginStart="200dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="20dp"
@@ -26,7 +26,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:scaleType="fitStart"
-        android:contentDescription="hi"/>
+        android:contentDescription="@string/profile_contentDescription"/>
 
     <LinearLayout
         android:layout_width="match_parent"

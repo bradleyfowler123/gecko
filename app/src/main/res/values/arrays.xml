@@ -6,4 +6,52 @@
         <item>Local Gym</item>
         <item>Alton Towers</item>
     </array>
+
+    <array name="elvCustomDialogMessages">
+        <item>Enter your maximum price of items</item>
+        <item>Enter the day(s) for which you would like to find items</item>
+        <item>Enter your desired location for the search</item>
+        <item>Set the maximum distance range of the search</item>
+    </array>
+    <array name="elvCostItems">
+        <item>Cost</item>
+        <item>Free</item>
+        <item>Up to £20</item>
+        <item>Up to £50</item>
+        <item>Up to £200</item>
+        <item>Any</item>
+        <item>Custom</item>
+    </array>
+    <array name="elvCategoryItems">
+        <item>Categories</item>
+        <item>Sports</item>
+        <item>Events</item>
+        <item>Food &amp; Drink</item>
+        <item>Entertainment</item>
+        <item>Arts &amp; Craft</item>
+    </array>
+    <array name="elvWhenItems">
+        <item>When</item>
+        <item>Today</item>
+        <item>Tomorrow</item>
+        <item>Select Days</item>
+    </array>
+    <array name="elvLocationItems">
+        <item>Location</item>
+        <item>Current</item>
+        <item>Set Location</item>
+    </array>
+    <array name="elvDistanceItems">
+        <item>Distance</item>
+        <item>&lt; 2 miles</item>
+        <item>&lt; 10 miles</item>
+        <item>&lt; 30 miles</item>
+        <item>Custom</item>
+    </array>
+    <array name="elvOtherItems">
+        <item>Other</item>
+        <item>Family Friendly</item>
+        <item>Indoor</item>
+    </array>
+
 </resources>

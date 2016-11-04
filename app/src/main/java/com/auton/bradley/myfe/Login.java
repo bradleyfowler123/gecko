@@ -67,8 +67,8 @@ class LoginActivity extends AppCompatActivity {
                                 LoginActivity.this.startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                builder.setMessage("Login Failed")
-                                        .setNegativeButton("Retry", null)
+                                builder.setMessage(getString(R.string.login_failed))
+                                        .setNegativeButton(getString(R.string.login_retry_button), null)
                                         .create()
                                         .show();
                             }
@@ -172,8 +172,8 @@ class RegisterActivity extends AppCompatActivity {
                                 RegisterActivity.this.startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                                builder.setMessage("Register Failed! Email already registered")
-                                        .setNegativeButton("Ok", null)
+                                builder.setMessage(getString(R.string.register_failed))
+                                        .setNegativeButton(getString(R.string.register_ok_button), null)
                                         .create()
                                         .show();
                             }

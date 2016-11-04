@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(),"Navigating to the website",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),R.string.home_toast_list_click,Toast.LENGTH_SHORT).show();
 
             }
         });
