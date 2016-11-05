@@ -47,7 +47,7 @@ public class FriendFeedFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_friend_feed, container, false);        // enables easy access to the root search xml
         ListView ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                              // locate the list object in the home tab
       //  int[] profilePics={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
-        RequestCreator picURLs[] = {Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
+        RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
        // Drawable[] img = {LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         final String[] friendNames = getResources().getStringArray(R.array.friendNames);                // get the names of the recommendations to display
         final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display
@@ -117,14 +117,14 @@ class friendFeedAdapter extends ArrayAdapter<String> {                          
             final ViewGroup nullParent = null;
             convertView=inflater.inflate(R.layout.friend_feed_list_item,nullParent);
         }
-                                // find the views within the listf
+                                // find the views within the list
         final ViewHolder holder=new ViewHolder();
         holder.friends=(TextView) convertView.findViewById(R.id.ff_list_item_friends);
         holder.activity=(TextView) convertView.findViewById(R.id.ff_list_item_activity);
         holder.time=(TextView) convertView.findViewById(R.id.ff_list_item_timeAgo);
         holder.img=(ImageView)  convertView.findViewById(R.id.ff_list_item_image);
                                 // populate the title and image with data for a list item
-        profilePics[position].into(holder.img);
+        profilePics[position].transform(new CircleTransform()).into(holder.img);
         holder.friends.setText(friendNames[position]);
         holder.activity.setText(activityDescriptions[position]);
         holder.time.setText(timeAgo[position]);
