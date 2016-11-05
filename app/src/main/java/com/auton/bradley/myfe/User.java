@@ -9,18 +9,19 @@ package com.auton.bradley.myfe;
 class User {
                             // parameter declarations
     boolean loggedIn = false;
-    String email, password, name, dob;
+    String email, password, name, dob, agenda;
                             // function used by main activity to declare an empty user when not logged in
     User() {
         this.loggedIn = false;
     }
                             // function to easily create logged in user
-    void LogIn(String email, String password, String name, String dob) {                                                          // Item(ListGroupTitle, defaultSelection)
+    void LogIn(String email, String password, String name, String dob, String agenda) {                                                          // Item(ListGroupTitle, defaultSelection)
         this.loggedIn = true;
         this.email = email;
         this.password = password;
         this.name = name;
         this.dob = dob;
+        this.agenda = agenda;
     }
                             // function to easily remove logged in user's data
     void LogOut(){

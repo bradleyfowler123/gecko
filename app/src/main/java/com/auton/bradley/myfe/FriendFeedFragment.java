@@ -46,23 +46,21 @@ public class FriendFeedFragment extends Fragment {
                                 // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_friend_feed, container, false);        // enables easy access to the root search xml
         ListView ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                              // locate the list object in the home tab
-      //  int[] profilePics={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
         RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
-       // Drawable[] img = {LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png"),LoadImageFromWebOperations("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         final String[] friendNames = getResources().getStringArray(R.array.friendNames);                // get the names of the recommendations to display
         final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display
         final String[] timeAgo = getResources().getStringArray(R.array.timeAgo);                // get the names of the recommendations to display
         // populate the list
         friendFeedAdapter adapter = new friendFeedAdapter(getActivity(),friendNames, activityDescriptions, timeAgo ,picURLs);
         ff_list.setAdapter(adapter);
-                                // handle clicks on the list items
+        // handle clicks on the list items
         ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(getContext(),"What do you want me to do?",Toast.LENGTH_SHORT).show();
-
             }
         });
+
         return rootView;
     }
 
@@ -71,11 +69,8 @@ public class FriendFeedFragment extends Fragment {
 
         try {
             InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-            Log.println(Log.INFO,"wOO","woo!");
-            return d;
+            return Drawable.createFromStream(is, "src name");
         } catch (Exception e) {
-            Log.println(Log.INFO,"no image","no image");
             return null;
         }
     }

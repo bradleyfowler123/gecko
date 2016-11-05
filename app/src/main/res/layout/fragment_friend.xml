@@ -1,23 +1,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context="com.auton.bradley.myfe.FriendFragment"
     android:orientation="vertical">
 
-
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabLayout_friend"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabIndicatorHeight="3dp"
-        app:tabMode="fixed"
-        android:theme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="@android:color/holo_blue_dark"/>
+        android:paddingTop="30dp"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:text="@string/friend_signUp"
+        android:id="@+id/friend_signUp_text"/>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager_friend"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white" />
+        android:layout_height="match_parent"
+        android:id="@+id/friend_LoggedIn"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayout_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed"
+            android:theme="@style/ThemeOverlay.AppCompat.Light"
+            android:background="@android:color/holo_blue_dark"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" />
+
+    </LinearLayout>
 
 </LinearLayout>

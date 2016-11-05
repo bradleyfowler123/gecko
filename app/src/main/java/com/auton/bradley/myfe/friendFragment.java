@@ -7,9 +7,10 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
-                                // fragment that handles the friends tab
+// fragment that handles the friends tab
 public class FriendFragment extends Fragment {
     ViewPager viewPager;
     TabLayout tabLayout;
@@ -18,12 +19,25 @@ public class FriendFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
                                 // get friend tab layout
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
+        TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
+        View LoggedInView = rootView.findViewById(R.id.friend_LoggedIn);
+
+        MainActivity activity = (MainActivity) getActivity();
+        if(activity.user.loggedIn) {
+            LoggedInView.setVisibility(View.VISIBLE);
+            signUp.setVisibility(View.INVISIBLE);
+            signUp.setHeight(0);
                                 // load tab bar and tab data into friend layout
-        viewPager = (ViewPager) rootView.findViewById(R.id.viewpager_friend);
-        setupViewpagerChild(viewPager);
-        tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_friend);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabTitles();
+            viewPager = (ViewPager) rootView.findViewById(R.id.viewpager_friend);
+            setupViewpagerChild(viewPager);
+            tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout_friend);
+            tabLayout.setupWithViewPager(viewPager);
+            setupTabTitles();
+        }
+        else {
+            signUp.setVisibility(View.VISIBLE);
+            LoggedInView.setVisibility(View.INVISIBLE);
+        }
                                 // return the view
         return rootView;
     }

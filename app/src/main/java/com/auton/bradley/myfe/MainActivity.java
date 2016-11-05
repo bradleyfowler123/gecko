@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
             String password = intent.getStringExtra("password");
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
-            user.LogIn(email,password,name,dob);
+            String agenda = intent.getStringExtra("agenda");
+            user.LogIn(email,password,name,dob,agenda);
         }
         viewPager.setCurrentItem(currentTab);
     }
