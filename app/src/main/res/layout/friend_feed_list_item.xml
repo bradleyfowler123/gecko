@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
     android:orientation="horizontal"
-    android:id="@+id/friend_feed_list_item">
+    android:id="@+id/friend_feed_list_item"
+    android:layout_height="80dp">
 
     <ImageView
         android:layout_height="match_parent"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:id="@+id/ff_list_item_image"
+        android:padding="5dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:contentDescription="desc" />
+        android:contentDescription="@string/friendFeed_imageDescription" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -32,14 +32,14 @@
             android:gravity="bottom|start"
             android:layout_height="40dp" />
         <TextView
-            android:layout_height="30dp"
             android:layout_width="match_parent"
             android:text="@string/test"
             android:id="@+id/ff_list_item_activity"
             android:textSize="15sp"
-            android:gravity="center_vertical"
             android:ellipsize="end"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:layout_height="40dp"
+            android:gravity="center_vertical" />
 
     </LinearLayout>
 
@@ -47,12 +47,9 @@
         android:layout_height="match_parent"
         android:layout_width="0dp"
         android:layout_weight="0.8"
-        android:text="30 mins ago"
         android:id="@+id/ff_list_item_timeAgo"
         android:textSize="15sp"
         android:gravity="center_vertical|center_horizontal" />
-
-
 
 
 </LinearLayout>

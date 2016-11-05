@@ -42,6 +42,7 @@
     <string name="profilePhotos_tabName">Photos</string>
 
     <string name="friendFeed_tabName">Feed</string>
+    <string name="friendFeed_imageDescription">A friend's profile picture</string>
     <string name="friendMap_tabName">Map</string>
 
     <string name="test">Here is some test data</string>
