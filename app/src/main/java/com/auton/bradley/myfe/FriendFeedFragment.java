@@ -117,7 +117,7 @@ class friendFeedAdapter extends ArrayAdapter<String> {                          
             final ViewGroup nullParent = null;
             convertView=inflater.inflate(R.layout.friend_feed_list_item,nullParent);
         }
-                                // find the views within the list
+                                // find the views within the listf
         final ViewHolder holder=new ViewHolder();
         holder.friends=(TextView) convertView.findViewById(R.id.ff_list_item_friends);
         holder.activity=(TextView) convertView.findViewById(R.id.ff_list_item_activity);
