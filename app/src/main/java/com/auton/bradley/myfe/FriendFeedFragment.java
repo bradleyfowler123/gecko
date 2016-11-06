@@ -64,17 +64,6 @@ public class FriendFeedFragment extends Fragment {
         return rootView;
     }
 
-
-    public static Drawable LoadImageFromWebOperations(String url) {
-
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            return Drawable.createFromStream(is, "src name");
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
 }
 
 
