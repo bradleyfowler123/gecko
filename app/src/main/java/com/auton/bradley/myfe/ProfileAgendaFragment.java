@@ -46,6 +46,10 @@ public class ProfileAgendaFragment extends Fragment {
             companies.add(itemElements[i][1]);
         }
 
+        Log.println(Log.WARN,"qwerty1",activities.get(0));
+        Log.println(Log.WARN,"qwerty1",activities.get(1));
+        Log.println(Log.WARN,"qwerty3",companies.get(0));
+        Log.println(Log.WARN,"qwerty4",companies.get(1));
         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),activities,companies);
         pa_list.setAdapter(adapter);
 

@@ -71,10 +71,10 @@ public class FriendFeedFragment extends Fragment {
                                 // adapter used for friend's activities list view in friend fees tab
 class friendFeedAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
                                 // declare variables of this class
-    private RequestCreator[] profilePics={};
-    private String[] friendNames={};
-    private String[] activityDescriptions={};
-    private String[] timeAgo={};
+    private RequestCreator[] profilePics;
+    private String[] friendNames;
+    private String[] activityDescriptions;
+    private String[] timeAgo;
     private Context c;
                                 // define a function that can be used to declare this custom adapter class
     friendFeedAdapter(Context context, String[] friendNames, String[] activityDescriptions, String[] timeAgo, RequestCreator[] profilePics) {     // arguments set the context, texts and images for this adapter class
