@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,7 +34,7 @@ public class ProfileAgendaFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
-        ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);                              // locate the list object in the home tab
+        ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
 
         MainActivity activity = (MainActivity) getActivity();
         String agenda = activity.user.agenda;
@@ -50,33 +52,31 @@ public class ProfileAgendaFragment extends Fragment {
         Log.println(Log.WARN,"qwerty1",activities.get(1));
         Log.println(Log.WARN,"qwerty3",companies.get(0));
         Log.println(Log.WARN,"qwerty4",companies.get(1));
-        profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),activities,companies);
+
+        profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),agendaItems);
         pa_list.setAdapter(adapter);
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,agendaItems);
+        pa_list.setAdapter(itemsAdapter);
 
         return rootView;
     }
 }
 
 
-
-
-                    // adapter used for friend's activities list view in friend fees tab
+// adapter used for friend's activities list view in friend fees tab
 class profileAgendaAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private ArrayList<String> companies;
-    private ArrayList<String> activities;
+    private String[] friendNames;
     private Context c;
     // define a function that can be used to declare this custom adapter class
-    profileAgendaAdapter(Context context, ArrayList<String> activities, ArrayList<String> companies) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.profile_agenda_list_item);
+    profileAgendaAdapter(Context context, String[] friendNames) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.profile_agenda_list_item,friendNames);
         this.c=context;
-        this.activities=activities;
-        this.companies=companies;
+        this.friendNames=friendNames;
     }
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
-        TextView company;                                                                             // used to store the relevant views
-        TextView activity;
+        TextView friends;
     }
     // function that generates the list view
     @Override
@@ -89,14 +89,11 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         }
         // find the views within the list
         final ViewHolder holder=new ViewHolder();
-        holder.company=(TextView) convertView.findViewById(R.id.pa_list_item_company);
-        holder.activity=(TextView) convertView.findViewById(R.id.pa_list_item_activity);
+        holder.friends=(TextView) convertView.findViewById(R.id.textView2);
         // populate the title and image with data for a list item
-        holder.company.setText(companies.get(position));
-        holder.activity.setText(activities.get(position));
+        holder.friends.setText(friendNames[position]);
         // return the updated view
         return convertView;
     }
 
 }
-
