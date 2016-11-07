@@ -42,21 +42,18 @@ public class ProfileAgendaFragment extends Fragment {
         String itemElements[][] = new String[2][3];
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> companies = new ArrayList<>();
+        ArrayList<String> dates = new ArrayList<>();
         for(int i=0; i<agendaItems.length; i++){
             itemElements[i] = agendaItems[i].split(";");
             activities.add(itemElements[i][0]);
             companies.add(itemElements[i][1]);
+            dates.add(itemElements[i][2]);
         }
 
-        Log.println(Log.WARN,"qwerty1",activities.get(0));
-        Log.println(Log.WARN,"qwerty1",activities.get(1));
-        Log.println(Log.WARN,"qwerty3",companies.get(0));
-        Log.println(Log.WARN,"qwerty4",companies.get(1));
-
-        profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),agendaItems);
+        profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),activities,dates,companies);
         pa_list.setAdapter(adapter);
-        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,agendaItems);
-        pa_list.setAdapter(itemsAdapter);
+      //  ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,agendaItems);
+     //   pa_list.setAdapter(itemsAdapter);
 
         return rootView;
     }
@@ -66,17 +63,23 @@ public class ProfileAgendaFragment extends Fragment {
 // adapter used for friend's activities list view in friend fees tab
 class profileAgendaAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private String[] friendNames;
+    private ArrayList<String> activities;
+    private ArrayList<String> dates;
+    private ArrayList<String> companies;
     private Context c;
     // define a function that can be used to declare this custom adapter class
-    profileAgendaAdapter(Context context, String[] friendNames) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.profile_agenda_list_item,friendNames);
+    profileAgendaAdapter(Context context, ArrayList<String> activities,ArrayList<String> dates, ArrayList<String> companies) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.profile_agenda_list_item,activities);
         this.c=context;
-        this.friendNames=friendNames;
+        this.activities=activities;
+        this.dates=dates;
+        this.companies=companies;
     }
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
-        TextView friends;
+        TextView activity;
+        TextView date;
+        TextView companies;
     }
     // function that generates the list view
     @Override
@@ -89,9 +92,13 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         }
         // find the views within the list
         final ViewHolder holder=new ViewHolder();
-        holder.friends=(TextView) convertView.findViewById(R.id.textView2);
+        holder.activity=(TextView) convertView.findViewById(R.id.tv_profile_agenda_activities);
+        holder.date=(TextView) convertView.findViewById(R.id.tv_profile_agenda_date);
+        holder.companies=(TextView) convertView.findViewById(R.id.tv_profile_agenda_company);
         // populate the title and image with data for a list item
-        holder.friends.setText(friendNames[position]);
+        holder.activity.setText(activities.get(position));
+        holder.date.setText(dates.get(position));
+        holder.companies.setText(companies.get(position));
         // return the updated view
         return convertView;
     }
