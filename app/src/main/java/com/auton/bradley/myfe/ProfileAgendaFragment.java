@@ -38,16 +38,23 @@ public class ProfileAgendaFragment extends Fragment {
 
         MainActivity activity = (MainActivity) getActivity();
         String agenda = activity.user.agenda;
-        String[] agendaItems = agenda.split(":");
-        String itemElements[][] = new String[2][3];
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> companies = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
-        for(int i=0; i<agendaItems.length; i++){
-            itemElements[i] = agendaItems[i].split(";");
-            activities.add(itemElements[i][0]);
-            companies.add(itemElements[i][1]);
-            dates.add(itemElements[i][2]);
+        if (agenda.equals("")) {
+            activities.add("Your Agenda is Empty");
+            companies.add("");
+            dates.add("");
+        }
+        else {
+            String[] agendaItems = agenda.split(":");
+            String itemElements[][] = new String[2][3];
+            for(int i=0; i<agendaItems.length; i++){
+                itemElements[i] = agendaItems[i].split(";");
+                activities.add(itemElements[i][0]);
+                companies.add(itemElements[i][1]);
+                dates.add(itemElements[i][2]);
+            }
         }
 
         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),activities,dates,companies);

@@ -40,6 +40,7 @@
     <string name="profile_contentDescription">Your Profile Picture</string>
     <string name="profileAgenda_tabName">Agenda</string>
     <string name="profilePhotos_tabName">Photos</string>
+    <string name="profileFriends_tabName">Friends</string>
 
     <string name="friendFeed_tabName">Feed</string>
     <string name="friend_signUp">Sign up to see the Social Tab!</string>
