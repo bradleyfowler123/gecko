@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_profile_agenda_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.auton.bradley.myfe.ProfileFriendsFragment">
+    tools:context="com.auton.bradley.myfe.ProfileFriendsFragment"
+    android:orientation="vertical">
 
-    <TextView
-        android:text="Some friends"
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_friend_list">
+    </ListView>
 
-    </TextView>
 </LinearLayout>
+

@@ -67,7 +67,7 @@ public class ProfileAgendaFragment extends Fragment {
 }
 
 
-// adapter used for friend's activities list view in friend fees tab
+                        // adapter used for to show your activities as a list view in profile agenda sub tab
 class profileAgendaAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
     private ArrayList<String> activities;
