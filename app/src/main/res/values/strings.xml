@@ -6,6 +6,7 @@
     <string name="action_close">Close</string>
     <string name="action_about_help">About &amp; Help</string>
     <string name="facebook_app_id">171902163272566</string>
+    <string name="fb_login_protocol_scheme">fb171902163272566</string>
 
     <string name="register_title">Create An Account</string>
     <string name="register_name">Screen Name</string>

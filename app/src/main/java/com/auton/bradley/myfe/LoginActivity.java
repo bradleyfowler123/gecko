@@ -14,10 +14,18 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +39,13 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     public int currentTab;
+    CallbackManager callbackManager;
+    LoginButton fbLoginButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);                                                    // set the xml file to be viewed
         // declarations
         loginButton = (Button) findViewById(R.id.login_button);
@@ -90,7 +102,38 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+
+        fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
+
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+
+       // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+
+
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
     // New user text click
     public void onCreateAccClick(View view) {
         Intent intent = new Intent(this, RegisterActivity.class);
