@@ -8,8 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
 
@@ -30,14 +34,13 @@ public class ProfileFriendsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_profile_friends, container, false);        // enables easy access to the root search xml
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
 
+        RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         ArrayList<String> activities = new ArrayList<>();
-        ArrayList<String> companies = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
         activities.add("Bradley Fowler");
-        companies.add("some activity");
-        dates.add("");
+        dates.add("is going go-karting tomorrow");
 
-        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,companies);
+        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
         pa_list.setAdapter(adapter);
 
         return rootView;
@@ -48,25 +51,25 @@ public class ProfileFriendsFragment extends Fragment {
 // adapter used for to show your activities as a list view in profile agenda sub tab
 class profileFriendsAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private ArrayList<String> activities;
-    private ArrayList<String> dates;
-    private ArrayList<String> companies;
+    private ArrayList<String> names;
+    private ArrayList<String> nextActivities;
+    private RequestCreator[] profilePics;
     private Context c;
 
     // define a function that can be used to declare this custom adapter class
-    profileFriendsAdapter(Context context, ArrayList<String> activities, ArrayList<String> dates, ArrayList<String> companies) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.profile_friends_list_item, activities);
+    profileFriendsAdapter(Context context, ArrayList<String> names, ArrayList<String> nextActivities, RequestCreator[] profilePics) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.profile_friends_list_item, names);
         this.c = context;
-        this.activities = activities;
-        this.dates = dates;
-        this.companies = companies;
+        this.names = names;
+        this.nextActivities = nextActivities;
+        this.profilePics = profilePics;
     }
 
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
-        TextView activity;
-        TextView date;
-        TextView companies;
+        TextView name;
+        TextView nextActivity;
+        ImageView img;
     }
 
     // function that generates the list view
@@ -81,13 +84,13 @@ class profileFriendsAdapter extends ArrayAdapter<String> {                      
         }
         // find the views within the list
         final ViewHolder holder = new ViewHolder();
-        holder.activity = (TextView) convertView.findViewById(R.id.tv_profile_friends_name);
-        holder.date = (TextView) convertView.findViewById(R.id.tv_profile_friends_nextActivity);
-        holder.companies = (TextView) convertView.findViewById(R.id.tv_other);
+        holder.name = (TextView) convertView.findViewById(R.id.tv_profile_friends_name);
+        holder.nextActivity = (TextView) convertView.findViewById(R.id.tv_profile_friends_nextActivity);
+        holder.img = (ImageView) convertView.findViewById(R.id.profile_friend_list_item_profilePic);
         // populate the title and image with data for a list item
-        holder.activity.setText(activities.get(position));
-        holder.date.setText(dates.get(position));
-        holder.companies.setText(companies.get(position));
+        holder.name.setText(names.get(position));
+        holder.nextActivity.setText(nextActivities.get(position));
+        profilePics[position].transform(new CircleTransform()).into(holder.img);
         // return the updated view
         return convertView;
     }
