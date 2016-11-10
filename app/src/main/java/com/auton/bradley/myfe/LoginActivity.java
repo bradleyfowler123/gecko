@@ -27,6 +27,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,7 +83,6 @@ public class LoginActivity extends AppCompatActivity {
                                 String name = jsonResponse.getString("name");
                                 String dob = jsonResponse.getString("dob");
                                 String agenda = jsonResponse.getString("agenda");
-                                Boolean fbLinked = jsonResponse.getBoolean("fbLinked");
                                 // start main activity passing user's data
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("email", email);
@@ -90,7 +90,6 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("name", name);
                                 intent.putExtra("dob", dob);
                                 intent.putExtra("agenda", agenda);
-                                intent.putExtra("fbLinked", fbLinked);
                                 intent.putExtra("tab", currentTab);
                                 LoginActivity.this.startActivity(intent);
                             } else {
@@ -114,6 +113,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+
+
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
         fbLoginButton.setReadPermissions("email");
 
@@ -121,57 +122,88 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         // App code
-                        requestUserProfile(loginResult);
-                        Toast.makeText(getBaseContext(),FacebookData.get("email").toString(),Toast.LENGTH_SHORT).show();           // inform user that system is registering them
+                        System.out.println("onSuccess");
+                        String accessToken = loginResult.getAccessToken().getToken();
+                        Log.i("accessToken", accessToken);
 
-                        final String email = FacebookData.get("email").toString();                                  // get the entered email address
-                        final String fbUserId = FacebookData.get("id").toString();
-                        final String fbPassword = "testFbPassword";
-                        final String name = FacebookData.get("first_name").toString();
-                        final String dob = FacebookData.get("birthday").toString();
+                        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response2) {
+                                Log.i("LoginActivity", response2.toString());
+                                // Get facebook data from login
+                                FacebookData = getFacebookData(object);
+                                Toast.makeText(getBaseContext(),FacebookData.get("first_name").toString(),Toast.LENGTH_SHORT).show();           // inform user that system is registering them
+
+                                final String email = FacebookData.get("email").toString();                                  // get the entered email address
+                                final String fbUserId = FacebookData.get("id").toString();
+                                final String fbPassword = "testFbPassword";
+                                final String name = FacebookData.get("first_name").toString();
+                                final String dob = "1996.07.28";
+
+
+
+                                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try {
+                                            JSONObject jsonResponse = new JSONObject(response);
+                                            boolean success = jsonResponse.getBoolean("success");
+                                            Log.i("response!!!!:",jsonResponse.toString());
+                                //            JSONArray jsonResponse3 = new JSONArray(response3);
+                                //            boolean success = jsonResponse3.getBoolean(0);                   // check whether database data request returned success
+                                            if (success) {
+                                                // get database data
+                                                String name = jsonResponse.getString("name");
+                                                Log.i("name:",name);
+                                         /*       String password = jsonResponse3.getString("password");
+                                                String dob = jsonResponse3.getString("dob");
+                                                String agenda = jsonResponse3.getString("agenda");
+                                                // start main activity passing user's data
+                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                intent.putExtra("email", email);
+                                                intent.putExtra("password", password);
+                                                intent.putExtra("name", name);
+                                                intent.putExtra("dob", dob);
+                                                intent.putExtra("agenda", agenda);
+                                                intent.putExtra("tab", currentTab);
+                                                LoginActivity.this.startActivity(intent);
+                                       */     } else {
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                                builder.setMessage(getString(R.string.login_failed))
+                                                        .setNegativeButton(getString(R.string.login_retry_button), null)
+                                                        .create()
+                                                        .show();
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                };
+
+                                // send the login request
+                                FbLoginRequest fbloginRequest = new FbLoginRequest(email, fbPassword, fbUserId, fbPassword, name, dob, responseListener);
+                                RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+                                queue.add(fbloginRequest);
+
+
+
+
+                            }
+                        });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
+                        request.setParameters(parameters);
+                        request.executeAsync();
+
+                     /*
+
 
 
                         // setup database response listener
-                        Response.Listener<String> responseListener = new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONObject jsonResponse = new JSONObject(response);
-                                    boolean success = jsonResponse.getBoolean("success");                   // check whether database data request returned success
-                                    if (success) {
-                                        // get database data
-                                        String name = jsonResponse.getString("name");
-                                        String password = jsonResponse.getString("password");
-                                        String dob = jsonResponse.getString("dob");
-                                        String agenda = jsonResponse.getString("agenda");
-                                        // start main activity passing user's data
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        intent.putExtra("email", email);
-                                        intent.putExtra("password", password);
-                                        intent.putExtra("name", name);
-                                        intent.putExtra("dob", dob);
-                                        intent.putExtra("agenda", agenda);
-                                        intent.putExtra("tab", currentTab);
-                                        LoginActivity.this.startActivity(intent);
-                                    } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                        builder.setMessage(getString(R.string.login_failed))
-                                                .setNegativeButton(getString(R.string.login_retry_button), null)
-                                                .create()
-                                                .show();
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
 
-                        };
-
-                        // send the login request
-                        FbLoginRequest fbloginRequest = new FbLoginRequest(email, fbPassword, fbUserId, fbPassword, name, dob, responseListener);
-                        RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-                        queue.add(fbloginRequest);
-
+*/
                     }
 
 
@@ -196,27 +228,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    public void requestUserProfile(LoginResult loginResult){
-        System.out.println("onSuccess");
-        String accessToken = loginResult.getAccessToken().getToken();
-        Log.i("accessToken", accessToken);
-
-        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-
-            @Override
-            public void onCompleted(JSONObject object, GraphResponse response) {
-                Log.i("LoginActivity", response.toString());
-                // Get facebook data from login
-                FacebookData = getFacebookData(object);
-            }
-        });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
-        request.setParameters(parameters);
-        Log.i("!!!!", FacebookData.toString());
-        request.executeAsync();
-    }
-
 
     Bundle getFacebookData(JSONObject object) {
 
@@ -234,7 +245,7 @@ public class LoginActivity extends AppCompatActivity {
                 return null;
             }
 
-            bundle.putString("idFacebook", id);
+            bundle.putString("id", id);
             if (object.has("first_name"))
                 bundle.putString("first_name", object.getString("first_name"));
             if (object.has("last_name"))
