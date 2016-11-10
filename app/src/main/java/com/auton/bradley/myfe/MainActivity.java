@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
             String agenda = intent.getStringExtra("agenda");
-            user.LogIn(email,password,name,dob,agenda);
+            Boolean fbLinked = intent.getBooleanExtra("fbLinked",false);
+            user.LogIn(email,password,name,dob,agenda, fbLinked);
         }
         viewPager.setCurrentItem(currentTab);
     }

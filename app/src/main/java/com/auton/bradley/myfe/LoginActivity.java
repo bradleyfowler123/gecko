@@ -46,7 +46,7 @@ import java.util.Set;
 
 public class LoginActivity extends AppCompatActivity {
     Button loginButton;
-    Bundle bFacebookData;
+    Bundle FacebookData;
     public int currentTab;
     CallbackManager callbackManager;
     LoginButton fbLoginButton;
@@ -82,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                                 String name = jsonResponse.getString("name");
                                 String dob = jsonResponse.getString("dob");
                                 String agenda = jsonResponse.getString("agenda");
+                                Boolean fbLinked = jsonResponse.getBoolean("fbLinked");
                                 // start main activity passing user's data
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("email", email);
@@ -89,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("name", name);
                                 intent.putExtra("dob", dob);
                                 intent.putExtra("agenda", agenda);
+                                intent.putExtra("fbLinked", fbLinked);
                                 intent.putExtra("tab", currentTab);
                                 LoginActivity.this.startActivity(intent);
                             } else {
@@ -120,15 +122,60 @@ public class LoginActivity extends AppCompatActivity {
                     public void onSuccess(LoginResult loginResult) {
                         // App code
                         requestUserProfile(loginResult);
-                        try {
-                            Toast.makeText(getBaseContext(),bFacebookData.get("email").toString(),Toast.LENGTH_SHORT).show();           // inform user that system is registering them
-                        }
-                        catch (Exception c) {
-                            
-                        }
+                        Toast.makeText(getBaseContext(),FacebookData.get("email").toString(),Toast.LENGTH_SHORT).show();           // inform user that system is registering them
 
+                        final String email = FacebookData.get("email").toString();                                  // get the entered email address
+                        final String fbUserId = FacebookData.get("id").toString();
+                        final String fbPassword = "testFbPassword";
+                        final String name = FacebookData.get("first_name").toString();
+                        final String dob = FacebookData.get("birthday").toString();
+
+
+                        // setup database response listener
+                        Response.Listener<String> responseListener = new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject jsonResponse = new JSONObject(response);
+                                    boolean success = jsonResponse.getBoolean("success");                   // check whether database data request returned success
+                                    if (success) {
+                                        // get database data
+                                        String name = jsonResponse.getString("name");
+                                        String password = jsonResponse.getString("password");
+                                        String dob = jsonResponse.getString("dob");
+                                        String agenda = jsonResponse.getString("agenda");
+                                        // start main activity passing user's data
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        intent.putExtra("email", email);
+                                        intent.putExtra("password", password);
+                                        intent.putExtra("name", name);
+                                        intent.putExtra("dob", dob);
+                                        intent.putExtra("agenda", agenda);
+                                        intent.putExtra("tab", currentTab);
+                                        LoginActivity.this.startActivity(intent);
+                                    } else {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                        builder.setMessage(getString(R.string.login_failed))
+                                                .setNegativeButton(getString(R.string.login_retry_button), null)
+                                                .create()
+                                                .show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        };
+
+                        // send the login request
+                        FbLoginRequest fbloginRequest = new FbLoginRequest(email, fbPassword, fbUserId, fbPassword, name, dob, responseListener);
+                        RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+                        queue.add(fbloginRequest);
 
                     }
+
+
+
 
                     @Override
                     public void onCancel() {
@@ -160,12 +207,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onCompleted(JSONObject object, GraphResponse response) {
                 Log.i("LoginActivity", response.toString());
                 // Get facebook data from login
-                bFacebookData = getFacebookData(object);
+                FacebookData = getFacebookData(object);
             }
         });
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
         request.setParameters(parameters);
+        Log.i("!!!!", FacebookData.toString());
         request.executeAsync();
     }
 
@@ -265,3 +313,25 @@ class LoginRequest extends StringRequest {
 
 
 
+// class used to send login request data nicely
+class FbLoginRequest extends StringRequest {
+    private  static final String LOGIN_REQUEST_URL = "https://myfe.000webhostapp.com/FB_Login_User.php";
+    private Map<String, String> params;
+
+    FbLoginRequest(String email, String password, String fbUserId, String fbPassword, String name, String dob, Response.Listener<String> listener) {
+        super(Method.POST, LOGIN_REQUEST_URL,listener, null);
+        params = new HashMap<>();
+        params.put("email", email);
+        params.put("password", password);
+        params.put("fbUserId", fbUserId);
+        params.put("fbPassword", fbPassword);
+        params.put("name", name);
+        params.put("dob", dob);
+    }
+
+    @Override
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+}
