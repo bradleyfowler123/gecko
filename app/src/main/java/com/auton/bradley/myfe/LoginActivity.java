@@ -150,15 +150,13 @@ public class LoginActivity extends AppCompatActivity {
                                             JSONObject jsonResponse = new JSONObject(response);
                                             boolean success = jsonResponse.getBoolean("success");
                                             Log.i("response!!!!:",jsonResponse.toString());
-                                //            JSONArray jsonResponse3 = new JSONArray(response3);
-                                //            boolean success = jsonResponse3.getBoolean(0);                   // check whether database data request returned success
                                             if (success) {
                                                 // get database data
                                                 String name = jsonResponse.getString("name");
                                                 Log.i("name:",name);
-                                         /*       String password = jsonResponse3.getString("password");
-                                                String dob = jsonResponse3.getString("dob");
-                                                String agenda = jsonResponse3.getString("agenda");
+                                                String password = jsonResponse.getString("password");
+                                                String dob = jsonResponse.getString("dob");
+                                                String agenda = jsonResponse.getString("agenda");
                                                 // start main activity passing user's data
                                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                                 intent.putExtra("email", email);
@@ -168,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 intent.putExtra("agenda", agenda);
                                                 intent.putExtra("tab", currentTab);
                                                 LoginActivity.this.startActivity(intent);
-                                       */     } else {
+                                            } else {
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                                 builder.setMessage(getString(R.string.login_failed))
                                                         .setNegativeButton(getString(R.string.login_retry_button), null)
