@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 final String email = FacebookData.get("email").toString();                                  // get the entered email address
                                 final String fbUserId = FacebookData.get("id").toString();
-                                final String fbPassword = "face pass";
+                                final String fbPassword = "facepass";
                                 final String name = FacebookData.get("first_name").toString();
                                 final String dob = "1996.07.28";
 
