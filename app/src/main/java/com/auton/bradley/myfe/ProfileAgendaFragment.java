@@ -47,6 +47,7 @@ public class ProfileAgendaFragment extends Fragment {
             dates.add("");
         }
         else {
+            Log.i("tag",agenda);
             String[] agendaItems = agenda.split(":");
             String itemElements[][] = new String[2][3];
             for(int i=0; i<agendaItems.length; i++){

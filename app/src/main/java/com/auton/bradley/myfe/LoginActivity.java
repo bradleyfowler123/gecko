@@ -83,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                                 String name = jsonResponse.getString("name");
                                 String dob = jsonResponse.getString("dob");
                                 String agenda = jsonResponse.getString("agenda");
+                                Log.i("qwerty",jsonResponse.toString());
                                 // start main activity passing user's data
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("email", email);
