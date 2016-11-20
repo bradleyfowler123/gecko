@@ -10,16 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     // declarations
@@ -60,7 +51,9 @@ public class MainActivity extends AppCompatActivity {
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
             String agenda = intent.getStringExtra("agenda");
-            user.LogIn(email,password,name,dob,agenda);
+            String fbUserId = intent.getStringExtra("fbUserId");
+            String fbPassword = intent.getStringExtra("fbPassword");
+            user.LogIn(email,password,name,dob,agenda,fbUserId,fbPassword);
         }
         viewPager.setCurrentItem(currentTab);
     }
@@ -108,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
+                if (!user.fbUserId.equals("")) {
+                    LoginManager.getInstance().logOut();
+                }
                 user.LogOut();
                 currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);

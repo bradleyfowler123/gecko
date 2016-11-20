@@ -20,7 +20,7 @@ public class FriendMapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.fragment_friend_map, container, false);        // enables easy access to the root search xml
+        final View rootView = inflater.inflate(R.layout.fragment_friend_feed, container, false);        // enables easy access to the root search xml
         return rootView;
     }
 }
