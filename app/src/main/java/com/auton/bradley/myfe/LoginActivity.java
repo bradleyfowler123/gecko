@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,9 +122,9 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-
+                                        // handle facebook login button press
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
-        fbLoginButton.setReadPermissions("email");
+        fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email"));
 
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                                 // if users logs into facebook and accepts
@@ -146,8 +147,7 @@ public class LoginActivity extends AppCompatActivity {
                             final String fbUserId = FacebookData.get("id").toString();
                             final String fbPassword = "facepass";
                             final String name = FacebookData.get("first_name").toString();
-                 //           Log.i("dob",FacebookData.get("birthday").toString());
-                            final String dob = "1996.07.28";
+                            final String dob = FacebookData.get("birthday").toString();
 
                                                 // setup database response listener
                             Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -159,9 +159,7 @@ public class LoginActivity extends AppCompatActivity {
                                         Log.i("response!!!!:",jsonResponse.toString());
                                         if (success) {
                                                             // get database data
-                                            String name = jsonResponse.getString("name");
                                             String password = jsonResponse.getString("password");
-                                            String dob = jsonResponse.getString("dob");
                                             String agenda = jsonResponse.getString("agenda");
                                                             // start main activity passing user's data
                                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);

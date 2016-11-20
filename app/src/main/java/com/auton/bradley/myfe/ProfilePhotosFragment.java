@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class ProfilePhotosFragment extends Fragment {
 
@@ -21,6 +22,9 @@ public class ProfilePhotosFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_profile_photos, container, false);        // enables easy access to the root search xml
+        TextView tv = (TextView) rootView.findViewById(R.id.textView);
+        MainActivity activity = (MainActivity) getActivity();
+        tv.setText(activity.user.dob);
         return rootView;
     }
 }
