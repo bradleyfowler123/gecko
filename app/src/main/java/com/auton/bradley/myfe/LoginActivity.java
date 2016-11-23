@@ -87,15 +87,15 @@ public class LoginActivity extends AppCompatActivity {
                                 String name = jsonResponse.getString("name");
                                 String dob = jsonResponse.getString("dob");
                                 String agenda = jsonResponse.getString("agenda");
-                                String fbUserId = jsonResponse.getString("fbUserId");
-                                String fbPassword = jsonResponse.getString("fbPassword");
+                                Bundle fbData = new Bundle();
+                                fbData.putString("userId",jsonResponse.getString("fbUserId"));
+                                fbData.putString("userPass",jsonResponse.getString("fbPassword"));
                                 // add bit to get facebook data
                                                         // start main activity passing user's data
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.putExtra("email", email);
                                 intent.putExtra("password", password);
-                                intent.putExtra("fbId", fbUserId);
-                                intent.putExtra("fbPass", fbPassword);
+                                intent.putExtra("fbData", fbData);
                                 intent.putExtra("name", name);
                                 intent.putExtra("dob", dob);
                                 intent.putExtra("agenda", agenda);
@@ -152,6 +152,11 @@ public class LoginActivity extends AppCompatActivity {
                             final String name = FacebookData.get("first_name").toString();
                             final String dob = FacebookData.get("birthday").toString();
 
+                            final Bundle fbData = new Bundle();
+                            fbData.putString("userId",fbUserId);
+                            fbData.putString("userPass",fbPassword);
+                            fbData.putString("profilePic",FacebookData.get("profile_pic").toString());
+
                                                 // setup database response listener
                             Response.Listener<String> responseListener = new Response.Listener<String>() {
                                 @Override
@@ -168,8 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                             intent.putExtra("email", email);
                                             intent.putExtra("password", password);
-                                            intent.putExtra("fbUserId", fbUserId);
-                                            intent.putExtra("fbPassword", fbPassword);
+                                            intent.putExtra("fbData", fbData);
                                             intent.putExtra("name", name);
                                             intent.putExtra("dob", dob);
                                             intent.putExtra("agenda", agenda);

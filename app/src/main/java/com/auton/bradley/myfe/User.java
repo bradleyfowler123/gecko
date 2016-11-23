@@ -1,5 +1,7 @@
 package com.auton.bradley.myfe;
 
+import android.os.Bundle;
+
 /**
  * Created by Bradley on 13/10/2016.
  * Custom Class used for storing user details
@@ -9,18 +11,18 @@ package com.auton.bradley.myfe;
 class User {
                             // parameter declarations
     boolean loggedIn;
-    String email, password, fbUserId, fbPassword, name, dob, agenda;
+    String email, password, name, dob, agenda;
+    Bundle facebookData;
                             // function used by main activity to declare an empty user when not logged in
     User() {
         this.loggedIn = false;
     }
                             // function to easily create logged in user
-    void LogIn(String email, String password, String name, String dob, String agenda, String fbUserId, String fbPassword) {                                                          // Item(ListGroupTitle, defaultSelection)
+    void LogIn(String email, String password, String name, String dob, String agenda, Bundle facebookData) {                                                          // Item(ListGroupTitle, defaultSelection)
         this.loggedIn = true;
         this.email = email;
         this.password = password;
-        this.fbUserId = fbUserId;
-        this.fbPassword = fbPassword;
+        this.facebookData = facebookData;
         this.name = name;
         this.dob = dob;
         this.agenda = agenda;
@@ -30,8 +32,7 @@ class User {
         this.loggedIn = false;
         this.email = "";
         this.password = "";
-        this.fbUserId = "";
-        this.fbPassword = "";
+        this.facebookData.clear();
         this.name = "";
         this.dob = "";
     }

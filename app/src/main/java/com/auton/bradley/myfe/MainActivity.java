@@ -51,9 +51,8 @@ public class MainActivity extends AppCompatActivity {
             String name = intent.getStringExtra("name");
             String dob = intent.getStringExtra("dob");
             String agenda = intent.getStringExtra("agenda");
-            String fbUserId = intent.getStringExtra("fbUserId");
-            String fbPassword = intent.getStringExtra("fbPassword");
-            user.LogIn(email,password,name,dob,agenda,fbUserId,fbPassword);
+            Bundle fbData = intent.getBundleExtra("fbData");
+            user.LogIn(email,password,name,dob,agenda,fbData);
         }
         viewPager.setCurrentItem(currentTab);
     }
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-                if (!user.fbUserId.equals("")) {
+                if (!user.facebookData.get("userId").equals("")) {
                     LoginManager.getInstance().logOut();
                 }
                 user.LogOut();

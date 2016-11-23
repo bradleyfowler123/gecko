@@ -41,19 +41,22 @@ public class ProfileFriendsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_profile_friends, container, false);        // enables easy access to the root search xml
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
 
-        RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
+        MainActivity activity = (MainActivity) getActivity();
+
+        RequestCreator picURLs[] = {Picasso.with(getContext()).load(activity.user.facebookData.get("profilePic").toString())};
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
         activities.add("Bradley Fowler");
         dates.add("is going go-karting tomorrow");
 
-        MainActivity activity = (MainActivity) getActivity();
-        if (!activity.user.fbUserId.equals("")) {
+
+        String fbUserId = activity.user.facebookData.get("userId").toString();
+        if (!fbUserId.equals("")) {
 
                            /* make the API call */
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
-                    "/" + activity.user.fbUserId + "/friends",
+                    "/" + fbUserId + "/friends",
                     null,
                     HttpMethod.GET,
                     new GraphRequest.Callback() {
