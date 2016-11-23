@@ -23,6 +23,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -124,7 +125,9 @@ public class LoginActivity extends AppCompatActivity {
 
                                         // handle facebook login button press
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
-        fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email"));
+        fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email", "user_friends"));
+
+
 
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                                 // if users logs into facebook and accepts
@@ -200,6 +203,7 @@ public class LoginActivity extends AppCompatActivity {
                     parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
                     request.setParameters(parameters);
                     request.executeAsync();
+
 
                 }
 

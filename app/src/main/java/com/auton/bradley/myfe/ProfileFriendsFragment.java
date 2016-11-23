@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -39,6 +46,33 @@ public class ProfileFriendsFragment extends Fragment {
         ArrayList<String> dates = new ArrayList<>();
         activities.add("Bradley Fowler");
         dates.add("is going go-karting tomorrow");
+
+        MainActivity activity = (MainActivity) getActivity();
+        if (!activity.user.fbUserId.equals("")) {
+
+                           /* make the API call */
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/" + activity.user.fbUserId + "/friends",
+                    null,
+                    HttpMethod.GET,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
+
+                            Log.i("unique!!",response.toString());
+
+                            /* handle the result */
+                        }
+
+
+                    }
+            ).executeAsync();
+
+
+        }
+
+
+
 
         profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
         pa_list.setAdapter(adapter);
