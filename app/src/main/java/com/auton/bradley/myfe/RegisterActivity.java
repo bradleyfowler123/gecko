@@ -2,9 +2,11 @@ package com.auton.bradley.myfe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +17,11 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,9 +36,30 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+
         setContentView(R.layout.activity_register);                                                 // set the xml file to be viewed
         // declarations
         final Button registerButton = (Button) findViewById(R.id.register_button);
@@ -39,6 +67,28 @@ public class RegisterActivity extends AppCompatActivity {
         final EditText etPassword = (EditText) findViewById(R.id.editText_register_password);
         final EditText etName = (EditText) findViewById(R.id.editText_register_name);
         final EditText etDob = (EditText) findViewById(R.id.editText_register_dob);
+
+
+
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("TAGr1", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("TAG2r", "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
+
+
+
+
         // handle sign up button click
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,35 +99,23 @@ public class RegisterActivity extends AppCompatActivity {
                 final String password = etPassword.getText().toString();
                 final String dob = etDob.getText().toString();
 
-                Toast.makeText(getBaseContext(),"Registering",Toast.LENGTH_SHORT).show();           // inform user that system is registering them
-                // setup database response listener
-                Response.Listener<String> responseListener = new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean success = jsonResponse.getBoolean("success");                   // check whether database accepted our data
-                            if (success) {
-                                // start login screen
-                                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                RegisterActivity.this.startActivity(intent);
-                            } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                                builder.setMessage(getString(R.string.register_failed))
-                                        .setNegativeButton(getString(R.string.register_ok_button), null)
-                                        .create()
-                                        .show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                Log.d("TAGr", "createUserWithEmail:onComplete:" + task.isSuccessful());
 
-                };
-                // send the register request
-                RegisterRequest registerRequest = new RegisterRequest(email, password, name, dob, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
-                queue.add(registerRequest);
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+                                if (!task.isSuccessful()) {
+                                    Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                                // ...
+                            }
+                        });
             }
         });
     }

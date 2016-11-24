@@ -3,6 +3,7 @@ package com.auton.bradley.myfe;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -27,6 +29,13 @@ import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,10 +63,33 @@ public class LoginActivity extends AppCompatActivity {
     public int currentTab;
     CallbackManager callbackManager;
     LoginButton fbLoginButton;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+
+
                                         // main function
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);                                                    // set the xml file to be viewed
@@ -69,213 +101,112 @@ public class LoginActivity extends AppCompatActivity {
         if(intent.getExtras()!=null) { currentTab = intent.getIntExtra("tab",0);}
         else { currentTab = 0;}
 
+
+
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d("TAG2", "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
+
                                         // handle login button click
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String email = etEmail.getText().toString();                                  // get the entered email address
                 final String password = etPassword.getText().toString();                            // get the entered password
-                // setup database response listener
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean success = jsonResponse.getBoolean("success");                   // check whether database data request returned success
-                            if(success) {
-                                                        // get database data
-                                String name = jsonResponse.getString("name");
-                                String dob = jsonResponse.getString("dob");
-                                String agenda = jsonResponse.getString("agenda");
-                                Bundle fbData = new Bundle();
-                                fbData.putString("userId",jsonResponse.getString("fbUserId"));
-                                fbData.putString("userPass",jsonResponse.getString("fbPassword"));
-                                // add bit to get facebook data
-                                                        // start main activity passing user's data
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtra("email", email);
-                                intent.putExtra("password", password);
-                                intent.putExtra("fbData", fbData);
-                                intent.putExtra("name", name);
-                                intent.putExtra("dob", dob);
-                                intent.putExtra("agenda", agenda);
-                                intent.putExtra("tab", currentTab);
-                                LoginActivity.this.startActivity(intent);
-                            } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                builder.setMessage(getString(R.string.login_failed))
-                                        .setNegativeButton(getString(R.string.login_retry_button), null)
-                                        .create()
-                                        .show();
-                            }
-                        }catch (JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
 
-                };
-                // send the login request
-                LoginRequest loginRequest = new LoginRequest(email,password,responseListener);
-                RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-                queue.add(loginRequest);
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                Log.d("Tag4", "signInWithEmail:onComplete:" + task.isSuccessful());
+
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+                                if (!task.isSuccessful()) {
+                                    Log.w("tag5", "signInWithEmail", task.getException());
+                                    Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                }
+
+                                // ...
+                            }
+                        });
             }
         });
-
 
 
                                         // handle facebook login button press
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
         fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email", "user_friends"));
 
-
-
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                                 // if users logs into facebook and accepts
                 @Override
                 public void onSuccess(LoginResult loginResult) {
 
-                    final String accessToken = loginResult.getAccessToken().getToken();
-                    Log.i("accessToken", accessToken);
-
-                                                // login to facebook and get data
-                    GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                                                // when logged in
-                        @Override
-                        public void onCompleted(JSONObject object, GraphResponse response2) {
-                                                // Get facebook data
-                            Log.i("qwert",object.toString());
-                            FacebookData = getFacebookData(object);
-                            Log.i("imp!",FacebookData.toString());
-                            final String email = FacebookData.get("email").toString();                                  // get the entered email address
-                            final String fbUserId = FacebookData.get("id").toString();
-                            final String fbPassword = "facepass";
-                            final String name = FacebookData.get("first_name").toString();
-                            final String dob = FacebookData.get("birthday").toString();
-
-                            final Bundle fbData = new Bundle();
-                            fbData.putString("userId",fbUserId);
-                            fbData.putString("userPass",fbPassword);
-                            fbData.putString("profilePic",FacebookData.get("profile_pic").toString());
-
-                                                // setup database response listener
-                            Response.Listener<String> responseListener = new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    try {
-                                        JSONObject jsonResponse = new JSONObject(response);
-                                        boolean success = jsonResponse.getBoolean("success");
-                                        Log.i("response!!!!:",jsonResponse.toString());
-                                        if (success) {
-                                                            // get database data
-                                            String password = jsonResponse.getString("password");
-                                            String agenda = jsonResponse.getString("agenda");
-                                                            // start main activity passing user's data
-                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                            intent.putExtra("email", email);
-                                            intent.putExtra("password", password);
-                                            intent.putExtra("fbData", fbData);
-                                            intent.putExtra("name", name);
-                                            intent.putExtra("dob", dob);
-                                            intent.putExtra("agenda", agenda);
-                                            intent.putExtra("tab", currentTab);
-                                            LoginActivity.this.startActivity(intent);
-                                        } else {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                            builder.setMessage(getString(R.string.login_failed))
-                                                    .setNegativeButton(getString(R.string.login_retry_button), null)
-                                                    .create()
-                                                    .show();
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                            };
-
-                            // send the login request
-                            FbLoginRequest fbloginRequest = new FbLoginRequest(email, fbPassword, fbUserId, fbPassword, name, dob, responseListener);
-                            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-                            queue.add(fbloginRequest);
-
-
-
-
-                        }
-                    });
-                    Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
-                    request.setParameters(parameters);
-                    request.executeAsync();
-
-
+                    handleFacebookAccessToken(loginResult.getAccessToken());
                 }
-
 
                 @Override
                 public void onCancel() {
-                    // App code
+                    Log.d("oncanas", "facebook:onCancel");
+                    // ...
                 }
 
                 @Override
-                public void onError(FacebookException exception) {
-                    // App code
+                public void onError(FacebookException error) {
+                    Log.d("hbcsh", "facebook:onError", error);
+                    // ...
                 }
-            });
 
-       // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+            private void handleFacebookAccessToken(AccessToken token) {
+                Log.d("TAGfe", "handleFacebookAccessToken:" + token);
 
+                AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+                mAuth.signInWithCredential(credential)
+                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                Log.d("TAGwdw", "signInWithCredential:onComplete:" + task.isSuccessful());
 
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+                                if (!task.isSuccessful()) {
+                                    Log.w("TAGrevf", "signInWithCredential", task.getException());
+                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
 
-    }
-
-
-
-
-    Bundle getFacebookData(JSONObject object) {
-
-        try {
-            Bundle bundle = new Bundle();
-            String id = object.getString("id");
-
-            try {
-                URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
-                Log.i("profile_pic", profile_pic + "");
-                bundle.putString("profile_pic", profile_pic.toString());
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
+                                // ...
+                            }
+                        });
             }
-
-            bundle.putString("id", id);
-            if (object.has("first_name"))
-                bundle.putString("first_name", object.getString("first_name"));
-            if (object.has("last_name"))
-                bundle.putString("last_name", object.getString("last_name"));
-            if (object.has("email"))
-                bundle.putString("email", object.getString("email"));
-            if (object.has("gender"))
-                bundle.putString("gender", object.getString("gender"));
-            if (object.has("birthday"))
-                bundle.putString("birthday", object.getString("birthday"));
-            if (object.has("location"))
-                bundle.putString("location", object.getJSONObject("location").getString("name"));
-
-            return bundle;
-        }
-        catch(JSONException e) {
-            Log.d("idk","Error parsing JSON");
-            return null;
-        }
+            });
     }
+
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // Pass the activity result back to the Facebook SDK
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
+
 
     // New user text click
     public void onCreateAccClick(View view) {
