@@ -62,7 +62,7 @@ public class ProfileFriendsFragment extends Fragment {
                     new GraphRequest.Callback() {
                         public void onCompleted(GraphResponse response) {
 
-                            Log.i("unique!!",response.toString());
+                            Log.i("unique!!",response.getJSONObject().toString());
 
                             /* handle the result */
                         }
