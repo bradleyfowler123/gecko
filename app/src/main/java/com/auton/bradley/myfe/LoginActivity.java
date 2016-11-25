@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -126,6 +127,8 @@ public class LoginActivity extends AppCompatActivity {
                 final String email = etEmail.getText().toString();                                  // get the entered email address
                 final String password = etPassword.getText().toString();                            // get the entered password
 
+                AuthCredential credential = EmailAuthProvider.getCredential(email, password);
+
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -172,27 +175,36 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
             private void handleFacebookAccessToken(AccessToken token) {
-                Log.d("TAGfe", "handleFacebookAccessToken:" + token);
+                Log.d("TAGfe", "handleFacebookAccessToken:" + token.getToken());
+
 
                 AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-                mAuth.signInWithCredential(credential)
+
+                Log.i("hyvghv",credential.toString());
+
+                mAuth.getCurrentUser().linkWithCredential(credential)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d("TAGwdw", "signInWithCredential:onComplete:" + task.isSuccessful());
+                                Log.d("uygbhj", "linkWithCredential:onComplete:" + task.isSuccessful());
 
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
                                 // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
-                                    Log.w("TAGrevf", "signInWithCredential", task.getException());
                                     Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    Toast.makeText(LoginActivity.this, "Linked!",
                                             Toast.LENGTH_SHORT).show();
                                 }
 
                                 // ...
                             }
                         });
+
+
             }
             });
     }
