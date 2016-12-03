@@ -2,8 +2,10 @@ package com.auton.bradley.myfe;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +21,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -29,14 +32,19 @@ import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.api.GoogleApiActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,10 +72,10 @@ public class LoginActivity extends AppCompatActivity {
     public int currentTab;
     CallbackManager callbackManager;
     LoginButton fbLoginButton;
-
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+                                        // cycle functions
     @Override
     public void onStart() {
         super.onStart();
@@ -84,17 +92,15 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                                        // main function
+    // main function
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mAuth = FirebaseAuth.getInstance();
-
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);                                                    // set the xml file to be viewed
-        // declarations
+                                        // declarations
         loginButton = (Button) findViewById(R.id.login_button);
         final EditText etEmail = (EditText) findViewById(R.id.editText_login_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_login_password);
@@ -105,13 +111,31 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
                     Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
+                    List<? extends UserInfo> data = user.getProviderData();
+                    Log.d("bfv0", data.get(0).getProviderId());
+                    Log.d("bfv1", data.get(1).getProviderId());
+                    Log.d("bfv2", data.get(2).getProviderId());
+
+              //      String tok = user.getToken(true).getResult().getToken()
+                    if(FacebookData != null) {
+                        Log.d("bdlx", FacebookData.get("gender").toString());
+                    }
+
+
+
+//                    Log.d("bndsjfv", user.getProviderData.get("acc"));
+
+                    // get facebook data
+
                 } else {
                     // User is signed out
                     Log.d("TAG2", "onAuthStateChanged:signed_out");
@@ -127,17 +151,19 @@ public class LoginActivity extends AppCompatActivity {
                 final String email = etEmail.getText().toString();                                  // get the entered email address
                 final String password = etPassword.getText().toString();                            // get the entered password
 
-                AuthCredential credential = EmailAuthProvider.getCredential(email, password);
-
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d("Tag4", "signInWithEmail:onComplete:" + task.isSuccessful());
+                                Log.d("Tag4", "signInWithEmail:onComplete:" + task.isSuccessful());;
 
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
+                                Log.d("xxzd", task.getResult().getUser().getProviders().toString());
+                                if(task.getResult().getUser().getProviders().contains("facebook.com")) {
+                                    LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));
+                                }
+
+
+
                                 if (!task.isSuccessful()) {
                                     Log.w("tag5", "signInWithEmail", task.getException());
                                     Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -154,13 +180,42 @@ public class LoginActivity extends AppCompatActivity {
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
         fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email", "user_friends"));
 
-        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-                                                // if users logs into facebook and accepts
+
+
+
+
+            fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
+                    // App code
+                    System.out.println("onSuccess");
 
-                    handleFacebookAccessToken(loginResult.getAccessToken());
+                    String accessToken = loginResult.getAccessToken().getToken();
+                    Log.i("accessToken", accessToken);
+
+                    AuthCredential credential = FacebookAuthProvider.getCredential(accessToken);
+
+                    mAuth.signInWithCredential(credential);
+
+                    GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+                        @Override
+                        public void onCompleted(JSONObject object, GraphResponse response2) {
+                            Log.i("LoginActivity", response2.toString());
+                            // Get facebook data from login
+                            FacebookData = getFacebookData(object);
+                            Toast.makeText(getBaseContext(),FacebookData.get("first_name").toString(),Toast.LENGTH_SHORT).show();           // inform user that system is registering them
+                        }
+                    });
+                    Bundle parameters = new Bundle();
+                    parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
+                    request.setParameters(parameters);
+                    request.executeAsync();
                 }
+
+
+
+
 
                 @Override
                 public void onCancel() {
@@ -174,38 +229,6 @@ public class LoginActivity extends AppCompatActivity {
                     // ...
                 }
 
-            private void handleFacebookAccessToken(AccessToken token) {
-                Log.d("TAGfe", "handleFacebookAccessToken:" + token.getToken());
-
-
-                AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-
-                Log.i("hyvghv",credential.toString());
-
-                mAuth.getCurrentUser().linkWithCredential(credential)
-                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d("uygbhj", "linkWithCredential:onComplete:" + task.isSuccessful());
-
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
-                                if (!task.isSuccessful()) {
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    Toast.makeText(LoginActivity.this, "Linked!",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-
-                                // ...
-                            }
-                        });
-
-
-            }
             });
     }
 
@@ -245,50 +268,46 @@ public class LoginActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    public Bundle getFacebookData(JSONObject object) {
+        try {
+            Bundle bundle = new Bundle();
+            String id = object.getString("id");
+
+            try {
+                URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
+                Log.i("profile_pic", profile_pic + "");
+                bundle.putString("profile_pic", profile_pic.toString());
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            bundle.putString("id", id);
+            if (object.has("first_name"))
+                bundle.putString("first_name", object.getString("first_name"));
+            if (object.has("last_name"))
+                bundle.putString("last_name", object.getString("last_name"));
+            if (object.has("email"))
+                bundle.putString("email", object.getString("email"));
+            if (object.has("gender"))
+                bundle.putString("gender", object.getString("gender"));
+            if (object.has("birthday"))
+                bundle.putString("birthday", object.getString("birthday"));
+            if (object.has("location"))
+                bundle.putString("location", object.getJSONObject("location").getString("name"));
+
+            return bundle;
+        }
+        catch(JSONException e) {
+            Log.d("idk","Error parsing JSON");
+            return null;
+        }
+    }
+
+
 }
 
 
-
-                            // class used to send login request data nicely
-class LoginRequest extends StringRequest {
-    private  static final String LOGIN_REQUEST_URL = "https://myfe.000webhostapp.com/Login_User.php";
-    private Map<String, String> params;
-
-    LoginRequest(String email, String password, Response.Listener<String> listener) {
-        super(Method.POST, LOGIN_REQUEST_URL,listener, null);
-        params = new HashMap<>();
-        params.put("email", email);
-        params.put("password", password);
-    }
-
-    @Override
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-}
-
-
-
-// class used to send login request data nicely
-class FbLoginRequest extends StringRequest {
-    private  static final String LOGIN_REQUEST_URL = "https://myfe.000webhostapp.com/FB_Login_User.php";
-    private Map<String, String> params;
-
-    FbLoginRequest(String email, String password, String fbUserId, String fbPassword, String name, String dob, Response.Listener<String> listener) {
-        super(Method.POST, LOGIN_REQUEST_URL,listener, null);
-        params = new HashMap<>();
-        params.put("email", email);
-        params.put("password", password);
-        params.put("fbUserId", fbUserId);
-        params.put("fbPassword", fbPassword);
-        params.put("name", name);
-        params.put("dob", dob);
-    }
-
-    @Override
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-}

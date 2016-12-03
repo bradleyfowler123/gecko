@@ -70,7 +70,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -85,8 +84,6 @@ public class RegisterActivity extends AppCompatActivity {
                 // ...
             }
         };
-
-
 
 
         // handle sign up button click
@@ -104,11 +101,10 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 Log.d("TAGr", "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
-                                if (!task.isSuccessful()) {
+                                if(task.isSuccessful()){
+                                    task.getResult().getUser().sendEmailVerification();
+                                }
+                                else  {
                                     Toast.makeText(RegisterActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
                                 }
@@ -128,27 +124,4 @@ public class RegisterActivity extends AppCompatActivity {
         }
         return true;
     }
-}
-
-
-
-// class used to send register request data nicely
-class RegisterRequest extends StringRequest {
-    private  static final String REGISTER_REQUEST_URL = "https://myfe.000webhostapp.com/Register_User2.php";
-    private Map<String, String> params;
-
-    RegisterRequest(String email, String password, String name, String dob, Response.Listener<String> listener) {
-        super(Method.POST, REGISTER_REQUEST_URL,listener, null);
-        params = new HashMap<>();
-        params.put("email", email);
-        params.put("password", password);
-        params.put("name", name);
-        params.put("dob", dob);
-    }
-
-    @Override
-    public Map<String, String> getParams() {
-        return params;
-    }
-
 }
