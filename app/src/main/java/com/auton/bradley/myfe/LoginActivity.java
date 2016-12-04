@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().logOut();
         setContentView(R.layout.activity_login);                                                    // set the xml file to be viewed
                                         // declarations
         loginButton = (Button) findViewById(R.id.login_button);

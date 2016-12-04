@@ -106,9 +106,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-                if (facebookData.getBoolean("connected")) {
-                    LoginManager.getInstance().logOut();
-                }
                 auth.signOut();
                 currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);
