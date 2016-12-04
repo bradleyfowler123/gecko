@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     };
 //    public User user = new User();
     public Bundle facebookData;
+    public Boolean facebookConnected;
     FirebaseAuth.AuthStateListener mAuthListener;
     public FirebaseAuth auth;
     int currentTab = 0;
@@ -50,10 +51,13 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();                                                                            // add icons to tabs
                                     // store user data if any
         Intent intent = getIntent();
-        if(intent.getExtras()!=null) {
+        if(intent.getExtras()!= null) {
             currentTab = intent.getIntExtra("tab", 0);
-            facebookData = intent.getBundleExtra("fbData");
-            Log.d("bhbhhj",facebookData.toString());
+            Log.d("45e56bhbhhj",intent.getExtras().toString());
+            if (intent.getBooleanExtra("fbConnected",false)) {
+                facebookData = intent.getBundleExtra("fbData");
+                Log.d("bhbhhj",facebookData.getString("gender"));
+            }
         }
 
         if(facebookData == null) {

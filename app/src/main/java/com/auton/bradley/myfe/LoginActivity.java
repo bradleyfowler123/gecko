@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -30,6 +29,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,13 +49,13 @@ import java.util.List;
 public class LoginActivity extends AppCompatActivity {
                                         // global variable declarations
     Button loginButton;
-    Bundle FacebookData = new Bundle();
+    Bundle FacebookData;
     public int currentTab;
     CallbackManager callbackManager;
     LoginButton fbLoginButton;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    public FirebaseUser firebaseUser;
+
                                         // cycle functions
     @Override
     public void onStart() {
@@ -85,18 +85,32 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent.getExtras()!=null) { currentTab = intent.getIntExtra("tab",0);}
         else { currentTab = 0;}
-        FacebookData.putBoolean("connected", false);
                                         // function that runs every time user logs in or out in this activity
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                firebaseUser = user;
                 if (user != null) {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.putExtra("fbData",FacebookData);
-                    intent.putExtra("tab", currentTab);
-                    startActivity(intent);
+                    Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
+                    if(user.getProviders().contains("facebook.com")) {
+                        if (FacebookData != null) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("tab", currentTab);
+                            intent.putExtra("fbConnected", true);
+                            intent.putExtra("fbData",FacebookData);
+                            Log.d("bdlx", FacebookData.get("gender").toString());
+                            startActivity(intent);
+                        }
+                    }
+                    else {
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("tab", currentTab);
+                        intent.putExtra("fbConnected",false);
+                        startActivity(intent);
+                    }
+                } else {
+                    // User is signed out
+                    Log.d("TAG2", "onAuthStateChanged:signed_out");
                 }
             }
         };
@@ -116,7 +130,6 @@ public class LoginActivity extends AppCompatActivity {
                                     List providers = task.getResult().getUser().getProviders();
                                     if(providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
                                         LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
-                                        // needto get login results
                                     }
                                 }
                                 else {                                                              // if fail
@@ -150,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
                                         // send the request for data
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id, first_name, last_name, email, gender, birthday, location, friends");
+                parameters.putString("fields", "id, first_name, last_name, email, gender, birthday, location");
                 request.setParameters(parameters);
                 request.executeAsync();
             }
@@ -203,7 +216,6 @@ public class LoginActivity extends AppCompatActivity {
     public Bundle getFacebookData(JSONObject object) {
         try {
             Bundle bundle = new Bundle();
-            bundle.putBoolean("connected", true);
             String id = object.getString("id");
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
@@ -226,8 +238,6 @@ public class LoginActivity extends AppCompatActivity {
                 bundle.putString("birthday", object.getString("birthday"));
             if (object.has("location"))
                 bundle.putString("location", object.getJSONObject("location").getString("name"));
-            if (object.has("friends"))
-                bundle.putString("friends", object.toString());
 
             return bundle;
         }
