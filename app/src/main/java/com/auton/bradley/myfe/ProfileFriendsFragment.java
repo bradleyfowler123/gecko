@@ -41,12 +41,13 @@ public class ProfileFriendsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_profile_friends, container, false);        // enables easy access to the root search xml
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
-
+                                // get user info
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
         Bundle fbData = activity.facebookData;
+        Boolean fbCon = activity.facebookConnected;
 
-        RequestCreator picURLs[] = {Picasso.with(getContext()).load(fbData.get("profile_pic").toString())};
+        RequestCreator picURLs[] = {Picasso.with(getContext()).load(fbData.getString("profile_pic"))};
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
         activities.add("Bradley Fowler");

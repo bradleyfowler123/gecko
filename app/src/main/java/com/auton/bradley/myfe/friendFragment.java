@@ -23,9 +23,9 @@ public class FriendFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         View LoggedInView = rootView.findViewById(R.id.friend_LoggedIn);
+                                // get user info
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
-        Bundle fbData = activity.facebookData;
 
         if(user != null) {
             LoggedInView.setVisibility(View.VISIBLE);

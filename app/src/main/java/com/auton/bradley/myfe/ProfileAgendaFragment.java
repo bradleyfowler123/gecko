@@ -38,7 +38,6 @@ public class ProfileAgendaFragment extends Fragment {
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
-        Bundle fbData = activity.facebookData;
 
         String agenda = "lies,ssa,adx;more,axd,adxwx;more,wexs,cdd";
         ArrayList<String> activities = new ArrayList<>();

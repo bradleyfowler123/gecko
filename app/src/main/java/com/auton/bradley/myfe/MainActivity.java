@@ -1,7 +1,6 @@
 package com.auton.bradley.myfe;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +13,6 @@ import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     // declarations
@@ -27,10 +25,8 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_friend_feed_grey,
             R.drawable.ic_planner
     };
-//    public User user = new User();
     public Bundle facebookData;
     public Boolean facebookConnected;
-    FirebaseAuth.AuthStateListener mAuthListener;
     public FirebaseAuth auth;
     int currentTab = 0;
 
@@ -53,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent.getExtras()!= null) {
             currentTab = intent.getIntExtra("tab", 0);
-            Log.d("45e56bhbhhj",intent.getExtras().toString());
-            if (intent.getBooleanExtra("fbConnected",false)) {
+            facebookConnected = intent.getBooleanExtra("fbConnected", false);
+            if (facebookConnected) {
                 facebookData = intent.getBundleExtra("fbData");
                 Log.d("bhbhhj",facebookData.getString("gender"));
             }
         }
 
-        if(facebookData == null) {
+        if(facebookConnected == null) {
             auth.signOut();
         }
 

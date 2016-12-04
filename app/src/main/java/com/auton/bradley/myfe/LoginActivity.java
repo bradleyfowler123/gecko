@@ -29,7 +29,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,26 +89,22 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
+                if (user != null) {                                                                 // if user logged into firebase
                     Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
-                    if(user.getProviders().contains("facebook.com")) {
-                        if (FacebookData != null) {
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("tab", currentTab);
+                    if(user.getProviders() != null && user.getProviders().contains("facebook.com")) { // check to see if facebook is linked to their account
+                        if (FacebookData != null) {                                                 // if it is see if the facebook data has been gotten yet
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
+                            intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
                             intent.putExtra("fbConnected", true);
                             intent.putExtra("fbData",FacebookData);
-                            Log.d("bdlx", FacebookData.get("gender").toString());
-                            startActivity(intent);
-                        }
-                    }
-                    else {
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);}}
+                    else {                                                                          // if facebook is not linked
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);         // start main activity and pass relevant data
                         intent.putExtra("tab", currentTab);
                         intent.putExtra("fbConnected",false);
                         startActivity(intent);
                     }
-                } else {
-                    // User is signed out
+                } else {                                                                            // User is signed out
                     Log.d("TAG2", "onAuthStateChanged:signed_out");
                 }
             }
@@ -169,14 +164,13 @@ public class LoginActivity extends AppCompatActivity {
             }
                                         // if login screen was cancelled
             @Override
-            public void onCancel() { Log.d("oncanas", "facebook:onCancel");}
+            public void onCancel() { Log.d("onFbCancel", "facebook:onCancel");}
                                         // if login error
             @Override
-            public void onError(FacebookException error) { Log.d("hbcsh", "facebook:onError", error);}
+            public void onError(FacebookException error) { Log.d("onFbError", "facebook:onError", error);}
 
         });
     }
-
                                     // facebook - passes data back to facebook api
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
