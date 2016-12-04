@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {                                                                 // User is signed in
                     Log.d("TAGr1", "onAuthStateChanged:signed_in:" + user.getUid());
                                     // add name and profile pic
@@ -72,9 +72,11 @@ public class RegisterActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Log.d("DisplayNameAdded", "User profile updated.");
-                                                        // start Login activity
-                                        Intent intent2 = new Intent(RegisterActivity.this, LoginActivity.class);
-                                        startActivity(intent2);
+                                                        // start Main activity
+                                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                               //         intent.putExtra("tab", 0);
+                               //         intent.putExtra("fbConnected", false);
+                                        startActivity(intent);
                                     }
                                 }
                             });

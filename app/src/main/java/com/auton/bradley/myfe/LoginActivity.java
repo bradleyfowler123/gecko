@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -90,22 +91,38 @@ public class LoginActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {                                                                 // if user logged into firebase
                     Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
-                    if(user.getProviders() != null && user.getProviders().contains("facebook.com")) { // check to see if facebook is linked to their account
-                        if (FacebookData != null) {                                                 // if it is see if the facebook data has been gotten yet
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
-                            intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
-                            intent.putExtra("fbConnected", true);
-                            intent.putExtra("fbData",FacebookData);
-                            startActivity(intent);}}
-                    else {                                                                          // if facebook is not linked
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);         // start main activity and pass relevant data
-                        intent.putExtra("tab", currentTab);
-                        intent.putExtra("fbConnected",false);
-                        startActivity(intent);
-                    }
+                        if (user.getProviders() != null && user.getProviders().contains("facebook.com")) { // check to see if facebook is linked to their account
+                            if (FacebookData != null) {                                                 // if it is see if the facebook data has been gotten yet
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
+                                intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
+                                intent.putExtra("fbConnected", true);
+                                intent.putExtra("fbData", FacebookData);
+                                startActivity(intent);
+                            }
+                        } else {                                                                          // if facebook is not linked
+                            if(!user.isEmailVerified()) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                builder.setMessage("Your email address has not been verified yet. Please follow the link we sent you after you registered")
+                                        .setPositiveButton("Resend Verification",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog,int id) {
+                                                        user.sendEmailVerification();                       // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                                                    }
+                                                })
+                                        .setNegativeButton("Okay", null)
+                                        .create()
+                                        .show();
+                            }
+                            else {
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);         // start main activity and pass relevant data
+                                intent.putExtra("tab", currentTab);
+                                intent.putExtra("fbConnected", false);
+                                startActivity(intent);
+                            }
+                        }
                 } else {                                                                            // User is signed out
                     Log.d("TAG2", "onAuthStateChanged:signed_out");
                 }
@@ -126,9 +143,11 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {                                           // if success
-                                        List providers = task.getResult().getUser().getProviders();
-                                        if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
-                                            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
+                                        if(task.getResult().getUser().isEmailVerified()) {          // if email has been verified
+                                            List providers = task.getResult().getUser().getProviders();
+                                            if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
+                                                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
+                                            }
                                         }
                                     } else {                                                              // if fail
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -157,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response2) {
-                        FacebookData = getFacebookData(object);                                     // Get facebook data from login         // inform user that system is registering them
+                        FacebookData = getFacebookData(object);                                     // Get facebook data from login
                     }
                 });
                                         // send the request for data
