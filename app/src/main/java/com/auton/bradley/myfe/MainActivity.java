@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-                if (facebookData.getBoolean("connected")) {
+                if (facebookConnected) {
                     LoginManager.getInstance().logOut();
                 }
                 auth.signOut();
