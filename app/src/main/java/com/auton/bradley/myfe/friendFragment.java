@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseUser;
+
 
 // fragment that handles the friends tab
 public class FriendFragment extends Fragment {
@@ -21,9 +23,11 @@ public class FriendFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         View LoggedInView = rootView.findViewById(R.id.friend_LoggedIn);
-
         MainActivity activity = (MainActivity) getActivity();
-        if(activity.user.loggedIn) {
+        FirebaseUser user = activity.auth.getCurrentUser();
+        Bundle fbData = activity.facebookData;
+
+        if(user != null) {
             LoggedInView.setVisibility(View.VISIBLE);
             signUp.setVisibility(View.INVISIBLE);
             signUp.setHeight(0);

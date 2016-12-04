@@ -17,6 +17,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -42,40 +43,14 @@ public class ProfileFriendsFragment extends Fragment {
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
 
         MainActivity activity = (MainActivity) getActivity();
+        FirebaseUser user = activity.auth.getCurrentUser();
+        Bundle fbData = activity.facebookData;
 
-        RequestCreator picURLs[] = {Picasso.with(getContext()).load(activity.user.facebookData.get("profilePic").toString())};
+        RequestCreator picURLs[] = {Picasso.with(getContext()).load(fbData.get("profile_pic").toString())};
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
         activities.add("Bradley Fowler");
         dates.add("is going go-karting tomorrow");
-
-
-        String fbUserId = activity.user.facebookData.get("userId").toString();
-        if (!fbUserId.equals("")) {
-
-                           /* make the API call */
-            new GraphRequest(
-                    AccessToken.getCurrentAccessToken(),
-                    "/" + fbUserId + "/friends",
-                    null,
-                    HttpMethod.GET,
-                    new GraphRequest.Callback() {
-                        public void onCompleted(GraphResponse response) {
-
-                            Log.i("unique!!",response.getJSONObject().toString());
-
-                            /* handle the result */
-                        }
-
-
-                    }
-            ).executeAsync();
-
-
-        }
-
-
-
 
         profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
         pa_list.setAdapter(adapter);

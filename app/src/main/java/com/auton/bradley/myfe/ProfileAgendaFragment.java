@@ -15,6 +15,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
@@ -35,9 +36,11 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-
         MainActivity activity = (MainActivity) getActivity();
-        String agenda = activity.user.agenda;
+        FirebaseUser user = activity.auth.getCurrentUser();
+        Bundle fbData = activity.facebookData;
+
+        String agenda = "lies,ssa,adx;more,axd,adxwx;more,wexs,cdd";
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> companies = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();

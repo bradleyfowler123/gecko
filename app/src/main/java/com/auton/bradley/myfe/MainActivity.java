@@ -1,16 +1,20 @@
 package com.auton.bradley.myfe;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     // declarations
@@ -23,14 +27,16 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_friend_feed_grey,
             R.drawable.ic_planner
     };
-    public User user = new User();
+//    public User user = new User();
+    public Bundle facebookData;
+    FirebaseAuth.AuthStateListener mAuthListener;
+    public FirebaseAuth auth;
     int currentTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-    //    AppEventsLogger.activateApp(this);
+        auth = FirebaseAuth.getInstance();
                                             // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
                                             // load action bar
@@ -44,16 +50,16 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();                                                                            // add icons to tabs
                                     // store user data if any
         Intent intent = getIntent();
-        currentTab = intent.getIntExtra("tab",0);
-        if(intent.getStringExtra("email")!=null) {
-            String email = intent.getStringExtra("email");
-            String password = intent.getStringExtra("password");
-            String name = intent.getStringExtra("name");
-            String dob = intent.getStringExtra("dob");
-            String agenda = intent.getStringExtra("agenda");
-            Bundle fbData = intent.getBundleExtra("fbData");
-            user.LogIn(email,password,name,dob,agenda,fbData);
+        if(intent.getExtras()!=null) {
+            currentTab = intent.getIntExtra("tab", 0);
+            facebookData = intent.getBundleExtra("fbData");
+            Log.d("bhbhhj",facebookData.toString());
         }
+
+        if(facebookData == null) {
+            auth.signOut();
+        }
+
         viewPager.setCurrentItem(currentTab);
     }
 
@@ -78,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if(user.loggedIn) {
+        if(auth.getCurrentUser() != null) {
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(true);
         }
@@ -100,10 +106,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-                if (!user.facebookData.get("userId").equals("")) {
+                if (facebookData.getBoolean("connected")) {
                     LoginManager.getInstance().logOut();
                 }
-                user.LogOut();
+                auth.signOut();
                 currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.putExtra("tab",viewPager.getCurrentItem());
