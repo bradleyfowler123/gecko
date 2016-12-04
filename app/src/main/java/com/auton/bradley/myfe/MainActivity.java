@@ -12,9 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.FacebookActivity;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class MainActivity extends AppCompatActivity {
     // declarations
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
+        FacebookSdk.sdkInitialize(getApplicationContext());
                                             // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
                                             // load action bar
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(facebookConnected == null) {
             auth.signOut();
-            facebookConnected = true;
+            facebookConnected = false;
         }
 
         viewPager.setCurrentItem(currentTab);
@@ -109,10 +113,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-                if (facebookConnected) {
+           //     if (facebookConnected) {
                     LoginManager.getInstance().logOut();
-                }
+           //     }
                 auth.signOut();
+                facebookConnected = false;
                 currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.putExtra("tab",viewPager.getCurrentItem());
