@@ -1,10 +1,10 @@
 package com.auton.bradley.myfe;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,21 +13,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 /**
  * Created by Bradley on 09/11/2016.
@@ -35,16 +26,15 @@ import java.util.Map;
  */
 
 public class RegisterActivity extends AppCompatActivity {
-
+                                    // global variables
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+                                    // cycle functions
     @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
-
     @Override
     public void onStop() {
         super.onStop();
@@ -52,71 +42,89 @@ public class RegisterActivity extends AppCompatActivity {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-
-
+                                    // main function
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mAuth = FirebaseAuth.getInstance();
-
         setContentView(R.layout.activity_register);                                                 // set the xml file to be viewed
-        // declarations
+                                    // declarations
         final Button registerButton = (Button) findViewById(R.id.register_button);
         final EditText etEmail = (EditText) findViewById(R.id.editText_register_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_register_password);
         final EditText etName = (EditText) findViewById(R.id.editText_register_name);
-        final EditText etDob = (EditText) findViewById(R.id.editText_register_dob);
-
-
-
+                                    // function that runs every time user logs in or out
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
+                if (user != null) {                                                                 // User is signed in
                     Log.d("TAGr1", "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
+                                    // add name and profile pic
+                    final String name = etName.getText().toString();
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(name)
+                            //    .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
+                            .build();
+                    user.updateProfile(profileUpdates)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d("DisplayNameAdded", "User profile updated.");
+                                                        // start Login activity
+                                        Intent intent2 = new Intent(RegisterActivity.this, LoginActivity.class);
+                                        startActivity(intent2);
+                                    }
+                                }
+                            });
+                } else {                                                                            // User is signed out
                     Log.d("TAG2r", "onAuthStateChanged:signed_out");
                 }
-                // ...
             }
         };
-
-
-        // handle sign up button click
+                                    // handle sign up button click
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // get the user's entered data
-                final String name = etName.getText().toString();
+                                    // get the user's entered data
                 final String email = etEmail.getText().toString();
                 final String password = etPassword.getText().toString();
-                final String dob = etDob.getText().toString();
-
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d("TAGr", "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                if(task.isSuccessful()){
-                                    task.getResult().getUser().sendEmailVerification();
+                final String name = etName.getText().toString();
+                                    // silly data entered checks
+                if(email.isEmpty()) Toast.makeText(getBaseContext(),"Enter an email address",Toast.LENGTH_LONG).show();
+                else if (password.isEmpty()) Toast.makeText(getBaseContext(),"Enter a password",Toast.LENGTH_LONG).show();
+                else if (password.length() < 6) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                    builder.setMessage("Password should be at least 6 characters")
+                            .setNegativeButton(getString(R.string.login_retry_button), null)
+                            .create()
+                            .show();}
+                else if (name.isEmpty()) Toast.makeText(getBaseContext(),"Enter a name",Toast.LENGTH_LONG).show();
+                                    // if all data meets checks
+                else {                                                                              // create account with firebase
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    Log.d("TAGr", "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                    if (task.isSuccessful()) {
+                                        task.getResult().getUser().sendEmailVerification();
+                                    } else {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                                        builder.setMessage("Register Failed")
+                                                .setNegativeButton(getString(R.string.login_retry_button), null)
+                                                .create()
+                                                .show();
+                                    }
                                 }
-                                else  {
-                                    Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-
-                                // ...
-                            }
-                        });
+                            });
+                }
             }
         });
     }
 
-    // add back button to take user to login screen
+                                    // add back button to take user to login screen
     public boolean onCreateOptionsMenu(Menu menu) {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {

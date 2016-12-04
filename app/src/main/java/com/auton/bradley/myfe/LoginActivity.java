@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -116,27 +117,29 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final String email = etEmail.getText().toString();                                  // get the entered email address
                 final String password = etPassword.getText().toString();                            // get the entered password
-                                        // sign in user
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                        // when data is returned
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()) {                                           // if success
-                                    List providers = task.getResult().getUser().getProviders();
-                                    if(providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
-                                        LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
+                if(email.isEmpty()) Toast.makeText(getBaseContext(),"Enter an email address",Toast.LENGTH_LONG).show();
+                else if (password.isEmpty()) Toast.makeText(getBaseContext(),"Enter a password",Toast.LENGTH_LONG).show();
+                else {                                                                              // sign in user
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                // when data is returned
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {                                           // if success
+                                        List providers = task.getResult().getUser().getProviders();
+                                        if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
+                                            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
+                                        }
+                                    } else {                                                              // if fail
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                        builder.setMessage(getString(R.string.login_failed))
+                                                .setNegativeButton(getString(R.string.login_retry_button), null)
+                                                .create()
+                                                .show();
                                     }
                                 }
-                                else {                                                              // if fail
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                    builder.setMessage(getString(R.string.login_failed))
-                                            .setNegativeButton(getString(R.string.login_retry_button), null)
-                                            .create()
-                                            .show();
-                                }
-                            }
-                        });
+                            });
+                }
             }
         });
                                         // handle facebook login button press
