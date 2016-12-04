@@ -234,6 +234,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             Bundle bundle = new Bundle();
             String id = object.getString("id");
+            Log.d("jewnjhc ds",object.toString());
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
                 Log.i("profile_pic", profile_pic + "");

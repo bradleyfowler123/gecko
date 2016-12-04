@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.FacebookActivity;
 import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(facebookConnected == null) {
             auth.signOut();
+            facebookConnected = true;
         }
 
         viewPager.setCurrentItem(currentTab);

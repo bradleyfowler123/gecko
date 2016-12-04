@@ -16,11 +16,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.net.URL;
+import java.security.Provider;
+import java.util.Iterator;
+import java.util.List;
+
+import bolts.Capture;
 
 /*
 Java file to contain all class' related to the friend feed sub tab
@@ -46,10 +62,52 @@ public class FriendFeedFragment extends Fragment {
                                 // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_friend_feed, container, false);        // enables easy access to the root search xml
         ListView ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                              // locate the list object in the home tab
+                                    // get user info
+        MainActivity activity = (MainActivity) getActivity();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        Bundle fbData = activity.facebookData;
+        Boolean fbCon = activity.facebookConnected;
+
+        Iterator<? extends UserInfo> providers = user.getProviderData().iterator();
+
+        String userID = "";
+        while (providers.hasNext()) {
+            UserInfo provider = providers.next();
+            Log.d("hjb",provider.getProviderId());
+            if (provider.getProviderId().equals("facebook.com")) {
+                userID = provider.getUid();
+                break;
+            };
+        }
+        Log.d("wndsjkx", userID);
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/"+userID+"/friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        JSONObject object = response.getJSONObject();
+                        JSONArray friendData; String friends = "";
+                        try {
+                            friendData = object.getJSONArray("data");
+                            friends = object.getJSONObject("summary").getString("total_count");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("bjdsnxn", friends);
+                    }
+                }
+        ).executeAsync();
+
+
         RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         final String[] friendNames = getResources().getStringArray(R.array.friendNames);                // get the names of the recommendations to display
         final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display
         final String[] timeAgo = getResources().getStringArray(R.array.timeAgo);                // get the names of the recommendations to display
+
+
         // populate the list
         friendFeedAdapter adapter = new friendFeedAdapter(getActivity(),friendNames, activityDescriptions, timeAgo ,picURLs);
         ff_list.setAdapter(adapter);
@@ -60,6 +118,7 @@ public class FriendFeedFragment extends Fragment {
                 Toast.makeText(getContext(),"What do you want me to do?",Toast.LENGTH_SHORT).show();
             }
         });
+
 
         return rootView;
     }
