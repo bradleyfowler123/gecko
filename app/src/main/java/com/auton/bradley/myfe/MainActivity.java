@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             facebookConnected = intent.getBooleanExtra("fbConnected", false);
             if (facebookConnected) {
                 facebookData = intent.getBundleExtra("fbData");
-                Log.d("bhbhhj",facebookData.getString("gender"));
+                Log.d("bhbhhj",facebookData.getString("friends"));
             }
         }
 

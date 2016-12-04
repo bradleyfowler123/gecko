@@ -68,40 +68,6 @@ public class FriendFeedFragment extends Fragment {
         Bundle fbData = activity.facebookData;
         Boolean fbCon = activity.facebookConnected;
 
-        Iterator<? extends UserInfo> providers = user.getProviderData().iterator();
-
-        String userID = "";
-        while (providers.hasNext()) {
-            UserInfo provider = providers.next();
-            Log.d("hjb",provider.getProviderId());
-            if (provider.getProviderId().equals("facebook.com")) {
-                userID = provider.getUid();
-                break;
-            };
-        }
-        Log.d("wndsjkx", userID);
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/"+userID+"/friends",
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        JSONObject object = response.getJSONObject();
-                        JSONArray friendData; String friends = "";
-                        try {
-                            friendData = object.getJSONArray("data");
-                            friends = object.getJSONObject("summary").getString("total_count");
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("bjdsnxn", friends);
-                    }
-                }
-        ).executeAsync();
-
-
         RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         final String[] friendNames = getResources().getStringArray(R.array.friendNames);                // get the names of the recommendations to display
         final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display

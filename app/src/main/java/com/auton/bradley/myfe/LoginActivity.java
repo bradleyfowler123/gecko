@@ -14,12 +14,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -31,13 +33,16 @@ import com.google.firebase.auth.FacebookAuthProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -168,15 +173,16 @@ public class LoginActivity extends AppCompatActivity {
                                         // if login was successful
             @Override
             public void onSuccess(LoginResult loginResult) {
-                String accessToken = loginResult.getAccessToken().getToken();                       // get the access token
-                Log.i("fbAccessToken", accessToken);
-                AuthCredential credential = FacebookAuthProvider.getCredential(accessToken);        // generate firebase credential
+                final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
+                Log.i("fbAccessToken", accessToken.getToken());
+                AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());        // generate firebase credential
                 mAuth.signInWithCredential(credential);                                             // login with firebase
                                         // get data from fb account
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response2) {
-                        FacebookData = getFacebookData(object);                                     // Get facebook data from login
+                        JSONArray friends = getFacebookFriends(accessToken);
+                        FacebookData = getFacebookData(object, friends);                                     // Get facebook data from login
                     }
                 });
                                         // send the request for data
@@ -229,8 +235,32 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public JSONArray getFacebookFriends(AccessToken accessToken) {
+        final JSONArray[] friendData = {null};
+        new GraphRequest(
+                accessToken,
+                "/"+ accessToken.getUserId() +"/friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        JSONObject object = response.getJSONObject();
+                        String friends = "";
+                        try {
+                            friendData[0] = object.getJSONArray("data");
+                            friends = object.getJSONObject("summary").getString("total_count");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("bjdsnxn", friends);
+                    }
+                }
+        ).executeAsync();
+        return friendData[0];
+    }
                                     // function to get all of the data
-    public Bundle getFacebookData(JSONObject object) {
+    public Bundle getFacebookData(JSONObject object, JSONArray friends) {
         try {
             Bundle bundle = new Bundle();
             String id = object.getString("id");
@@ -256,6 +286,10 @@ public class LoginActivity extends AppCompatActivity {
                 bundle.putString("birthday", object.getString("birthday"));
             if (object.has("location"))
                 bundle.putString("location", object.getJSONObject("location").getString("name"));
+            if (friends!=null)
+                bundle.putString("friends", friends.toString());
+            else
+                bundle.putString("friends", "0");
 
             return bundle;
         }
