@@ -39,7 +39,7 @@ public class ProfileAgendaFragment extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
 
-        String agenda = "lies,ssa,adx;more,axd,adxwx;more,wexs,cdd";
+        String agenda = "lies;ssa;adx:more;axd;adxwx:more;wexs;cdd";
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> companies = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
@@ -51,7 +51,7 @@ public class ProfileAgendaFragment extends Fragment {
         else {
             Log.i("tag",agenda);
             String[] agendaItems = agenda.split(":");
-            String itemElements[][] = new String[2][3];
+            String itemElements[][] = new String[agendaItems.length][3];
             for(int i=0; i<agendaItems.length; i++){
                 itemElements[i] = agendaItems[i].split(";");
                 activities.add(itemElements[i][0]);

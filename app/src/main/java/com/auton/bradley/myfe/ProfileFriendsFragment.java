@@ -47,14 +47,20 @@ public class ProfileFriendsFragment extends Fragment {
         Bundle fbData = activity.facebookData;
         Boolean fbCon = activity.facebookConnected;
 
-        RequestCreator picURLs[] = {Picasso.with(getContext()).load(fbData.getString("profile_pic"))};
-        ArrayList<String> activities = new ArrayList<>();
-        ArrayList<String> dates = new ArrayList<>();
-        activities.add("Bradley Fowler");
-        dates.add("is going go-karting tomorrow");
+        if (fbCon) {
+            RequestCreator[] picURLs = {Picasso.with(getContext()).load(fbData.getString("profile_pic"))};
+            ArrayList<String> activities = new ArrayList<>();
+            ArrayList<String> dates = new ArrayList<>();
+            activities.add("Bradley Fowler");
+            dates.add("is going go-karting tomorrow");
 
-        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
-        pa_list.setAdapter(adapter);
+            profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
+            pa_list.setAdapter(adapter);
+        }
+        else {
+            //
+        }
+
 
         return rootView;
     }
