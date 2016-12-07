@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -26,6 +29,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -33,6 +37,7 @@ import com.google.firebase.auth.FacebookAuthProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.auth.UserInfo;
 
 import org.json.JSONArray;
@@ -44,6 +49,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.Inflater;
 
 /**
  * Created by Bradley on 04/11/2016.
@@ -175,14 +181,63 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
                 Log.i("fbAccessToken", accessToken.getToken());
-                AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());        // generate firebase credential
-                mAuth.signInWithCredential(credential);                                             // login with firebase
+                final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());        // generate firebase credential
                                         // get data from fb account
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response2) {
                         JSONArray friends = getFacebookFriends(accessToken);
                         FacebookData = getFacebookData(object, friends);                                     // Get facebook data from login
+
+                        Task<ProviderQueryResult> providers = mAuth.fetchProvidersForEmail(FacebookData.getString("email"));
+                        providers.addOnSuccessListener(new OnSuccessListener<ProviderQueryResult>() {
+                            @Override
+                            public void onSuccess(ProviderQueryResult providerQueryResult) {
+                                if(providerQueryResult.getProviders().contains("facebook.com")) {
+                                    mAuth.signInWithCredential(credential);
+                                }
+                                else { // they have a myfe account but have not connected facebook yet
+                                    final ViewGroup nullParent = null;
+                                    View promptsView = getLayoutInflater().inflate(R.layout.input_prompt,nullParent); // get input_prompts.xml view
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                    builder.setView(promptsView);                                    // set input_prompts.xml to alert dialog builder
+
+                                    final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
+                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);                                          // set the dialog input data type
+                                    final TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage);
+                                    promptMessage.setVisibility(View.GONE);
+
+                                    builder.setMessage(FacebookData.getString("first_name")+ ", you have not yet linked Facebook to your Myfe account. Please enter your Myfe password below to link it.")
+                                            .setPositiveButton("Link",
+                                                    new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog,int id) {
+                                                            String pass = userInput.getText().toString();
+                                                            mAuth.signInWithEmailAndPassword(FacebookData.getString("email"),pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                                                    if(task.isSuccessful()) {
+                                                                        task.getResult().getUser().linkWithCredential(credential);
+                                                                    }
+                                                                    else {
+                                                                        Toast.makeText(LoginActivity.this,"Password Incorrect",Toast.LENGTH_LONG).show();
+                                                                        LoginManager.getInstance().logOut();
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    })
+                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog,int id) {
+                                                    LoginManager.getInstance().logOut();
+                                                }
+                                            })
+                                            .create()
+                                            .show();
+                                }
+                                Log.d("fdjkv fd", providerQueryResult.getProviders().toString());
+
+                            }
+                        });
                     }
                 });
                                         // send the request for data
