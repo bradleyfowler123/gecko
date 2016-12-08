@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -53,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         final EditText etEmail = (EditText) findViewById(R.id.editText_register_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_register_password);
         final EditText etName = (EditText) findViewById(R.id.editText_register_name);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.registerProgressBar);
                                     // function that runs every time user logs in or out
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -103,6 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                 else if (name.isEmpty()) Toast.makeText(getBaseContext(),"Enter a name",Toast.LENGTH_LONG).show();
                                     // if all data meets checks
                 else {                                                                              // create account with firebase
+                    progressBar.setVisibility(View.VISIBLE);
                     mAuth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
@@ -111,6 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         task.getResult().getUser().sendEmailVerification();
                                     } else {
+                                        progressBar.setVisibility(View.INVISIBLE);
                                         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
                                         builder.setMessage("Register Failed - " + task.getException().getMessage())
                                                 .setNegativeButton(getString(R.string.login_retry_button), null)

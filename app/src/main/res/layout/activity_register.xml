@@ -3,7 +3,8 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
     >
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,60 +12,69 @@
         android:orientation="vertical">
 
 
-    <TextView
-        android:text="@string/register_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-        android:textAlignment="center"
-        android:textSize="20sp" />
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:id="@+id/registerProgressBar"
+            android:indeterminate="true"
+            android:visibility="invisible"/>
 
-    <TextView
-        android:text="@string/register_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
-        android:id="@+id/editText_register_email"
-        android:labelFor="@id/editText_register_email"/>
+        <TextView
+            android:text="@string/register_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:textAlignment="center"
+            android:textSize="20sp" />
 
-    <TextView
-        android:text="@string/register_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:text="@string/register_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/editText_register_password"
-        android:labelFor="@id/editText_register_password" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/editText_register_email"
+            android:labelFor="@id/editText_register_email"/>
 
-    <TextView
-        android:text="@string/register_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        <TextView
+            android:text="@string/register_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:id="@+id/editText_register_name"
-        android:labelFor="@id/editText_register_name"
-        android:textSize="18sp"
-        android:maxLines="1"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/editText_register_password"
+            android:labelFor="@id/editText_register_password" />
 
-        <Button
-        android:text="@string/register_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_button" />
+        <TextView
+            android:text="@string/register_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:id="@+id/editText_register_name"
+            android:labelFor="@id/editText_register_name"
+            android:textSize="18sp"
+            android:maxLines="1"/>
+
+            <Button
+            android:text="@string/register_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/register_button" />
 
     </LinearLayout>
 </ScrollView>
