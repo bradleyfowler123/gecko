@@ -85,7 +85,7 @@ public class FriendFragment extends Fragment {
                         final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
                         Log.i("fbAccessToken", accessToken.getToken());
                         final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());  // generate firebase credential
-                        // make request for facebook user information
+                                                // make request for facebook user information
                         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                             @Override           // when data is returned
                             public void onCompleted(JSONObject object, GraphResponse response2) {
@@ -94,14 +94,13 @@ public class FriendFragment extends Fragment {
                                 if(FacebookData.getString("email").equals(user.getEmail())) {
                                     user.linkWithCredential(credential);
                                     Toast.makeText(getContext(),"FB Linked",Toast.LENGTH_SHORT).show();
-
-                                    Intent intent = new Intent();     // if there is facebook data
-                                    intent.putExtra("tab", 3);                                     // start main activity and pass relevant data
+                                                    // restart main activity to display new user state
+                                    Intent intent = new Intent();
+                                    intent.putExtra("tab", 3);
                                     intent.putExtra("fbConnected", true);
                                     intent.putExtra("fbData", FacebookData);
                                     activity.setIntent(intent);
                                     activity.recreate();
-
                                 }
                                 else {
                                     LoginManager.getInstance().logOut();

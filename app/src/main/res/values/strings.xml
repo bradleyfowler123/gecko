@@ -20,7 +20,7 @@
     <string name="login_button">Login</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
-    <string name="login_create_account">New? Create an account here</string>
+    <string name="login_create_account">New? Sign Up</string>
     <string name="login_failed">Login Failed - Email or Password Incorrect</string>
     <string name="login_retry_button">Retry</string>
 
