@@ -158,11 +158,37 @@ public class LoginActivity extends AppCompatActivity {
                                             LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "email", "user_friends"));   // login facebook and get data
                                         }
                                     } else {                                                              // if fail
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                        builder.setMessage("Login Failed - " + task.getException().getMessage())
-                                                .setNegativeButton(getString(R.string.login_retry_button), null)
-                                                .create()
-                                                .show();
+                                                                            // if fails due to not a network error
+                                        if (!task.getException().getMessage().contains("A network error")){
+                                                                                    // allow them to reset password
+                                            final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                            builder.setMessage("Login Failed - Email or password incorrect.")
+                                                    .setPositiveButton(getString(R.string.login_retry_button), null)
+                                                    .setNegativeButton("reset password", new DialogInterface.OnClickListener() {
+                                                                public void onClick(DialogInterface dialog, int id) {
+                                                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(LoginActivity.this);
+                                                                    builder2.setMessage("Are you sure you want to reset your password? This cannot be undone.")
+                                                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                                                public void onClick(DialogInterface dialog, int id) {
+                                                                                    mAuth.sendPasswordResetEmail(email);
+                                                                                    Toast.makeText(LoginActivity.this,"Password reset link sent", Toast.LENGTH_SHORT).show();
+                                                                                }
+                                                                            })
+                                                                            .setNegativeButton("No", null)
+                                                                            .create()
+                                                                            .show();
+                                                                }
+                                                            })
+                                                    .create()
+                                                    .show();
+                                        }
+                                        else {                          // if login fails due to other reason, tell them why
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                            builder.setMessage("Login Failed - Network error.")
+                                                    .setPositiveButton(getString(R.string.login_retry_button), null)
+                                                    .create()
+                                                    .show();
+                                        }
                                     }
                                 }
                             });
