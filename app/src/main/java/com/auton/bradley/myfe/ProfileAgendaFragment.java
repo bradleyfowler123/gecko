@@ -39,7 +39,7 @@ public class ProfileAgendaFragment extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
 
-        String agenda = "lies;ssa;adx:more;axd;adxwx:more;wexs;cdd";
+        String agenda = "Go-Karting;Swains, Buxton;2pm Tomorrow:Hip-Hop Class; 2 Berwick Road, Buxton;7pm Wed 20th:Pottery Workshop; Potts R Us, Buxton;11am Sat 24th";
         ArrayList<String> activities = new ArrayList<>();
         ArrayList<String> companies = new ArrayList<>();
         ArrayList<String> dates = new ArrayList<>();
