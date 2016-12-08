@@ -12,8 +12,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // declarations
         loginButton = (Button) findViewById(R.id.login_button);
         fbLoginButton = (LoginButton) findViewById(R.id.login_with_facebook_button);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.loginProgressBar);
         final EditText etEmail = (EditText) findViewById(R.id.editText_login_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_login_password);
         Intent intent = getIntent();
@@ -142,6 +145,9 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);                                                // show progress bar
+                InputMethodManager imm = (InputMethodManager)getSystemService(LoginActivity.INPUT_METHOD_SERVICE);  // hide keyboard
+                imm.hideSoftInputFromWindow(etPassword.getWindowToken(), 0);
                 final String email = etEmail.getText().toString();                                  // get the entered email address
                 final String password = etPassword.getText().toString();                            // get the entered password
                 if(email.isEmpty()) Toast.makeText(getBaseContext(),"Enter an email address",Toast.LENGTH_LONG).show();
@@ -158,6 +164,7 @@ public class LoginActivity extends AppCompatActivity {
                                             LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "email", "user_friends"));   // login facebook and get data
                                         }
                                     } else {                                                              // if fail
+                                        progressBar.setVisibility(View.INVISIBLE);                          // hide progress bar
                                                                             // if fails due to not a network error
                                         if (!task.getException().getMessage().contains("A network error")){
                                                                                     // allow them to reset password
@@ -202,6 +209,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // if login to facebook was successful
             @Override
             public void onSuccess(LoginResult loginResult) {
+                progressBar.setVisibility(View.VISIBLE);
                 final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
                 Log.i("fbAccessToken", accessToken.getToken());
                 final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());  // generate firebase credential
@@ -248,6 +256,7 @@ public class LoginActivity extends AppCompatActivity {
                                                                     else {          // return to initial state
                                                                         Toast.makeText(LoginActivity.this,"Password Incorrect",Toast.LENGTH_LONG).show();
                                                                         LoginManager.getInstance().logOut();
+                                                                        progressBar.setVisibility(View.INVISIBLE);                          // hide progress bar
                                                                     }
                                                                 }
                                                             });
@@ -256,6 +265,7 @@ public class LoginActivity extends AppCompatActivity {
                                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog,int id) {
                                                     LoginManager.getInstance().logOut();
+                                                    progressBar.setVisibility(View.INVISIBLE);                          // hide progress bar
                                                 }
                                             })
                                             .create()
@@ -278,7 +288,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onCancel() { Log.d("onFbCancel", "facebook:onCancel");}
                                         // if login error
             @Override
-            public void onError(FacebookException error) { Log.d("onFbError", "facebook:onError", error);}
+            public void onError(FacebookException error) {
+                Toast.makeText(LoginActivity.this,"Error - " + error.getMessage(),Toast.LENGTH_SHORT).show();
+                Log.d("onFbError", "facebook:onError", error);}
 
         });
     }
