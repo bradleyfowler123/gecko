@@ -38,7 +38,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
-import com.google.firebase.auth.UserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,9 +46,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.zip.Inflater;
 
 /**
  * Created by Bradley on 04/11/2016.
@@ -67,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton fbLoginButton;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private Boolean Pass = false;                                                                   // variable used to prevent main activity loading in certain case
 
                                         // cycle functions
     @Override
@@ -127,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                                         .create()
                                         .show();
                             }
-                            else {
+                            else if(!Pass){
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);         // start main activity and pass relevant data
                                 intent.putExtra("tab", currentTab);
                                 intent.putExtra("fbConnected", false);
@@ -154,11 +152,9 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {                                           // if success
-                                        if(task.getResult().getUser().isEmailVerified()) {          // if email has been verified
-                                            List providers = task.getResult().getUser().getProviders();
-                                            if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
-                                                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
-                                            }
+                                        List providers = task.getResult().getUser().getProviders();
+                                        if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
+                                            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
                                         }
                                     } else {                                                              // if fail
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -174,51 +170,55 @@ public class LoginActivity extends AppCompatActivity {
         });
                                         // handle facebook login button press
         fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email", "user_friends"));
-                                        // on click login
+                                        // on click, login to facebook
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-                                        // if login was successful
+                                        // if login to facebook was successful
             @Override
             public void onSuccess(LoginResult loginResult) {
                 final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
                 Log.i("fbAccessToken", accessToken.getToken());
-                final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());        // generate firebase credential
-                                        // get data from fb account
+                final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());  // generate firebase credential
+                                        // make request for facebook user information
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
+                    @Override           // when data is returned
                     public void onCompleted(JSONObject object, GraphResponse response2) {
-                        JSONArray friends = getFacebookFriends(accessToken);
-                        FacebookData = getFacebookData(object, friends);                                     // Get facebook data from login
-
-                        Task<ProviderQueryResult> providers = mAuth.fetchProvidersForEmail(FacebookData.getString("email"));
+                        JSONArray friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
+                        FacebookData = getFacebookData(object, friends);                            // format the data into a nice bundle
+                                        // find out what providers, if any, email is used for
+                        final Task<ProviderQueryResult> providers = mAuth.fetchProvidersForEmail(FacebookData.getString("email")); // check to see what providers the user uses
                         providers.addOnSuccessListener(new OnSuccessListener<ProviderQueryResult>() {
-                            @Override
+                            @Override   // when the data is returned
                             public void onSuccess(ProviderQueryResult providerQueryResult) {
-                                if(providerQueryResult.getProviders().contains("facebook.com")) {
-                                    mAuth.signInWithCredential(credential);
+                               final List provs =  providerQueryResult.getProviders();
+                                if (provs == null || provs.isEmpty() || provs.contains("facebook.com")) {              // if new user; if used facebook before
+                                    mAuth.signInWithCredential(credential);                         // create an account; log them in
                                 }
-                                else { // they have a myfe account but have not connected facebook yet
+                                else {  // if they have a myfe account, but have not connected facebook yet
+                                            // request they enter their myfe password
                                     final ViewGroup nullParent = null;
-                                    View promptsView = getLayoutInflater().inflate(R.layout.input_prompt,nullParent); // get input_prompts.xml view
+                                    View promptsView = getLayoutInflater().inflate(R.layout.input_prompt,nullParent);               // get input_prompts.xml view
                                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                    builder.setView(promptsView);                                    // set input_prompts.xml to alert dialog builder
-
-                                    final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
-                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);                                          // set the dialog input data type
+                                    builder.setView(promptsView);                                                                   // set input_prompts.xml to alert dialog builder
+                                    final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput);      // enable easy access to object
+                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);                                 // set the dialog input data type
                                     final TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage);
                                     promptMessage.setVisibility(View.GONE);
-
                                     builder.setMessage(FacebookData.getString("first_name")+ ", you have not yet linked Facebook to your Myfe account. Please enter your Myfe password below to link it.")
                                             .setPositiveButton("Link",
                                                     new DialogInterface.OnClickListener() {
                                                         public void onClick(DialogInterface dialog,int id) {
                                                             String pass = userInput.getText().toString();
+                                                                            // sign in with given password
+                                                            Pass = true;                // prevent main activity starting from the following login
                                                             mAuth.signInWithEmailAndPassword(FacebookData.getString("email"),pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                                 @Override
                                                                 public void onComplete(@NonNull Task<AuthResult> task) {
+                                                                   Pass = false;
+                                                                             // if password entered correctly
                                                                     if(task.isSuccessful()) {
-                                                                        task.getResult().getUser().linkWithCredential(credential);
-                                                                    }
-                                                                    else {
+                                                                        task.getResult().getUser().linkWithCredential(credential);      // link facebook account
+                                                                    }       // if password entered in correctly
+                                                                    else {          // return to initial state
                                                                         Toast.makeText(LoginActivity.this,"Password Incorrect",Toast.LENGTH_LONG).show();
                                                                         LoginManager.getInstance().logOut();
                                                                     }
