@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.CallbackManager;
 import com.facebook.FacebookActivity;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     };
     public Bundle facebookData;
     public Boolean facebookConnected;
+    public CallbackManager callbackManager;
     public FirebaseAuth auth;
     int currentTab = 0;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
+        callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(getApplicationContext());
                                             // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
@@ -68,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         viewPager.setCurrentItem(currentTab);
+    }
+
+    // facebook - passes data back to facebook api
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);                            // Pass the activity result back to the Facebook SDK
     }
 
     private void setupTabIcons() {

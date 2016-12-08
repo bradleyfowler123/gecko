@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog,int id) {
                                                         user.sendEmailVerification();                       // collapse the list view which causes the view to be regenerated and so new selected item will be shown
+                                                        Toast.makeText(LoginActivity.this,"Email verification request sent",Toast.LENGTH_LONG).show();
                                                     }
                                                 })
                                         .setNegativeButton("Okay", null)
@@ -154,11 +155,11 @@ public class LoginActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {                                           // if success
                                         List providers = task.getResult().getUser().getProviders();
                                         if (providers != null && providers.contains("facebook.com")) {    // if user has connected facebook
-                                            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "user_friends"));   // login facebook and get data
+                                            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile", "email", "user_friends"));   // login facebook and get data
                                         }
                                     } else {                                                              // if fail
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                        builder.setMessage(getString(R.string.login_failed))
+                                        builder.setMessage("Login Failed - " + task.getException().getMessage())
                                                 .setNegativeButton(getString(R.string.login_retry_button), null)
                                                 .create()
                                                 .show();
@@ -169,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
                                         // handle facebook login button press
-        fbLoginButton.setReadPermissions(Arrays.asList("user_birthday", "email", "user_friends"));
+        fbLoginButton.setReadPermissions(Arrays.asList("public_profile", "email", "user_friends"));
                                         // on click, login to facebook
         fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                         // if login to facebook was successful
