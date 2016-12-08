@@ -74,8 +74,6 @@ public class RegisterActivity extends AppCompatActivity {
                                         Log.d("DisplayNameAdded", "User profile updated.");
                                                         // start Main activity
                                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                               //         intent.putExtra("tab", 0);
-                               //         intent.putExtra("fbConnected", false);
                                         startActivity(intent);
                                     }
                                 }
@@ -114,7 +112,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         task.getResult().getUser().sendEmailVerification();
                                     } else {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                                        builder.setMessage("Register Failed")
+                                        builder.setMessage("Register Failed - " + task.getException().getMessage())
                                                 .setNegativeButton(getString(R.string.login_retry_button), null)
                                                 .create()
                                                 .show();

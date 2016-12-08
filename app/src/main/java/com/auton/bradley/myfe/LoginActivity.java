@@ -200,7 +200,7 @@ public class LoginActivity extends AppCompatActivity {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                     builder.setView(promptsView);                                                                   // set input_prompts.xml to alert dialog builder
                                     final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput);      // enable easy access to object
-                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);                                 // set the dialog input data type
+                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);                                 // set the dialog input data type
                                     final TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage);
                                     promptMessage.setVisibility(View.GONE);
                                     builder.setMessage(FacebookData.getString("first_name")+ ", you have not yet linked Facebook to your Myfe account. Please enter your Myfe password below to link it.")

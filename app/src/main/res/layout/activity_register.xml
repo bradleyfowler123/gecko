@@ -60,23 +60,11 @@
         android:textSize="18sp"
         android:maxLines="1"/>
 
-    <TextView
-        android:text="@string/register_dob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="date"
-        android:ems="10"
-        android:id="@+id/editText_register_dob"
-        android:labelFor="@id/editText_register_dob"/>
-
-    <Button
+        <Button
         android:text="@string/register_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/register_button" />
+
     </LinearLayout>
 </ScrollView>
