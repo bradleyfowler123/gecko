@@ -45,21 +45,19 @@ public class ProfileFriendsFragment extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
         Bundle fbData = activity.facebookData;
-        Boolean fbCon = activity.facebookConnected;
 
-        if (fbCon) {
-            RequestCreator[] picURLs = {Picasso.with(getContext()).load(fbData.getString("profile_pic"))};
-            ArrayList<String> activities = new ArrayList<>();
-            ArrayList<String> dates = new ArrayList<>();
-            activities.add("Bradley Fowler");
-            dates.add("is going go-karting tomorrow");
 
-            profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
-            pa_list.setAdapter(adapter);
+        ArrayList<String> activities = activity.facebookData.getStringArrayList("friendNames");
+        ArrayList<String> dates = activity.facebookData.getStringArrayList("friendIds");
+        ArrayList<String> urls = activity.facebookData.getStringArrayList("friendUrls");
+        RequestCreator[] picURLs = new RequestCreator[urls.size()];
+        for (int i = 0; i < urls.size(); i++) {
+            picURLs[i] = Picasso.with(getContext()).load(urls.get(i));
         }
-        else {
-            //
-        }
+
+        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
+        pa_list.setAdapter(adapter);
+
 
 
         return rootView;

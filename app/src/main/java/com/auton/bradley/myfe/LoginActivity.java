@@ -49,6 +49,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by Bradley on 04/11/2016.
@@ -217,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override           // when data is returned
                     public void onCompleted(JSONObject object, GraphResponse response2) {
-                        JSONArray friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
+                        FacebookFriendData friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
                         FacebookData = getFacebookData(object, friends);                            // format the data into a nice bundle
                                         // find out what providers, if any, email is used for
                         final Task<ProviderQueryResult> providers = mAuth.fetchProvidersForEmail(FacebookData.getString("email")); // check to see what providers the user uses
@@ -328,9 +329,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public JSONArray getFacebookFriends(AccessToken accessToken) {
-        final JSONArray[] friendData = {null};
+                            // function to get users friends info
+    public FacebookFriendData getFacebookFriends(AccessToken accessToken) {
+        final FacebookFriendData friendData = new FacebookFriendData();
         new GraphRequest(
                 accessToken,
                 "/"+ accessToken.getUserId() +"/friends",
@@ -339,29 +340,33 @@ public class LoginActivity extends AppCompatActivity {
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         JSONObject object = response.getJSONObject();
-                        String friends = "";
+                        String friendsNo = "";
                         try {
-                            friendData[0] = object.getJSONArray("data");
-                            friends = object.getJSONObject("summary").getString("total_count");
+                            JSONArray jsonArray = object.getJSONArray("data");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject aFriend = (JSONObject) jsonArray.get(i);
+                                friendData.names.add(i,aFriend.getString("name"));
+                                friendData.ids.add(i,aFriend.getString("id"));
+                                friendData.picUrls.add(i,"https://graph.facebook.com/" + aFriend.getString("id") + "/picture?width=200&height=150");
+                            }
+                            friendsNo = object.getJSONObject("summary").getString("total_count");
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        Log.d("bjdsnxn", friends);
+                        Log.d("You have friends", friendsNo);
                     }
                 }
         ).executeAsync();
-        return friendData[0];
+        return friendData;
     }
-                                    // function to get all of the data
-    public Bundle getFacebookData(JSONObject object, JSONArray friends) {
+                                    // function to format all of the data
+    public Bundle getFacebookData(JSONObject object, FacebookFriendData friends) {
         try {
             Bundle bundle = new Bundle();
             String id = object.getString("id");
-            Log.d("jewnjhc ds",object.toString());
             try {
                 URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
-                Log.i("profile_pic", profile_pic + "");
                 bundle.putString("profile_pic", profile_pic.toString());
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -372,18 +377,18 @@ public class LoginActivity extends AppCompatActivity {
                 bundle.putString("first_name", object.getString("first_name"));
             if (object.has("last_name"))
                 bundle.putString("last_name", object.getString("last_name"));
-            if (object.has("email"))
-                bundle.putString("email", object.getString("email"));
+            if (object.has("email")){ bundle.putString("email", object.getString("email"));}
+            else { bundle.putString("email", id + "@facebook.com");}                                // for users who signed upto facebook with mobile
             if (object.has("gender"))
                 bundle.putString("gender", object.getString("gender"));
             if (object.has("birthday"))
                 bundle.putString("birthday", object.getString("birthday"));
             if (object.has("location"))
                 bundle.putString("location", object.getJSONObject("location").getString("name"));
-            if (friends!=null)
-                bundle.putString("friends", friends.toString());
-            else
-                bundle.putString("friends", "0");
+            if (friends!=null) {
+                bundle.putStringArrayList("friendNames", friends.names);
+                bundle.putStringArrayList("friendIds", friends.ids);
+                bundle.putStringArrayList("friendUrls", friends.picUrls);}
 
             return bundle;
         }
