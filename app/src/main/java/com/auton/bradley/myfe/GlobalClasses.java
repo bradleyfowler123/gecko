@@ -40,3 +40,17 @@ class friendClass {
         this.activity = activity;
     }
 }
+
+class FriendUIDs {
+    int friendNumber;
+    String friendUID;
+
+    public FriendUIDs(){
+
+    }
+
+    public FriendUIDs(int friendNumber, String friendUID) {
+        this.friendNumber = friendNumber;
+        this.friendUID = friendUID;
+    }
+}

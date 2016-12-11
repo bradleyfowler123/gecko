@@ -40,8 +40,11 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +52,9 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -70,6 +75,9 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private Boolean Pass = false;                                                                   // variable used to prevent main activity loading in certain case
+    private DatabaseReference friends;
+    private int friendCount;
+    private ArrayList<String> friendFirebaseIDs;
 
                                         // cycle functions
     @Override
@@ -111,24 +119,57 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
                         if (user.getProviders() != null && user.getProviders().contains("facebook.com")) { // check to see if facebook is linked to their account
                             if (FacebookData != null) {                                                 // if it is see if the facebook data has been gotten yet
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
-                                intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
-                                intent.putExtra("fbConnected", true);
-                                intent.putExtra("fbData", FacebookData);
 
                                         //  change - need not run everytime
                                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                                DatabaseReference facebookIDs = database.child("facebookIDs");
-                                facebookIDs.child(FacebookData.getString("id")).setValue(user.getUid());
+                                DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
+                                myFacebookIDRef.setValue(user.getUid());
 
-                                        // need do everytime login
-                                DatabaseReference friends = database.child("users").child(user.getUid()).child("friendFbIDs");
-                                for (int i = 0; i < FacebookData.getStringArrayList("friendIds").size(); i++) {
-                                    friends.child(FacebookData.getStringArrayList("friendIds").get(i)).setValue(true);
+                                        // store friend uids
+                                friends = database.child("users").child(user.getUid()).child("friendUIDs");
+                                ArrayList<String> facebookFriendIDs = FacebookData.getStringArrayList("friendIds");
+                            //    Collections.reverse(facebookFriendIDs);
+                                Log.d("tyghuj",facebookFriendIDs.toString());
+                                friendFirebaseIDs = new ArrayList<>();
+                                friendCount = facebookFriendIDs.size();
+                                            // for every facebook friend, get their uid
+                                for (int i = 0; i < facebookFriendIDs.size(); i++) {
+                                    DatabaseReference firebaseIDRef = database.child("facebookIDs").child(facebookFriendIDs.get(i));
+                                    firebaseIDRef.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        // store their uid in list
+                                            Log.d("iuijk",dataSnapshot.toString());
+                                            friendFirebaseIDs.add(dataSnapshot.getValue().toString());
+                                            friendCount = friendCount -1;
+                                                            // once all uids stored, store friends uids in user entry of database
+                                            if(friendCount==0) {
+                                                friends.setValue(friendFirebaseIDs);
+                                                FacebookData.putStringArrayList("friendUids",friendFirebaseIDs);
+                                                Log.d("uuhjv",FacebookData.getStringArrayList("friendUids").toString());
+
+                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
+                                                intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
+                                                intent.putExtra("fbConnected", true);
+                                                intent.putExtra("fbData", FacebookData);
+                                                startActivity(intent);
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
 
+                                /*  // need do everytime login
+                                    DatabaseReference friends = database.child("users").child(user.getUid()).child("friendFbIDs");
+                                    for (int i = 0; i < FacebookData.getStringArrayList("friendIds").size(); i++) {
+                                        friends.child(FacebookData.getStringArrayList("friendIds").get(i)).setValue(true);
+                                    }
+*/
 
-                                startActivity(intent);
+
                             }
                         } else {                                                                          // if facebook is not linked
                             if(!user.isEmailVerified()) {
