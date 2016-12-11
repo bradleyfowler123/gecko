@@ -17,9 +17,19 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 /*
 Java file to contain all class' related to the Search tab
@@ -135,6 +145,18 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(),"Searching!",Toast.LENGTH_SHORT).show();
+                // add database data temporarily
+                DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                //DatabaseReference myRef = database.getReference("message");
+               // myRef.setValue("Hello, World!");
+                DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
+                DatabaseReference item = agenda.push();
+                item.child("activity").setValue("running");
+                item.child("company").setValue("buxton ac");
+                item.child("date").setValue("12/12/16");
+                item.child("time").setValue("1300");
+
             }
         });
 
