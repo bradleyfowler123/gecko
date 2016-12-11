@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +29,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /*
 Java file to contain all class' related to the friend feed sub tab
@@ -44,11 +49,9 @@ public class FriendFeedFragment extends Fragment {
     private ArrayList<String> activityDescriptions = new ArrayList<>();
     private ArrayList<String> friendNames = new ArrayList<>();
     private ArrayList<String> timeAgo = new ArrayList<>();
+    private ArrayList<String> listItems = new ArrayList<>(); // unique identifier for each list item
     private ArrayList<RequestCreator> picUrls = new ArrayList<>();
-    private String friendFirebaseID;
     private ListView ff_list;
-    private int i;
-    private String friendFireRef;
 
 
     @Override
@@ -71,48 +74,49 @@ public class FriendFeedFragment extends Fragment {
         final ArrayList<String> friendFBNames = fbData.getStringArrayList("friendNames");
         final ArrayList<String> friendFBUrls = fbData.getStringArrayList("friendUrls");
         final ArrayList<String> friendUIDs = fbData.getStringArrayList("friendUids");
-                    // get friends data
-                            // get friends UIDs
-
         Log.d("nkklws",friendFBNames.toString());
         Log.d("nkklws",friendUIDs.toString());
-
-        i = -1;
+                    // get friends data
+                          // for each friend
         for (int j = 0; j < friendUIDs.size(); j++) {
-                            // get friends agenda data
+                            // get the friends' agenda data
             final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
-            friend.addChildEventListener(new ChildEventListener() {
-                @Override       // when data is returned, and on every addition
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    String friendRef = dataSnapshot.getRef().getParent().getParent().toString();
-                    if (!friendRef.equals(friendFireRef)) {
-                        friendFireRef = friendRef;
-                        i = i + 1;
+            friend.addValueEventListener(new ValueEventListener() {
+                @Override       // upon data return
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    GenericTypeIndicator<HashMap<String,friendClass>> t = new GenericTypeIndicator<HashMap<String,friendClass>>() {};
+                    HashMap<String,friendClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                    Iterator<friendClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                    Iterator<String> keys = agendaData.keySet().iterator();
+                    String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
+                    int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
+                                    // for each agenda item
+                    while (iterator.hasNext()) {
+                        String key = keys.next();
+                        friendClass agendaItem = iterator.next();
+                        if (listItems.contains(key)) {
+                            activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.company);
+                            timeAgo.remove(agendaItem.date);
+                            friendNames.remove(friendFBNames.get(i));
+                            picUrls.remove(Picasso.with(getContext()).load(friendFBUrls.get(i)));
+                        }
+                        listItems.add(key);
+                        activityDescriptions.add(agendaItem.activity + " at " + agendaItem.company);
+                        timeAgo.add(agendaItem.date);
+                        friendNames.add(friendFBNames.get(i));
+                        picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
+                        // update the list view
+                        friendFeedAdapter adapter = new friendFeedAdapter(getActivity(), friendNames, activityDescriptions, timeAgo, picUrls);
+                        ff_list.setAdapter(adapter);
                     }
-                                    // add an agenda items to current list
-                    friendClass friendFirebaseData = dataSnapshot.getValue(friendClass.class);
-                    activityDescriptions.add(friendFirebaseData.activity + " at " + friendFirebaseData.company);
-                    timeAgo.add(friendFirebaseData.date);
-                    friendNames.add(friendFBNames.get(i));
-                    picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
-                                    // update the list view
-                    friendFeedAdapter adapter = new friendFeedAdapter(getActivity(), friendNames, activityDescriptions, timeAgo, picUrls);
-                    ff_list.setAdapter(adapter);
-                }               // when data is changed is other ways
+                }
 
                 @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {}
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
             });
         }
-
-
-
 
         ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
