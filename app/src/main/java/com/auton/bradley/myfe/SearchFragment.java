@@ -157,6 +157,7 @@ public class SearchFragment extends Fragment {
                 item.child("date").setValue("12/12/16");
                 item.child("time").setValue("1300");
 
+
             }
         });
 

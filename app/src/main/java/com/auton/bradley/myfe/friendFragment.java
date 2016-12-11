@@ -56,9 +56,10 @@ public class FriendFragment extends Fragment {
         final MainActivity activity = (MainActivity) getActivity();
         final FirebaseUser user = activity.auth.getCurrentUser();
         Boolean fbCon = activity.facebookConnected;
-        Log.d("refdvrfd",fbCon.toString());
 
+                            // if user signed in
         if(user != null) {
+                            // if fb connected - show fb screen
             if (fbCon) {
                 signUp.setVisibility(View.GONE);
                 fbLinkButton.setVisibility(View.GONE);
@@ -70,7 +71,7 @@ public class FriendFragment extends Fragment {
                 tabLayout.setupWithViewPager(viewPager);
                 setupTabTitles();
             }
-            else {
+            else {         // else show connect fb screen
                 signUp.setVisibility(View.VISIBLE);
                 signUp.setText("Link Facebook to see your friends!");
                 fbLinkButton.setVisibility(View.VISIBLE);
@@ -134,7 +135,7 @@ public class FriendFragment extends Fragment {
 
             }
         }
-        else {
+        else {          // otherwise show sign up screen
             signUp.setVisibility(View.VISIBLE);
             fbLinkButton.setVisibility(View.GONE);
             LoggedInView.setVisibility(View.GONE);

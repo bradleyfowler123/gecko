@@ -23,6 +23,12 @@ import com.facebook.HttpMethod;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -55,6 +61,7 @@ public class FriendFeedFragment extends Fragment {
     }
 
                                 // function that generates the view
+                                    private String data;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -67,11 +74,61 @@ public class FriendFeedFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         Bundle fbData = activity.facebookData;
         Boolean fbCon = activity.facebookConnected;
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+
 
         RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
         final String[] friendNames = getResources().getStringArray(R.array.friendNames);                // get the names of the recommendations to display
         final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display
         final String[] timeAgo = getResources().getStringArray(R.array.timeAgo);                // get the names of the recommendations to display
+
+        // testing getting data
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        data = "a";
+        Log.d("ujhb", fbData.getStringArrayList("friendIds").get(0));
+        DatabaseReference facebookIDs = database.child("facebookIDs").child(fbData.getStringArrayList("friendIds").get(0));
+        facebookIDs.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                data = dataSnapshot.getValue().toString();
+                Log.d("hbj n",data);
+                DatabaseReference friend = database.child("users").child(data).child("Agenda");
+                friend.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Log.d("ujbk",dataSnapshot.toString());
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("ikninjm", databaseError.toString());
+
+            }
+        });
+
 
 
         // populate the list

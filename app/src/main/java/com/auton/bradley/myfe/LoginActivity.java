@@ -40,6 +40,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.ProviderQueryResult;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -113,6 +115,19 @@ public class LoginActivity extends AppCompatActivity {
                                 intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
                                 intent.putExtra("fbConnected", true);
                                 intent.putExtra("fbData", FacebookData);
+
+                                        //  change - need not run everytime
+                                DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                                DatabaseReference facebookIDs = database.child("facebookIDs");
+                                facebookIDs.child(FacebookData.getString("id")).setValue(user.getUid());
+
+                                        // need do everytime login
+                                DatabaseReference friends = database.child("users").child(user.getUid()).child("friendFbIDs");
+                                for (int i = 0; i < FacebookData.getStringArrayList("friendIds").size(); i++) {
+                                    friends.child(FacebookData.getStringArrayList("friendIds").get(i)).setValue(true);
+                                }
+
+
                                 startActivity(intent);
                             }
                         } else {                                                                          // if facebook is not linked
