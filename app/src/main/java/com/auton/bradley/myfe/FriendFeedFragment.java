@@ -1,7 +1,6 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,13 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,19 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.security.Provider;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import bolts.Capture;
 
 /*
 Java file to contain all class' related to the friend feed sub tab
@@ -56,20 +36,21 @@ public class FriendFeedFragment extends Fragment {
 
     public FriendFeedFragment() {}
 
-    ArrayList<String> activityDescriptions = new ArrayList<>();
-    ArrayList<String> friendNames = new ArrayList<>();
-    ArrayList<String> timeAgo = new ArrayList<>();
-    ArrayList<RequestCreator> picUrls = new ArrayList<>();
-    int i;
+    private ArrayList<String> activityDescriptions = new ArrayList<>();
+    private ArrayList<String> friendNames = new ArrayList<>();
+    private ArrayList<String> timeAgo = new ArrayList<>();
+    private ArrayList<RequestCreator> picUrls = new ArrayList<>();
+    private String friendFirebaseID;
+    private ListView ff_list;
+    private int i;
+    private String friendFireRef;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
                                 // function that generates the view
-                                    private String data;
-                                    private ListView ff_list;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -77,105 +58,66 @@ public class FriendFeedFragment extends Fragment {
                                 // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_friend_feed, container, false);        // enables easy access to the root search xml
         ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                              // locate the list object in the home tab
-                                    // get user info
-        MainActivity mactivity = (MainActivity) getActivity();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        Bundle fbData = mactivity.facebookData;
-        Boolean fbCon = mactivity.facebookConnected;
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-
-
-
-      //  RequestCreator picURLs[] = {Picasso.with(getContext()).load(R.drawable.altontowers),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png"),Picasso.with(getContext()).load("http://www.freeiconspng.com/uploads/profile-icon-1.png")};
-      //  final String[] friendNames = getResources().getStringArray(R.array.friendNames);          // get the names of the recommendations to display
-      //  final String[] activityDescriptions = getResources().getStringArray(R.array.activityDescriptions);                // get the names of the recommendations to display
-      //  final String[] timeAgo = getResources().getStringArray(R.array.timeAgo);                // get the names of the recommendations to display
-
-
-        // testing getting data
-        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        data = "a";
-
+                                    // get user data
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
+        MainActivity mActivity = (MainActivity) getActivity();
+        Bundle fbData = mActivity.facebookData;                                                     // facebook data
         ArrayList<String> friendFBIds = fbData.getStringArrayList("friendIds");
         final ArrayList<String> friendFBNames = fbData.getStringArrayList("friendNames");
         final ArrayList<String> friendFBUrls = fbData.getStringArrayList("friendUrls");
-        for (i = 0; i < friendFBIds.size(); i++) {
-            DatabaseReference facebookIDs = database.child("facebookIDs").child(friendFBIds.get(i));
-            facebookIDs.addValueEventListener(new ValueEventListener() {
+                                // for every facebook friend
+        i = -1;
+        for (int j = 0; j < friendFBIds.size(); j++) {
+                                // get their firebase id
+            DatabaseReference firebaseIDRef = database.child("facebookIDs").child(friendFBIds.get(j));
+            firebaseIDRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    data = dataSnapshot.getValue().toString();
-                    Log.d("hbj n",data);
-                    final DatabaseReference friend = database.child("users").child(data).child("Agenda");
+                    friendFirebaseID = dataSnapshot.getValue().toString();
+                                // get friends agenda data
+                    final DatabaseReference friend = database.child("users").child(friendFirebaseID).child("Agenda");
                     friend.addChildEventListener(new ChildEventListener() {
-                        @Override
+                        @Override       // when data is returned, and on every addition
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            friendClass friendData = dataSnapshot.getValue(friendClass.class);
-                            Log.d("ujbk",friendData.activity);
-                            activityDescriptions.add(friendData.activity + " at " + friendData.company);
-                            friendNames.add(friendFBNames.get(i-1));
-                            timeAgo.add(friendData.date);
-                            picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i-1)));
-
-
-                            Log.d("ewujds",friendNames.toString());
-                            Log.d("ewujds",activityDescriptions.toString());
-                            Log.d("ewujds",timeAgo.toString());
-                            Log.d("ewujds",picUrls.toString());
-                            // populate the list
+                            String friendRef = dataSnapshot.getRef().getParent().getParent().toString();
+                            if (!friendRef.equals(friendFireRef)) {
+                                friendFireRef = friendRef;
+                                i = i+1;
+                            }
+                            dataSnapshot.getRef().getParent().getParent().toString();
+                                            // add an agenda items to current list
+                            friendClass friendFirebaseData = dataSnapshot.getValue(friendClass.class);
+                            activityDescriptions.add(friendFirebaseData.activity + " at " + friendFirebaseData.company);
+                            timeAgo.add(friendFirebaseData.date);
+                            friendNames.add(friendFBNames.get(i));
+                            picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
+                                            // update the list view
                             friendFeedAdapter adapter = new friendFeedAdapter(getActivity(),friendNames, activityDescriptions, timeAgo, picUrls);
                             ff_list.setAdapter(adapter);
-                            // handle clicks on the list items
-
-                        }
-
+                        }           // when data is changed is other ways
                         @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
                         @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                        }
-
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {}
                         @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
                         @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
+                        public void onCancelled(DatabaseError databaseError) {}
                     });
                 }
-
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("ikninjm", databaseError.toString());
-
-                }
+                public void onCancelled(DatabaseError databaseError) { Log.d("Error FFF1", databaseError.toString());}
             });
         }
-
-
-
         ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(getContext(),"What do you want me to do?",Toast.LENGTH_SHORT).show();
             }
         });
-
-
         return rootView;
     }
-
 }
-
-
-
                                 // adapter used for friend's activities list view in friend fees tab
 class friendFeedAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
                                 // declare variables of this class
