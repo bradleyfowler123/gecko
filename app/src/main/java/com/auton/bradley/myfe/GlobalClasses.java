@@ -24,3 +24,19 @@ class FacebookFriendData {
         this.picUrls = new ArrayList<>();
     }
 }
+
+class friendClass {
+    String date;
+    String company;
+    String activity;
+
+    public friendClass(){
+
+    }
+
+    public friendClass(String date, String company, String activity) {
+        this.date = date;
+        this.company = company;
+        this.activity = activity;
+    }
+}
