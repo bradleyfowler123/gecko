@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -65,8 +66,15 @@ public class ProfileFriendsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String friendUID = fbData.getStringArrayList("friendUids").get(i);
-
-                Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
+                String friendName = fbData.getStringArrayList("friendNames").get(i);
+                String friendUrl = fbData.getStringArrayList("friendUrls").get(i);
+                //start new activity, pass friendUID, friendFBFirstName, profilePic
+                Intent intent = new Intent(getContext(), FriendActivity.class);     // if there is facebook data
+                intent.putExtra("uid", friendUID);
+                intent.putExtra("name", friendName);
+                intent.putExtra("url", friendUrl);
+                startActivity(intent);
+             //   Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
             }
         });
 
