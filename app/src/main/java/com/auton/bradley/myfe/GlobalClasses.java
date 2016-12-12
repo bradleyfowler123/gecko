@@ -21,6 +21,45 @@ import java.util.List;
  * File containing all global Custom Classes
  */
 
+
+// custom class definition used for search elv
+class Item {
+    // parameter declarations
+    String Option;                                                                                  // Contains the title of the list group
+    String Selected;                                                                                // Used to recorded the current element selection
+    boolean MultiSelect;                                                                            // identifies whether or not a list group is a multi select one
+    Object CustomValue;                                                                             // used to store the custom value
+    String CustomValuePreview;                                                                      // used to store the custom value formatted for preview
+    ArrayList<String> mSelected=new ArrayList<>();
+    ArrayList<String> elements=new ArrayList<>();                                                   // array containing all of the elements within a list group
+    // function used to declare an Item object with a list group title and default selection
+    Item(String option, ArrayList<String> selected, boolean multiSelect) {                                                          // Item(ListGroupTitle, defaultSelection)
+        this.Option=option;                                                                         // variable to store list group name
+        if(multiSelect) {
+            this.mSelected = selected;                                                              // set the default selection
+        }
+        else {
+            this.Selected=selected.get(0);                                                          // also for single group case
+        }
+        this.MultiSelect=multiSelect;                                                               // variable to store list group type
+    }
+
+
+    String stringify () {
+        String item = "";
+        if (this.MultiSelect)
+            item = this.mSelected.toString();
+        else {
+            if (this.Selected.equals(this.elements.get(this.elements.size()-1)))
+                item = this.CustomValue.toString();
+            else
+                item = this.Selected;
+        }
+        return item;
+    }
+}
+
+
                             // class definition
 class FacebookFriendData {
                             // parameter declarations

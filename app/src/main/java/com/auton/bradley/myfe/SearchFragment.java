@@ -2,11 +2,13 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,8 +146,12 @@ public class SearchFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(),"Searching!",Toast.LENGTH_SHORT).show();
-                // add database data temporarily
+                Intent intent = new Intent(getContext(),SearchActivity.class);
+                for (int i = 0; i < item.size(); i++) {
+                    intent.putExtra(Integer.toString(i),item.get(i).stringify());
+                }
+                startActivity(intent);
+               /* // add database data temporarily
                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 //DatabaseReference myRef = database.getReference("message");
@@ -156,7 +162,7 @@ public class SearchFragment extends Fragment {
                 item.child("company").setValue("buxton ac");
                 item.child("date").setValue("12/12/16");
                 item.child("time").setValue("1300");
-
+*/
 
             }
         });
