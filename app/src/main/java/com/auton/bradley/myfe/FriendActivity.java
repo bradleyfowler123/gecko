@@ -115,7 +115,7 @@ public class FriendActivity extends AppCompatActivity {
     private void setupTabTitles() {
         tabLayout.getTabAt(0).setText(getString(R.string.profileAgenda_tabName));
         tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
-        tabLayout.getTabAt(2).setText(getString(R.string.profileFriends_tabName));
+        tabLayout.getTabAt(2).setText("Your Friends");
     }
 
 

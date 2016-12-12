@@ -46,47 +46,49 @@ public class ProfileFriendsFragment extends Fragment {
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
                                 // get user info
         final Bundle fbData;
-        ArrayList<String> activities;
-        ArrayList<String> dates;
-        ArrayList<String> urls;
+        final ArrayList<String> friendNames;
+        final ArrayList<String> nextActivity;
+        final ArrayList<String> friendUids;
+        final ArrayList<String> profilePicUrls;
 
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
-            activities = activity.names;
-            dates = activity.UIDs;
-            urls = activity.Urls;
+            friendNames = activity.names;
+            nextActivity = activity.UIDs;
+            friendUids = activity.UIDs;
+            profilePicUrls = activity.Urls;
         }
         else {
             final MainActivity activity = (MainActivity) getActivity();
             fbData = activity.facebookData;
-            activities = activity.facebookData.getStringArrayList("friendNames");
-            dates = activity.facebookData.getStringArrayList("friendIds");
-            urls = activity.facebookData.getStringArrayList("friendUrls");
-
-            pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    ArrayList<String> friendUID = fbData.getStringArrayList("friendUids");
-                    ArrayList<String> friendName = fbData.getStringArrayList("friendNames");
-                    ArrayList<String> friendUrl = fbData.getStringArrayList("friendUrls");
-                    //start new activity, pass friendUID, friendFBFirstName, profilePic
-                    Intent intent = new Intent(getContext(), FriendActivity.class);     // if there is facebook data
-                    intent.putExtra("uid", friendUID);
-                    intent.putExtra("name", friendName);
-                    intent.putExtra("url", friendUrl);
-                    intent.putExtra("index", i);
-                    startActivity(intent);
-                    //   Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
-                }
-            });
+            friendNames = activity.facebookData.getStringArrayList("friendNames");
+            nextActivity = activity.facebookData.getStringArrayList("friendUids");
+            friendUids = activity.facebookData.getStringArrayList("friendUids");
+            profilePicUrls = activity.facebookData.getStringArrayList("friendUrls");
         }
-        RequestCreator[] picURLs = new RequestCreator[urls.size()];
-        for (int i = 0; i < urls.size(); i++) {
-            picURLs[i] = Picasso.with(getContext()).load(urls.get(i));
+        RequestCreator[] requestURL = new RequestCreator[profilePicUrls.size()];
+        for (int i = 0; i < profilePicUrls.size(); i++) {
+            requestURL[i] = Picasso.with(getContext()).load(profilePicUrls.get(i));
         }
 
-        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),activities,dates,picURLs);
+        profileFriendsAdapter adapter = new profileFriendsAdapter(getActivity(),friendNames,nextActivity,requestURL);
         pa_list.setAdapter(adapter);
+
+        pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //start new activity, pass friendUID, friendFBFirstName, profilePic
+                Intent intent = new Intent(getContext(), FriendActivity.class);     // if there is facebook data
+                intent.putStringArrayListExtra("uid", friendUids);
+                intent.putStringArrayListExtra("name", friendNames);
+                intent.putStringArrayListExtra("url", profilePicUrls);
+                intent.putExtra("index", i);
+          //      getActivity().setIntent(intent);
+          //      getActivity().recreate();
+                startActivity(intent);
+                //   Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         return rootView;
