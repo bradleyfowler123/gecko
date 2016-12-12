@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
@@ -67,6 +69,12 @@ import java.util.List;
 
 public class FriendActivity extends AppCompatActivity {
                                         // global variable declarations
+    private TabLayout tabLayout;
+    ViewPager viewPager;
+    public ArrayList<String> UIDs;
+    public ArrayList<String> names;
+    public ArrayList<String> Urls;
+    public int index;
 
                                         // main function
     @Override
@@ -74,17 +82,43 @@ public class FriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
         Intent intent = getIntent();
-        String UID = intent.getStringExtra("uid");
-        String name = intent.getStringExtra("name");
-        String url = intent.getStringExtra("url");
+        UIDs = intent.getStringArrayListExtra("uid");
+        names = intent.getStringArrayListExtra("name");
+        Urls = intent.getStringArrayListExtra("url");
+        index = intent.getIntExtra("index",0);
 
         TextView naneTv = (TextView) findViewById(R.id.af_tv_profile_name);
-        naneTv.setText(name);
+        naneTv.setText(names.get(index));
         ImageView imageView = (ImageView) findViewById(R.id.af_img_profile_pic);
-        RequestCreator picURL = Picasso.with(getBaseContext()).load(url);
+        RequestCreator picURL = Picasso.with(getBaseContext()).load(Urls.get(index));
         picURL.transform(new CircleTransform()).into(imageView);
 
+
+        // load tab bar and tab data
+        viewPager = (ViewPager) findViewById(R.id.af_viewpager_profile);                                       // find view underneith tabs
+        setupViewPager(viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.af_tabLayout_profile);                                            // find tab layout
+        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+        setupTabTitles();                                                                            // add icons to tabs
+
+
     }
+
+    public void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
+        adapter.addFragment(new ProfileAgendaFragment(), "Agenda");
+        adapter.addFragment(new ProfilePhotosFragment(), "Photos");
+        adapter.addFragment(new ProfileFriendsFragment(), "Friends");
+        viewPager.setAdapter(adapter);
+    }
+
+    private void setupTabTitles() {
+        tabLayout.getTabAt(0).setText(getString(R.string.profileAgenda_tabName));
+        tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
+        tabLayout.getTabAt(2).setText(getString(R.string.profileFriends_tabName));
+    }
+
+
                                     // generate login options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

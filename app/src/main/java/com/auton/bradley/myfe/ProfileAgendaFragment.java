@@ -50,11 +50,20 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        final MainActivity activity = (MainActivity) getActivity();
-        FirebaseUser user = activity.auth.getCurrentUser();
+        Log.d("drtfg", getActivity().getLocalClassName());
+        String Uid;
+        if (getActivity().getLocalClassName().equals("FriendActivity")) {
+            final FriendActivity activity = (FriendActivity) getActivity();
+            Uid = activity.UIDs.get(activity.index);
+        }
+        else {
+            final MainActivity activity = (MainActivity) getActivity();
+            Uid = activity.auth.getCurrentUser().getUid();
+        }
+
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
+        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
