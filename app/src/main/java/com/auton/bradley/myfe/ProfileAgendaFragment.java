@@ -50,7 +50,6 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        Log.d("drtfg", getActivity().getLocalClassName());
         String Uid;
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
@@ -67,33 +66,37 @@ public class ProfileAgendaFragment extends Fragment {
         agenda.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
-                 GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                 GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
+                 };
                  HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                 Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                 Iterator<String> keys = agendaData.keySet().iterator();
-                 while (iterator.hasNext()) {
-                     String key = keys.next();
-                     AgendaClass agendaItem = iterator.next();
-                     // if already exists in list
-                     if (listItems.contains(key)) {          // remove it
-                         listItems.remove(key);
-                         activities.remove(agendaItem.activity);
-                         dates.remove(agendaItem.date);
-                         companies.remove(agendaItem.company);
-                     }               // add agenda item to list
-                     listItems.add(key);
-                     activities.add(agendaItem.activity);
-                     dates.add(agendaItem.date);
-                     companies.add(agendaItem.company);
-                     // update the list view
-                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, companies);
-                     pa_list.setAdapter(adapter);
+                 if (agendaData != null) {
+                     Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                     Iterator<String> keys = agendaData.keySet().iterator();
+                     while (iterator.hasNext()) {
+                         String key = keys.next();
+                         AgendaClass agendaItem = iterator.next();
+                         // if already exists in list
+                         if (listItems.contains(key)) {          // remove it
+                             listItems.remove(key);
+                             activities.remove(agendaItem.activity);
+                             dates.remove(agendaItem.date);
+                             companies.remove(agendaItem.company);
+                         }               // add agenda item to list
+                         listItems.add(key);
+                         activities.add(agendaItem.activity);
+                         dates.add(agendaItem.date);
+                         companies.add(agendaItem.company);
+                         // update the list view
+                         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, companies);
+                         pa_list.setAdapter(adapter);
+                     }
                  }
              }
              @Override
              public void onCancelled(DatabaseError databaseError) {
              }
         });
+
 
         return rootView;
     }

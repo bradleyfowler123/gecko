@@ -2,9 +2,12 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +26,11 @@ import com.facebook.HttpMethod;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Transformation;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ProfileFriendsFragment extends Fragment {
@@ -83,10 +88,7 @@ public class ProfileFriendsFragment extends Fragment {
                 intent.putStringArrayListExtra("name", friendNames);
                 intent.putStringArrayListExtra("url", profilePicUrls);
                 intent.putExtra("index", i);
-          //      getActivity().setIntent(intent);
-          //      getActivity().recreate();
                 startActivity(intent);
-                //   Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -138,7 +140,7 @@ class profileFriendsAdapter extends ArrayAdapter<String> {                      
         // populate the title and image with data for a list item
         holder.name.setText(names.get(position));
         holder.nextActivity.setText(nextActivities.get(position));
-        profilePics[position].transform(new CircleTransform()).into(holder.img);
+        profilePics[position].into(holder.img);
         // return the updated view
         return convertView;
     }
