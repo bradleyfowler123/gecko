@@ -151,19 +151,6 @@ public class SearchFragment extends Fragment {
                     intent.putExtra(Integer.toString(i),item.get(i).stringify());
                 }
                 startActivity(intent);
-               /* // add database data temporarily
-                DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                //DatabaseReference myRef = database.getReference("message");
-               // myRef.setValue("Hello, World!");
-                DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
-                DatabaseReference item = agenda.push();
-                item.child("activity").setValue("running");
-                item.child("company").setValue("buxton ac");
-                item.child("date").setValue("12/12/16");
-                item.child("time").setValue("1300");
-*/
-
             }
         });
 

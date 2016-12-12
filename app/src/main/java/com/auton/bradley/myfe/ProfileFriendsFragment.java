@@ -124,9 +124,8 @@ class profileFriendsAdapter extends ArrayAdapter<String> {                      
 
     // function that generates the list view
     @Override
-    public
     @NonNull
-    View getView(int position, View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final ViewGroup nullParent = null;

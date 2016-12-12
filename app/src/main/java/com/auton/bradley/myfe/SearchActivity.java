@@ -9,11 +9,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -41,6 +47,28 @@ public class SearchActivity extends AppCompatActivity {
         ListView results_list = (ListView) findViewById(R.id.activity_search_list);                              // locate the list object in the home tab
         searchResultsAdapter adapter = new searchResultsAdapter(getBaseContext(),testTitles,testLocations,urls);
         results_list.setAdapter(adapter);
+
+        results_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        // if user signed in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user!=null) {       // upload selection to there agenda
+                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
+                    agendaItem.child("activity").setValue("Activity One");
+                    agendaItem.child("company").setValue("Myfe Inc");
+                    agendaItem.child("date").setValue("25/12/16");
+                    agendaItem.child("time").setValue("0900");
+                    Toast.makeText(getBaseContext(),"Added to Agenda",Toast.LENGTH_SHORT).show();
+                }
+             //   Intent intent = new Intent(getBaseContext(), MainActivity.class);     // if there is facebook data
+             //   startActivity(intent);
+            }
+        });
+
+
+
     }
 }
 
