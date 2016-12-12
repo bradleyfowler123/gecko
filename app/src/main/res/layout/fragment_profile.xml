@@ -12,6 +12,8 @@
         android:paddingTop="30dp"
         android:textSize="20sp"
         android:textAlignment="center"
+        android:paddingStart="50dp"
+        android:paddingEnd="50dp"
         android:text="@string/profile_signIp"
         android:id="@+id/profile_signUp_text"/>
 

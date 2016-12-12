@@ -38,7 +38,7 @@
     <string name="search_previewDistanceBefore">&lt; </string>
     <string name="search_previewDistanceAfter"> miles</string>
 
-    <string name="profile_signIp">Sign up to see your agenda and more! </string>
+    <string name="profile_signIp">Sign up to save items to your Agenda! </string>
     <string name="profile_contentDescription">Your Profile Picture</string>
     <string name="profileAgenda_tabName">Agenda</string>
     <string name="profilePhotos_tabName">Photos</string>
