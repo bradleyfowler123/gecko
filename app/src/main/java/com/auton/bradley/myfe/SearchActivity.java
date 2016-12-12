@@ -26,16 +26,20 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         Intent intent = getIntent();
-        ArrayList<String> test = new ArrayList<>();
-        RequestCreator[] urls = new RequestCreator[4];
-        for (int i = 0; i < 3; i++) {
-            Log.d("ujkbl;",intent.getStringExtra(Integer.toString(i)));
-            test.add(intent.getStringExtra(Integer.toString(i)));
-            urls[i] = (Picasso.with(getBaseContext()).load(R.drawable.altontowers));
+        ArrayList<String> testTitles = new ArrayList<>();
+        ArrayList<String> testLocations = new ArrayList<>();
+        RequestCreator[] urls = new RequestCreator[6];
+        String result = "";
+        for (int i = 0; i < 6; i++) {
+            result = result + intent.getStringExtra(Integer.toString(i));
 
+            testTitles.add("Alton Towers");
+            testLocations.add("Alton, Cheshire");
+            urls[i] = (Picasso.with(getBaseContext()).load(R.drawable.altontowers));
         }
+        Log.d("Result!!!!", result);
         ListView results_list = (ListView) findViewById(R.id.activity_search_list);                              // locate the list object in the home tab
-        searchResultsAdapter adapter = new searchResultsAdapter(getBaseContext(),test,test,urls);
+        searchResultsAdapter adapter = new searchResultsAdapter(getBaseContext(),testTitles,testLocations,urls);
         results_list.setAdapter(adapter);
     }
 }
@@ -44,24 +48,24 @@ public class SearchActivity extends AppCompatActivity {
 // adapter used for to show your activities as a list view in profile agenda sub tab
 class searchResultsAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private ArrayList<String> names;
-    private ArrayList<String> nextActivities;
-    private RequestCreator[] profilePics;
+    private ArrayList<String> activityTitles;
+    private ArrayList<String> activityLocations;
+    private RequestCreator[] activityPics;
     private Context c;
 
     // define a function that can be used to declare this custom adapter class
-    searchResultsAdapter(Context context, ArrayList<String> names, ArrayList<String> nextActivities, RequestCreator[] profilePics) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.search_results_list_item, names);
+    searchResultsAdapter(Context context, ArrayList<String> titles, ArrayList<String> locations, RequestCreator[] pics) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.search_results_list_item, titles);
         this.c = context;
-        this.names = names;
-        this.nextActivities = nextActivities;
-        this.profilePics = profilePics;
+        this.activityTitles = titles;
+        this.activityLocations = locations;
+        this.activityPics = pics;
     }
 
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
-        TextView name;
-        TextView nextActivity;
+        TextView activityTitle;
+        TextView activityLocation;
         ImageView img;
     }
 
@@ -77,13 +81,13 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
         }
         // find the views within the list
         final ViewHolder holder = new ViewHolder();
-        holder.name = (TextView) convertView.findViewById(R.id.sr_list_item_friends);
-        holder.nextActivity = (TextView) convertView.findViewById(R.id.sr_list_item_activity);
+        holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
+        holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         // populate the title and image with data for a list item
-        holder.name.setText(names.get(position));
-        holder.nextActivity.setText(nextActivities.get(position));
-        profilePics[position].into(holder.img);
+        holder.activityTitle.setText(activityTitles.get(position));
+        holder.activityLocation.setText(activityLocations.get(position));
+        activityPics[position].into(holder.img);
         // return the updated view
         return convertView;
     }
