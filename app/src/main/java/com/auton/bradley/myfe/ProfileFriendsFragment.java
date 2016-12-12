@@ -8,10 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -44,7 +46,7 @@ public class ProfileFriendsFragment extends Fragment {
                                 // get user info
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
-        Bundle fbData = activity.facebookData;
+        final Bundle fbData = activity.facebookData;
 
 
         ArrayList<String> activities = activity.facebookData.getStringArrayList("friendNames");
@@ -59,6 +61,14 @@ public class ProfileFriendsFragment extends Fragment {
         pa_list.setAdapter(adapter);
 
 
+        pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String friendUID = fbData.getStringArrayList("friendUids").get(i);
+
+                Toast.makeText(getContext(), fbData.getStringArrayList("friendUids").get(i), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return rootView;
     }

@@ -16,11 +16,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class ProfileAgendaFragment extends Fragment {
+
+    ArrayList<String> activities = new ArrayList<>();
+    ArrayList<String> companies = new ArrayList<>();
+    ArrayList<String> dates = new ArrayList<>();
+    ArrayList<String> listItems = new ArrayList<>();
 
     public ProfileAgendaFragment() {}
 
@@ -35,35 +49,42 @@ public class ProfileAgendaFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
-        ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        MainActivity activity = (MainActivity) getActivity();
+        final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
+        final MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = activity.auth.getCurrentUser();
 
-        String agenda = "Go-Karting;Swains, Buxton;2pm Tomorrow:Hip-Hop Class; 2 Berwick Road, Buxton;7pm Wed 20th:Pottery Workshop; Potts R Us, Buxton;11am Sat 24th";
-        ArrayList<String> activities = new ArrayList<>();
-        ArrayList<String> companies = new ArrayList<>();
-        ArrayList<String> dates = new ArrayList<>();
-        if (agenda.equals("")) {
-            activities.add("Your Agenda is Empty");
-            companies.add("");
-            dates.add("");
-        }
-        else {
-            Log.i("tag",agenda);
-            String[] agendaItems = agenda.split(":");
-            String itemElements[][] = new String[agendaItems.length][3];
-            for(int i=0; i<agendaItems.length; i++){
-                itemElements[i] = agendaItems[i].split(";");
-                activities.add(itemElements[i][0]);
-                companies.add(itemElements[i][1]);
-                dates.add(itemElements[i][2]);
-            }
-        }
-
-        profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(),activities,dates,companies);
-        pa_list.setAdapter(adapter);
-      //  ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_list_item_1,agendaItems);
-     //   pa_list.setAdapter(itemsAdapter);
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
+        agenda.addValueEventListener(new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot dataSnapshot) {
+                 GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                 HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                 Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                 Iterator<String> keys = agendaData.keySet().iterator();
+                 while (iterator.hasNext()) {
+                     String key = keys.next();
+                     AgendaClass agendaItem = iterator.next();
+                     // if already exists in list
+                     if (listItems.contains(key)) {          // remove it
+                         listItems.remove(key);
+                         activities.remove(agendaItem.activity);
+                         dates.remove(agendaItem.date);
+                         companies.remove(agendaItem.company);
+                     }               // add agenda item to list
+                     listItems.add(key);
+                     activities.add(agendaItem.activity);
+                     dates.add(agendaItem.date);
+                     companies.add(agendaItem.company);
+                     // update the list view
+                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, companies);
+                     pa_list.setAdapter(adapter);
+                 }
+             }
+             @Override
+             public void onCancelled(DatabaseError databaseError) {
+             }
+        });
 
         return rootView;
     }

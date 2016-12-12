@@ -25,16 +25,16 @@ class FacebookFriendData {
     }
 }
 
-class friendClass {
+class AgendaClass {
     String date;
     String company;
     String activity;
 
-    public friendClass(){
+    public AgendaClass(){
 
     }
 
-    public friendClass(String date, String company, String activity) {
+    public AgendaClass(String date, String company, String activity) {
         this.date = date;
         this.company = company;
         this.activity = activity;

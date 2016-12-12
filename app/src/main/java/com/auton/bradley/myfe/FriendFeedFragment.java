@@ -77,18 +77,19 @@ public class FriendFeedFragment extends Fragment {
                     @Override       // upon data return
                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         // isolate each agenda item along with which friend it is
-                        GenericTypeIndicator<HashMap<String, friendClass>> t = new GenericTypeIndicator<HashMap<String, friendClass>>() {};
-                        HashMap<String, friendClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                        Iterator<friendClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                        GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                        HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                        Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                         Iterator<String> keys = agendaData.keySet().iterator();
                         String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
                         int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
                                         // for each agenda item
                         while (iterator.hasNext()) {
                             String key = keys.next();
-                            friendClass agendaItem = iterator.next();
+                            AgendaClass agendaItem = iterator.next();
                                                 // if already exists in list
                             if (listItems.contains(key)) {          // remove it
+                                listItems.remove(key);
                                 activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.company);
                                 timeAgo.remove(agendaItem.date);
                                 friendNames.remove(friendFBNames.get(i));
