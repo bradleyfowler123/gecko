@@ -118,15 +118,6 @@ public class FriendActivity extends AppCompatActivity {
         tabLayout.getTabAt(2).setText("Your Friends");
     }
 
-
-                                    // generate login options menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
-        return true;
-    }
-
                                     // respond to action bar item press
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

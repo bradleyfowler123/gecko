@@ -1,55 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="horizontal"
     android:id="@+id/friend_feed_list_item"
     android:layout_height="80dp">
 
     <ImageView
         android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="80dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
         android:id="@+id/ff_list_item_image"
         android:padding="5dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:contentDescription="@string/friendFeed_imageDescription" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:paddingStart="10dp"
-        android:paddingEnd="5dp"
-        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:text="@string/test"
-            android:id="@+id/ff_list_item_friends"
-            android:textSize="20sp"
-            android:paddingTop="10dp"
-            android:gravity="bottom|start"
-            android:layout_height="40dp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:text="@string/test"
-            android:id="@+id/ff_list_item_activity"
-            android:textSize="15sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:layout_height="40dp"
-            android:gravity="center_vertical" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="@string/test"
+        android:id="@+id/ff_list_item_friends"
+        android:textSize="20sp"
+        android:paddingTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/ff_list_item_image"
+        android:gravity="bottom|start"
+        android:layout_height="40dp" />
 
-    </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:text="@string/test"
+        android:id="@+id/ff_list_item_activity"
+        android:layout_below="@id/ff_list_item_friends"
+        android:layout_toEndOf="@id/ff_list_item_image"
+        android:textSize="15sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_height="40dp"
+        android:gravity="top" />
+
 
     <TextView
         android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="0.8"
+        android:layout_width="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:text="3 mins ago"
+        android:layout_above="@id/ff_list_item_activity"
+        android:layout_toEndOf="@id/ff_list_item_friends"
         android:id="@+id/ff_list_item_timeAgo"
         android:textSize="15sp"
-        android:gravity="center_vertical|center_horizontal" />
+        android:gravity="bottom|center_horizontal" />
 
 
-</LinearLayout>
+</RelativeLayout>

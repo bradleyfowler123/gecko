@@ -22,7 +22,11 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -97,7 +101,7 @@ public class FriendFeedFragment extends Fragment {
                             }               // add agenda item to list
                             listItems.add(key);
                             activityDescriptions.add(agendaItem.activity + " at " + agendaItem.company);
-                            timeAgo.add(agendaItem.date);
+                            timeAgo.add(formatData(agendaItem.date));
                             friendNames.add(friendFBNames.get(i));
                             picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
                             // update the list view
@@ -121,6 +125,20 @@ public class FriendFeedFragment extends Fragment {
             });
         }
         return rootView;
+    }
+
+    private String formatData(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
+        String output = "error";
+        try {
+            Date date = format.parse(input);
+            //   String week = (String) android.text.format.DateFormat.format("ww", date);
+            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
+            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }
                                 // adapter used for friend's activities list view in friend fees tab
@@ -163,7 +181,7 @@ class friendFeedAdapter extends ArrayAdapter<String> {                          
         holder.time=(TextView) convertView.findViewById(R.id.ff_list_item_timeAgo);
         holder.img=(ImageView)  convertView.findViewById(R.id.ff_list_item_image);
                                 // populate the title and image with data for a list item
-        profilePics.get(position).transform(new CircleTransform()).into(holder.img);
+        profilePics.get(position).into(holder.img);
         holder.friends.setText(friendNames.get(position));
         holder.activity.setText(activityDescriptions.get(position));
         holder.time.setText(timeAgo.get(position));

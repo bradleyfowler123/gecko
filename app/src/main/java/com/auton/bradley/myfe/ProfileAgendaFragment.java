@@ -25,7 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -84,7 +88,7 @@ public class ProfileAgendaFragment extends Fragment {
                          }               // add agenda item to list
                          listItems.add(key);
                          activities.add(agendaItem.activity);
-                         dates.add(agendaItem.date);
+                         dates.add(formatData(agendaItem.date));
                          companies.add(agendaItem.company);
                          // update the list view
                          profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, companies);
@@ -99,6 +103,20 @@ public class ProfileAgendaFragment extends Fragment {
 
 
         return rootView;
+    }
+
+    private String formatData(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
+        String output = "error";
+        try {
+            Date date = format.parse(input);
+         //   String week = (String) android.text.format.DateFormat.format("ww", date);
+         //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
+            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }
 
@@ -145,5 +163,4 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         // return the updated view
         return convertView;
     }
-
 }
