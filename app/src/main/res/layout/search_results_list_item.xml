@@ -1,47 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:orientation="horizontal"
     android:id="@+id/search_results_list_item"
-    android:layout_height="80dp">
+    android:layout_height="160dp">
 
     <ImageView
         android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="170dp"
         android:id="@+id/sr_list_item_image"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:padding="5dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:contentDescription="@string/friendFeed_imageDescription" />
+        android:contentDescription="@string/friendFeed_imageDescription"
+        app:srcCompat="@drawable/altontowers" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:paddingStart="10dp"
-        android:paddingEnd="5dp"
-        android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/sr_list_item_image"
+        android:text="@string/test"
+        android:id="@+id/sr_list_item_title"
+        android:textSize="20sp"
+        android:gravity="bottom|start"
+        android:textStyle="normal|bold" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/sr_list_item_image"
+        android:layout_below="@id/sr_list_item_title"
+        android:text="@string/test"
+        android:id="@+id/sr_list_item_location"
+        android:textSize="15sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:gravity="center_vertical" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/sr_list_item_image"
+        android:layout_below="@id/sr_list_item_location"
+        android:text="@string/test"
+        android:id="@+id/sr_list_item_price"
+        android:textSize="15sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:gravity="top" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:text="@string/test"
-            android:id="@+id/sr_list_item_title"
-            android:textSize="20sp"
-            android:paddingTop="10dp"
-            android:gravity="bottom|start"
-            android:layout_height="40dp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:text="@string/test"
-            android:id="@+id/sr_list_item_location"
-            android:textSize="15sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:layout_height="40dp"
-            android:gravity="center_vertical" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/sr_space2"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/sr_list_item_image"/>
 
-    </LinearLayout>
+    <Space
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sr_list_item_price"
+        android:layout_above="@id/sr_space2"
+        android:layout_toEndOf="@+id/sr_list_item_image"
+        android:id="@+id/sr_space"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/ic_menu_my_calendar"
+        android:layout_toEndOf="@id/sr_space"
+        android:layout_above="@id/sr_space2"
+        android:layout_below="@id/sr_list_item_price"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/imageView" />
 
 
-</LinearLayout>
+</RelativeLayout>

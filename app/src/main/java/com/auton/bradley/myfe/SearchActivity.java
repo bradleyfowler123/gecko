@@ -40,7 +40,7 @@ public class SearchActivity extends AppCompatActivity {
             result = result + intent.getStringExtra(Integer.toString(i));
 
             testTitles.add("Alton Towers");
-            testLocations.add("Alton, Cheshire");
+            testLocations.add("2 miles away");
             urls[i] = (Picasso.with(getBaseContext()).load(R.drawable.altontowers));
         }
         Log.d("Result!!!!", result);
@@ -78,6 +78,7 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
     // declare variables of this class
     private ArrayList<String> activityTitles;
     private ArrayList<String> activityLocations;
+    private ArrayList<String> activityPrices;
     private RequestCreator[] activityPics;
     private Context c;
 
@@ -87,6 +88,7 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
         this.c = context;
         this.activityTitles = titles;
         this.activityLocations = locations;
+        this.activityPrices = locations;
         this.activityPics = pics;
     }
 
@@ -94,6 +96,7 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
+        TextView activityPrice;
         ImageView img;
     }
 
@@ -111,10 +114,12 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
+        holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         // populate the title and image with data for a list item
         holder.activityTitle.setText(activityTitles.get(position));
         holder.activityLocation.setText(activityLocations.get(position));
+        holder.activityPrice.setText(activityPrices.get(position));
         activityPics[position].into(holder.img);
         // return the updated view
         return convertView;
