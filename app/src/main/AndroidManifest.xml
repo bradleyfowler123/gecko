@@ -24,10 +24,12 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:label="Login"/>
         <activity
             android:name=".RegisterActivity"
-            android:parentActivityName=".LoginActivity" />
+            android:parentActivityName=".LoginActivity"
+            android:label="Register"/>
         <activity
             android:name=".FriendActivity"
             android:parentActivityName=".MainActivity" />
@@ -56,6 +58,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.auton.bradley.myfe.MainActivity" />
+        </activity>
+        <activity android:name=".DetailedItemActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="Custom">
         </activity>
     </application>
 

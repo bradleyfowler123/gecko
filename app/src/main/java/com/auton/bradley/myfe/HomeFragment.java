@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -87,7 +88,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(getContext(),testTitles.get(i),Toast.LENGTH_SHORT).show();
-
+                Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
+                startActivity(intent);
             }
         });
 
