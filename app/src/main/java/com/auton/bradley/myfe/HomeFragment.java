@@ -54,8 +54,9 @@ public class HomeFragment extends Fragment {
                                    // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                           // enables easy access to the root search xml
         ListView home_list = (ListView) rootView.findViewById(R.id.home_list);                              // locate the list object in the home tab
+        final MainActivity activity = (MainActivity) getActivity();
                                 // get test data
-        int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers,R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
+        final int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers,R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
         final String[] titles = getResources().getStringArray(R.array.recommendationsArray);                // get the names of the recommendations to display
         final String[] pris = getResources().getStringArray(R.array.pricesArray);
         final String[] locs = getResources().getStringArray(R.array.locationsArray);
@@ -88,8 +89,11 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(),testTitles.get(i),Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
+                intent.putExtra("fbData", activity.facebookData);
+                intent.putExtra("fbCon", activity.facebookConnected);
+                intent.putExtra("title",testTitles.get(i));
+                intent.putExtra("image",images[i]);
                 startActivity(intent);
             }
         });
@@ -140,7 +144,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
     @Override
     public
     @NonNull
-    View getView(int position, View convertView, @NonNull ViewGroup parent) {
+    View getView(final int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final ViewGroup nullParent = null;
@@ -181,7 +185,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
             @Override
             public void onClick(View view) {
                 Snackbar snackbar = Snackbar
-                        .make(view, "Added to Calendar", Snackbar.LENGTH_SHORT)
+                        .make(view, "Added " + holder.activityTitle.getText() + " to calendar", Snackbar.LENGTH_SHORT)
                         .setAction("UNDO", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
