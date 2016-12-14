@@ -52,12 +52,13 @@ public class HomeFragment extends Fragment {
                                    // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                           // enables easy access to the root search xml
         ListView home_list = (ListView) rootView.findViewById(R.id.home_list);                              // locate the list object in the home tab
+                                // get test data
         int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers,R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
         final String[] titles = getResources().getStringArray(R.array.recommendationsArray);                // get the names of the recommendations to display
         final String[] pris = getResources().getStringArray(R.array.pricesArray);
         final String[] locs = getResources().getStringArray(R.array.locationsArray);
-
-        ArrayList<String> testTitles = new ArrayList<>();
+                                    // format test data
+        final ArrayList<String> testTitles = new ArrayList<>();
         ArrayList<String> testLocations = new ArrayList<>();
         ArrayList<String> testPrices = new ArrayList<>();
         RequestCreator[] urls = new RequestCreator[8];
@@ -77,7 +78,6 @@ public class HomeFragment extends Fragment {
                 dark[i] = true; // It's a dark color
             }
             urls[i] = Picasso.with(getContext()).load(images[i]);
-
         }
                                    // populate the list
         homeAdapter adapter = new homeAdapter(getActivity(),testTitles, testLocations, testPrices, urls,color,dark);
@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(),R.string.home_toast_list_click,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),testTitles.get(i),Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -110,7 +110,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
 
     // define a function that can be used to declare this custom adapter class
     homeAdapter(Context context, ArrayList<String> titles, ArrayList<String> locations, ArrayList<String> prices, RequestCreator[] pics, int[] colors, boolean[] darks) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.search_results_list_item, titles);
+        super(context, R.layout.home_list_item, titles);
         this.c = context;
         this.activityTitles = titles;
         this.activityLocations = locations;
@@ -138,7 +138,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final ViewGroup nullParent = null;
-            convertView = inflater.inflate(R.layout.search_results_list_item, nullParent);
+            convertView = inflater.inflate(R.layout.home_list_item, nullParent);
         }
         // find the views within the list
         final ViewHolder holder = new ViewHolder();

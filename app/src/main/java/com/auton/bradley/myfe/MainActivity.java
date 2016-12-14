@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             if (facebookConnected) {
                 facebookData = intent.getBundleExtra("fbData");
             }
+            Bundle searchPref = intent.getBundleExtra("searchPref");
         }
 
         if (facebookConnected == null) {
@@ -125,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_preferences:
                 Intent intent3 = new Intent(this, SearchPrefActivity.class);
+                intent3.putExtra("fbData", facebookData);
+                intent3.putExtra("fbCon", facebookConnected);
                 startActivity(intent3);
                 return true;
             case R.id.action_settings:

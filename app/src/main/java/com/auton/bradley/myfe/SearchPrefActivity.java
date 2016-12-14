@@ -23,10 +23,14 @@ import java.util.Collections;
 
 public class SearchPrefActivity extends AppCompatActivity {
 
+    private Boolean fbCon;
+    private Bundle fbData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_search);
+        setContentView(R.layout.activity_search_pref);
+        fbCon = getIntent().getBooleanExtra("fbCon",false);
+        fbData = getIntent().getBundleExtra("fbData");
         // variable declarations
         final ExpandableListView elv=(ExpandableListView) findViewById(R.id.search_list);  // locate the elv in this view
         final ArrayList<Item> item=getData();                                                       // generate data which will be used to populate the el
@@ -76,7 +80,7 @@ public class SearchPrefActivity extends AppCompatActivity {
 
                         final ViewGroup nullParent = null;
                         View promptsView = LayoutInflater.from(getBaseContext()).inflate(R.layout.input_prompt, nullParent);     // get input_prompts.xml view
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getBaseContext());
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SearchPrefActivity.this);
                         alertDialogBuilder.setView(promptsView);                                    // set input_prompts.xml to alert dialog builder
 
                         final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput); // enable easy access to object
@@ -118,7 +122,16 @@ public class SearchPrefActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(getBaseContext(),MainActivity.class);
+                Bundle searchPref = new Bundle();
+                for (int i = 0; i < item.size(); i++) {
+                    searchPref.putString(Integer.toString(i),item.get(i).stringify());
+                }
+                intent.putExtra("searchPref",searchPref);
+                intent.putExtra("fbConnected",fbCon);
+                intent.putExtra("fbData",fbData);
+                intent.putExtra("tab",0);
+                startActivity(intent);
             }
         });
                                                                         // return the search view (and everything below) to the main activity so it can be shown
@@ -203,7 +216,7 @@ class searchPrefAdapter extends BaseExpandableListAdapter {                     
     public View getChildView(int groupPos, int childPos, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView==null) {
             final ViewGroup nullParent = null;
-            convertView=inflater.inflate(R.layout.search_element_list_item,nullParent);
+            convertView=inflater.inflate(R.layout.searchpref_element_list_item,nullParent);
         }
         // populate a child element within a list group
         String child = (String) getChild(groupPos, childPos);                                               // return name of a particular child element
@@ -236,7 +249,7 @@ class searchPrefAdapter extends BaseExpandableListAdapter {                     
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if(convertView == null) {
             final ViewGroup nullParent = null;
-            convertView=inflater.inflate(R.layout.search_option_list_item,nullParent);
+            convertView=inflater.inflate(R.layout.searchpref_option_list_item,nullParent);
         }
         // variable declarations
         Item i=(Item) getGroup(groupPosition);                                                                      // return a list group's data
