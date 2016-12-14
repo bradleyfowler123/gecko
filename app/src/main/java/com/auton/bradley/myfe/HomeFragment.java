@@ -11,6 +11,7 @@ import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -95,7 +96,10 @@ public class HomeFragment extends Fragment {
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
+
 }
+
+
 
 
 
@@ -172,6 +176,23 @@ class homeAdapter extends ArrayAdapter<String> {                                
             holder.activityPrice.setTextColor(Color.BLACK);
         }
         // return the updated view
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar
+                        .make(view, "Added to Calendar", Snackbar.LENGTH_SHORT)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
+                                snackbar1.show();
+                            }
+                        });
+
+                snackbar.show();
+            }
+        });
         return convertView;
     }
 }
