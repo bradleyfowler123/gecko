@@ -19,7 +19,7 @@
         android:nestedScrollingEnabled="true"
         android:layout_below="@id/home_welcome_textView"
         android:id="@+id/home_list"
-        >
+        android:divider="@null">
     </ListView>
 
 </RelativeLayout>

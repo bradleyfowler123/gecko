@@ -5,6 +5,30 @@
         <item>Cambridge Climbing</item>
         <item>Local Gym</item>
         <item>Alton Towers</item>
+        <item>Alton Towers</item>
+        <item>Cambridge Climbing</item>
+        <item>Local Gym</item>
+        <item>Alton Towers</item>
+    </array>
+    <array name="locationsArray">
+        <item>15 miles away</item>
+        <item>2 miles away</item>
+        <item>400m away</item>
+        <item>25 miles away</item>
+        <item>15 miles away</item>
+        <item>2 miles away</item>
+        <item>400m away</item>
+        <item>25 miles away</item>
+    </array>
+    <array name="pricesArray">
+        <item>$$$</item>
+        <item>$$</item>
+        <item>$</item>
+        <item>$$$</item>
+        <item>$$$</item>
+        <item>$$</item>
+        <item>$</item>
+        <item>$$$</item>
     </array>
 
     <array name="friendNames">
