@@ -2,11 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.auton.bradley.myfe.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_preferences"
         android:title="@string/action_settings"
-        android:icon="@drawable/ic_settings_grey"
-        app:showAsAction="ifRoom" />
+        android:icon="@android:drawable/ic_menu_preferences"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_login"
         android:title="@string/action_login"
@@ -20,8 +21,13 @@
         app:showAsAction="never"
         />
     <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_settings_grey"
+        app:showAsAction="withText" />
+    <item
         android:id="@+id/action_about_help"
         android:title="@string/action_about_help"
-        app:showAsAction="never"
+        app:showAsAction="withText"
         />
 </menu>

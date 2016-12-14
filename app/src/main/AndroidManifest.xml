@@ -51,6 +51,15 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+        <activity
+            android:name=".SearchPrefActivity"
+            android:label="@string/title_activity_search_pref"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.auton.bradley.myfe.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

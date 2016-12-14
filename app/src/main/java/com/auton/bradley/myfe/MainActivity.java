@@ -1,15 +1,22 @@
 package com.auton.bradley.myfe;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookActivity;
@@ -27,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     private int[] tabIcons = {
             R.drawable.ic_home_grey,
-            R.drawable.ic_search_grey,
             R.drawable.ic_friend_feed_grey,
             R.drawable.ic_planner
     };
@@ -43,20 +49,20 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(getApplicationContext());
-                                            // load main activity layout
+        // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
-                                            // load action bar
+        // load action bar
         toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);                                                               // you can edit action bar style in activity_main.xml
-                                    // load tab bar and tab data
+        // load tab bar and tab data
         viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
-                                    // store user data if any
+        // store user data if any
         Intent intent = getIntent();
-        if(intent.getExtras()!= null) {
+        if (intent.getExtras() != null) {
             currentTab = intent.getIntExtra("tab", 0);
             facebookConnected = intent.getBooleanExtra("fbConnected", false);
             if (facebookConnected) {
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(facebookConnected == null) {
+        if (facebookConnected == null) {
             auth.signOut();
             facebookConnected = false;
         }
@@ -83,34 +89,32 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
-        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
         adapter.addFragment(new HomeFragment(), "Home");
-        adapter.addFragment(new SearchFragment(), "Search");
         adapter.addFragment(new FriendFragment(), "Friend");
         adapter.addFragment(new ProfileFragment(), "Profile");
         viewPager.setAdapter(adapter);                                                              // set the adapter to the container
     }
 
 
-                            // create options menu in action bar
+    // create options menu in action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if(auth.getCurrentUser() != null) {
+        if (auth.getCurrentUser() != null) {
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(true);
-        }
-        else {
+        } else {
             menu.getItem(1).setVisible(true);
             menu.getItem(2).setVisible(false);
         }
         return true;
     }
-                            // respond to action bar item press
+
+    // respond to action bar item press
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -119,23 +123,27 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         switch (id) {
+            case R.id.action_preferences:
+                Intent intent3 = new Intent(this, SearchPrefActivity.class);
+                startActivity(intent3);
+                return true;
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
-           //     if (facebookConnected) {
-                    LoginManager.getInstance().logOut();
-           //     }
+                //     if (facebookConnected) {
+                LoginManager.getInstance().logOut();
+                //     }
                 auth.signOut();
                 facebookConnected = false;
                 currentTab = viewPager.getCurrentItem();
                 Intent intent = new Intent(this, LoginActivity.class);
-                intent.putExtra("tab",viewPager.getCurrentItem());
+                intent.putExtra("tab", viewPager.getCurrentItem());
                 startActivity(intent);
                 return true;
             case R.id.action_login:
                 currentTab = viewPager.getCurrentItem();
                 Intent intent2 = new Intent(this, LoginActivity.class);
-                intent2.putExtra("tab",viewPager.getCurrentItem());
+                intent2.putExtra("tab", viewPager.getCurrentItem());
                 startActivity(intent2);
                 return true;
         }
