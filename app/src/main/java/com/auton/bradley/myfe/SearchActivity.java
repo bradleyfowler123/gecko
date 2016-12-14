@@ -2,6 +2,7 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -98,6 +99,7 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
         TextView activityLocation;
         TextView activityPrice;
         ImageView img;
+        ImageView imageView;
     }
 
     // function that generates the list view
@@ -116,11 +118,13 @@ class searchResultsAdapter extends ArrayAdapter<String> {                       
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
+        holder.imageView = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
         // populate the title and image with data for a list item
         holder.activityTitle.setText(activityTitles.get(position));
         holder.activityLocation.setText(activityLocations.get(position));
         holder.activityPrice.setText(activityPrices.get(position));
         activityPics[position].into(holder.img);
+        Picasso.with(c).load(R.drawable.ic_calander).into(holder.imageView);
         // return the updated view
         return convertView;
     }
