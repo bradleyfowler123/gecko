@@ -7,36 +7,42 @@
     android:layout_height="120dp">
 
 
-    <ImageView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:id="@+id/sr_list_item_image"
-        android:padding="5dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="@string/friendFeed_imageDescription"
-        app:srcCompat="@drawable/altontowers"
-        android:adjustViewBounds="true" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/sr_color"
         android:layout_margin="5dp"
-        android:background="@drawable/shader"/>
+        android:background="@drawable/homerectangle"/>
 
 
     <RelativeLayout
-        android:layout_width="110dp"
-        android:layout_gravity="end"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:layout_height="match_parent"
+            android:layout_width="250dp"
+            android:id="@+id/sr_list_item_image"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:paddingStart="15dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/friendFeed_imageDescription"
+            app:srcCompat="@drawable/altontowers" />
 
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@id/sr_list_item_image"
             android:layout_alignParentEnd="true"
             android:textColor="@android:color/white"
             android:text="@string/test"
@@ -57,15 +63,15 @@
             android:id="@+id/sr_add_to_calander" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentEnd="true"
+            android:layout_toStartOf="@id/sr_add_to_calander"
             android:layout_below="@id/sr_list_item_title"
-            android:layout_alignParentStart="true">
+            android:layout_toEndOf="@id/sr_list_item_image">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/test"
                 android:id="@+id/sr_list_item_location"

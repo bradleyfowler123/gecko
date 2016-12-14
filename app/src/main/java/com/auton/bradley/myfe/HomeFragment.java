@@ -1,9 +1,18 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,15 +61,26 @@ public class HomeFragment extends Fragment {
         ArrayList<String> testLocations = new ArrayList<>();
         ArrayList<String> testPrices = new ArrayList<>();
         RequestCreator[] urls = new RequestCreator[8];
+        int[] color = new int[8];
+        boolean[] dark = new boolean[8];
         for (int i = 0; i < 8; i++) {
             testTitles.add(titles[i]);
             testLocations.add(locs[i]);
             testPrices.add(pris[i]);
+            Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),images[i]);
+            color[i] = Palette.from(bitmap).generate().getDominantColor(0);
+            double darkness = 1-(0.299*Color.red(color[i]) + 0.587*Color.green(color[i]) + 0.114*Color.blue(color[i]))/255;
+            if(darkness<0.4){
+                dark[i] = false; // It's a light color
+            }else{
+                dark[i] = true; // It's a dark color
+            }
+            Log.d("njecdms", Boolean.toString(dark[i]));
             urls[i] = Picasso.with(getContext()).load(images[i]);
 
         }
                                    // populate the list
-        homeAdapter adapter = new homeAdapter(getActivity(),testTitles, testLocations, testPrices, urls);
+        homeAdapter adapter = new homeAdapter(getActivity(),testTitles, testLocations, testPrices, urls,color,dark);
         home_list.setAdapter(adapter);
                                    // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -84,16 +104,20 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private ArrayList<String> activityLocations;
     private ArrayList<String> activityPrices;
     private RequestCreator[] activityPics;
+    private int[] colors;
+    private boolean[] darks;
     private Context c;
 
     // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<String> titles, ArrayList<String> locations, ArrayList<String> prices, RequestCreator[] pics) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<String> titles, ArrayList<String> locations, ArrayList<String> prices, RequestCreator[] pics, int[] colors, boolean[] darks) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.search_results_list_item, titles);
         this.c = context;
         this.activityTitles = titles;
         this.activityLocations = locations;
         this.activityPrices = prices;
         this.activityPics = pics;
+        this.colors = colors;
+        this.darks = darks;
     }
 
     // class definition used to store different views within the list view to be populated
@@ -103,6 +127,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         TextView activityPrice;
         ImageView img;
         ImageView imageView;
+        TextView color;
     }
 
     // function that generates the list view
@@ -120,6 +145,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
+      //  holder.color = (TextView) convertView.findViewById(R.id.sr_color);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         holder.imageView = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
         // populate the title and image with data for a list item
@@ -127,7 +153,22 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityLocation.setText(activityLocations.get(position));
         holder.activityPrice.setText(activityPrices.get(position));
         activityPics[position].into(holder.img);
-        Picasso.with(c).load(R.drawable.ic_calander).into(holder.imageView);
+        View btn = convertView.findViewById(R.id.sr_color);
+        GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();
+        bgShape.setColor(colors[position]);
+      //  holder.color.setBackgroundColor(colors[position]);
+        if (this.darks[position]) {
+            Picasso.with(c).load(R.drawable.ic_calendar_white).into(holder.imageView);
+            holder.activityTitle.setTextColor(Color.WHITE);
+            holder.activityLocation.setTextColor(Color.WHITE);
+            holder.activityPrice.setTextColor(Color.WHITE);
+        }
+        else {
+            Picasso.with(c).load(R.drawable.ic_calander).into(holder.imageView);
+            holder.activityTitle.setTextColor(Color.BLACK);
+            holder.activityLocation.setTextColor(Color.BLACK);
+            holder.activityPrice.setTextColor(Color.BLACK);
+        }
         // return the updated view
         return convertView;
     }
