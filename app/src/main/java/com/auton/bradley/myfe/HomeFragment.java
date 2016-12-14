@@ -69,13 +69,13 @@ public class HomeFragment extends Fragment {
             testPrices.add(pris[i]);
             Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),images[i]);
             color[i] = Palette.from(bitmap).generate().getDominantColor(0);
+            color[i] = Color.argb(200,Color.red(color[i]),Color.green(color[i]),Color.blue(color[i]));
             double darkness = 1-(0.299*Color.red(color[i]) + 0.587*Color.green(color[i]) + 0.114*Color.blue(color[i]))/255;
             if(darkness<0.4){
                 dark[i] = false; // It's a light color
             }else{
                 dark[i] = true; // It's a dark color
             }
-            Log.d("njecdms", Boolean.toString(dark[i]));
             urls[i] = Picasso.with(getContext()).load(images[i]);
 
         }
