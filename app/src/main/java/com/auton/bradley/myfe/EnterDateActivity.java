@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -24,14 +25,21 @@ import java.util.Date;
 
 public class EnterDateActivity extends AppCompatActivity {
 
+    private int year;
+    private int month;
+    private int day;
+    private String title;
+    private String loction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_date);
 
-        GridLayout grid = (GridLayout) findViewById(R.id.activity_enter_date);
+        title = getIntent().getStringExtra("title");
+        loction = getIntent().getStringExtra("location");
 
-        Log.d("nfdkls", Integer.toString(grid.getChildCount()));
+        GridLayout grid = (GridLayout) findViewById(R.id.activity_enter_date);
         LinearLayout line1 = (LinearLayout) grid.getChildAt(1);
         LinearLayout line2 = (LinearLayout) grid.getChildAt(3);
         final TextView[] weekDays = new TextView[8];
@@ -48,16 +56,11 @@ public class EnterDateActivity extends AppCompatActivity {
             weekDays[i].setOnClickListener(new onClickListenerPosition(i) {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(getBaseContext(),Integer.toString(this.position),Toast.LENGTH_SHORT).show();
-
-                    TimePickerDialog tpd = new TimePickerDialog(EnterDateActivity.this, AlertDialog.THEME_HOLO_LIGHT, new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker timePicker, int i, int i1) {
-
-                        }
-                    },Calendar.getInstance().get(Calendar.HOUR_OF_DAY),Calendar.getInstance().get(Calendar.MINUTE),true);
-                    tpd.show();
-
+                    month = Calendar.getInstance().get(Calendar.MONTH);
+                    day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)+this.position;
+                    year = Calendar.getInstance().get(Calendar.YEAR);
+                    Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
+                    startActivityForResult(intent,2);
                 }
             });
         }
@@ -67,15 +70,8 @@ public class EnterDateActivity extends AppCompatActivity {
                 DatePickerDialog dpd = new DatePickerDialog(EnterDateActivity.this, AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, final int i2) {
-
-                        TimePickerDialog tpd = new TimePickerDialog(EnterDateActivity.this, AlertDialog.THEME_HOLO_LIGHT, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int i3, int i4) {
-                                
-                            }
-                        },Calendar.getInstance().get(Calendar.HOUR_OF_DAY),Calendar.getInstance().get(Calendar.MINUTE),true);
-                        tpd.show();
-
+                        Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
+                        startActivityForResult(intent,2);
                     }
                 }, Calendar.getInstance().get(Calendar.YEAR),Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
                 dpd.show();
@@ -84,6 +80,26 @@ public class EnterDateActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 2) {
+            // Make sure the request was successful
+            if (resultCode == 1) {
+                Intent intent = new Intent();
+                intent.putExtra("year", year);
+                intent.putExtra("month", month);
+                intent.putExtra("day", day);
+                intent.putExtra("hour", data.getIntExtra("hour",12));
+                intent.putExtra("min", data.getIntExtra("min",0));
+                intent.putExtra("title", title);
+                intent.putExtra("location", loction);
+                setResult(1,intent);
+                finish();
+            }
+        }
     }
 
 }

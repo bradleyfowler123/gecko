@@ -2,6 +2,7 @@ package com.auton.bradley.myfe;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookActivity;
@@ -24,6 +26,8 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.ArrayList;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -84,6 +88,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);                            // Pass the activity result back to the Facebook SDK
+                    // add to calendar button returns data
+        if (requestCode == 1) {
+            // Make sure the request was successful
+            if (resultCode == 1) {
+                ArrayList<Integer> date = new ArrayList<>();
+                date.add(data.getIntExtra("year",2017));
+                date.add(data.getIntExtra("month",0));
+                date.add(data.getIntExtra("day",1));
+                date.add(data.getIntExtra("hour",12));
+                date.add(data.getIntExtra("min",0));
+                Toast.makeText(getBaseContext(),date.toString(),Toast.LENGTH_LONG).show();
+                Snackbar snackbar = Snackbar
+                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
+                                snackbar1.show();
+                            }
+                        });
+
+                snackbar.show();
+            }
+        }
+
     }
 
     private void setupTabIcons() {

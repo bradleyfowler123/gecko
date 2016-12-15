@@ -55,22 +55,22 @@
             android:label="@string/title_activity_search_pref"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.auton.bradley.myfe.MainActivity" />
         </activity>
         <activity
             android:name=".DetailedItemActivity"
-            android:label="Custom"
+            android:label="Activity Details"
             android:parentActivityName=".MainActivity">
         </activity>
-        <activity android:name=".EnterDateActivity"
-            android:parentActivityName=".MainActivity"
+        <activity
+            android:name=".EnterDateActivity"
             android:label="Select a day"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.auton.bradley.myfe.MainActivity" />
+        </activity>
+        <activity android:name=".EnterTimeActivity"
+            android:label="Select a time"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
         </activity>
     </application>
 

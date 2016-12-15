@@ -188,25 +188,15 @@ class homeAdapter extends ArrayAdapter<String> {                                
             @Override
             public void onClick(View view) {
 
-                Snackbar snackbar = Snackbar
-                        .make(view, "Added " + holder.activityTitle.getText() + " to calendar", Snackbar.LENGTH_SHORT)
-                        .setAction("UNDO", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                snackbar1.show();
-                            }
-                        });
+                MainActivity activity = (MainActivity) getContext();
+                Intent intent = new Intent(activity, EnterDateActivity.class);
+                intent.putExtra("title", holder.activityTitle.getText());
+                intent.putExtra("location", holder.activityTitle.getText());
+                activity.startActivityForResult(intent, 1);
 
-                snackbar.show();
-                enterDate(view);
             }
         });
         return convertView;
     }
 
-    void enterDate(View view) {
-        Intent intent = new Intent(getContext(), EnterDateActivity.class);
-        getContext().startActivity(intent);
-    }
 }
