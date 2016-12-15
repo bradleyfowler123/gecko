@@ -32,7 +32,8 @@
             android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".FriendActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:label="Friends Page"/>
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
@@ -45,7 +46,6 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

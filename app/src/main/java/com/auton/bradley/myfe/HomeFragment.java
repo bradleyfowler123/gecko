@@ -18,6 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +30,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -43,11 +46,13 @@ Java file to contain all class' related to the home tab
 public class HomeFragment extends Fragment {
 
     public HomeFragment() {        // Required empty public constructor
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
                                    // function that generates the view
@@ -102,7 +107,22 @@ public class HomeFragment extends Fragment {
         });
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
+    };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_home,menu);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(true);
+        } else {
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(false);
+        }
     }
+
+
 
 }
 
