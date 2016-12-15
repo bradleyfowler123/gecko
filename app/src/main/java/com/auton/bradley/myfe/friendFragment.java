@@ -52,6 +52,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -247,8 +248,6 @@ public class FriendFragment extends Fragment {
             // get friend data
             final ArrayList<String> friendFBUrls = fbData.getStringArrayList("friendUrls");
             final ArrayList<String> friendUIDs = fbData.getStringArrayList("friendUids");
-            //    Log.d("nkklws",friendFBNames.toString());
-            //    Log.d("nkklws",friendUIDs.toString());
             // for each friend
             for (int j = 0; j < friendUIDs.size(); j++) {
                 // get the friends' agenda data
@@ -271,13 +270,13 @@ public class FriendFragment extends Fragment {
                             if (listItems.contains(key)) {          // remove it
                                 listItems.remove(key);
                                 activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.location);
-                                timeAgo.remove(agendaItem.date);
+                                timeAgo.remove(formatTime(agendaItem.date,agendaItem.time));  // today - date,time
                                 friendNames.remove(friendFBNames.get(i));
                                 picUrls.remove(Picasso.with(getContext()).load(friendFBUrls.get(i)));
                             }               // add agenda item to list
                             listItems.add(key);
                             activityDescriptions.add(agendaItem.activity + " at " + agendaItem.location);
-                            timeAgo.add(formatData(agendaItem.date));
+                            timeAgo.add(formatTime(agendaItem.date,agendaItem.time));
                             friendNames.add(friendFBNames.get(i));
                             picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
                             // update the list view
@@ -302,17 +301,39 @@ public class FriendFragment extends Fragment {
         }
     }
 
-    private String formatData(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
-        String output = "error";
+
+    private String formatTime(String date, String time) {
+        String output;
+        String[] dateComponents = date.split("/");
+        int[] currentDCs = {Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH),Calendar.getInstance().get(Calendar.YEAR)};
+        if (dateComponents[1].equals(currentDCs[1])) {
+            output = "at " + time;
+        }
+        else {
+            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+            try {
+                Date date1 = format.parse(date);
+                output = "on " + android.text.format.DateFormat.format("dd, MMM", date1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                output = "error";
+            }
+        }
+
+        return output;
+    }
+
+    private String calculateTime(String date, String time) {
+        Date date1 = Calendar.getInstance().getTime();
+       // SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        Date date2 = new Date();
         try {
-            Date date = format.parse(input);
-            //   String week = (String) android.text.format.DateFormat.format("ww", date);
-            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
-            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+            date2 = SimpleDateFormat.getInstance().parse(date + " " + time);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        Long date3 = date2.getTime()-date1.getTime();
+        String output = date3.toString();
         return output;
     }
 

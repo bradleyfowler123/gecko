@@ -161,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         switch (id) {
+            case R.id.action_search:
+                return true;
             case R.id.action_preferences:
                 Intent intent3 = new Intent(this, SearchPrefActivity.class);
                 intent3.putExtra("fbData", facebookData);

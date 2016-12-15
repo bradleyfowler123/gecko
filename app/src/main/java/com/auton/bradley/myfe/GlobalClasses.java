@@ -12,6 +12,7 @@ import android.graphics.Shader;
 import android.os.Bundle;
 import android.view.View;
 
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
@@ -60,6 +61,45 @@ class Item {
     }
 }
 
+class HomeListData {
+
+    private String activityTitle;
+    private String activityLocation;
+    private String activityPrice;
+    private RequestCreator activityPic;
+    private int color;
+    private boolean dark;
+
+    public String getActivityTitle() {return activityTitle;}
+    public void setActivityTitle(String title) { this.activityTitle = title;}
+
+    public String getActivityLocation() {return activityLocation;}
+    public void setActivityLocation(String location) { this.activityLocation = location;}
+
+    public String getActivityPrice() {return activityPrice;}
+    public void setActivityPrice(String price) { this.activityPrice = price;}
+
+    public RequestCreator getActivityPic() {return activityPic;}
+    public void setActivityPic(RequestCreator data) { this.activityPic = data;}
+
+    public int getColor() {return color;}
+    public void setColor(int color) { this.color = color;}
+
+    public Boolean getDark() {return dark;}
+    public void setDark(Boolean data) { this.dark = data;}
+
+    public HomeListData(String activityTitle, String activityLocation, String activityPrice, RequestCreator rq, int color, Boolean dark) {
+        this.activityTitle = activityTitle;
+        this.activityLocation = activityLocation;
+        this.activityPrice = activityPrice;
+        this.activityPic = rq;
+        this.color = color;
+        this.dark = dark;
+    }
+
+    public HomeListData() {}
+}
+
 
                             // class definition
 class FacebookFriendData {
@@ -78,6 +118,7 @@ class FacebookFriendData {
 
 class AgendaClass {
     String date;
+    String time;
     String location;
     String activity;
 
@@ -85,8 +126,9 @@ class AgendaClass {
 
     }
 
-    public AgendaClass(String date, String location, String activity) {
+    public AgendaClass(String date, String time, String location, String activity) {
         this.date = date;
+        this.time = time;
         this.location = location;
         this.activity = activity;
     }
