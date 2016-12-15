@@ -1,25 +1,17 @@
 package com.auton.bradley.myfe;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,18 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /*
@@ -52,7 +40,8 @@ Java file to contain all class' related to the home tab
 public class HomeFragment extends Fragment {
 
     private ListView home_list;
-                                private homeAdapter adapter;
+    private homeAdapter adapter;
+
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
     }
@@ -81,11 +70,8 @@ public class HomeFragment extends Fragment {
         final ArrayList<String> searchTitles = new ArrayList<>(8);
         int[] color = new int[8];
         for (int i = 0; i < 8; i++) {
-            HomeListData element = new HomeListData();
-            element.setActivityTitle(titles[i]);
+            HomeListData element = new HomeListData(titles[i],locs[i],pris[i],Picasso.with(getContext()).load(images[i]));
             searchTitles.add(titles[i]);
-            element.setActivityLocation(locs[i]);
-            element.setActivityPrice(pris[i]);
             Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),images[i]);
             color[i] = Palette.from(bitmap).generate().getDominantColor(0);
             element.setColor(Color.argb(200,Color.red(color[i]),Color.green(color[i]),Color.blue(color[i])));
@@ -95,11 +81,10 @@ public class HomeFragment extends Fragment {
             }else{
                 element.setDark(true); // It's a dark color
             }
-            element.setActivityPic(Picasso.with(getContext()).load(images[i]));
             listData.add(element);
         }
                                    // populate the list
-        adapter = new homeAdapter(getActivity(),listData,searchTitles);
+        adapter = new homeAdapter(getActivity(),listData,searchTitles);                             // note searchTitles the strings that are search able, in this case just the titles
         home_list.setAdapter(adapter);
                                    // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,189 +100,146 @@ public class HomeFragment extends Fragment {
         });
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
-    };
-
-
+    }
+                                // setup the home menu items
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        inflater.inflate(R.menu.menu_home,menu);
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        menu.clear();                                                                               // remove current menu
+        inflater.inflate(R.menu.menu_home,menu);                                                    // add home one
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {                                  // display either login or logout
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
         } else {
             menu.getItem(2).setVisible(true);
             menu.getItem(3).setVisible(false);
         }
-
+                                // set up search button
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        //*** setOnQueryTextFocusChangeListener ***
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
 
             }
         });
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 return false;
             }
-
-            @Override
+            @Override               // on text entered
             public boolean onQueryTextChange(String searchQuery) {
-                adapter.filter(searchQuery.trim());
-                home_list.invalidate();
+                adapter.filter(searchQuery.trim());                                                 // update the list items
+                home_list.invalidate();                                                             // ensure list refresh
                 return true;
             }
-        });
-
+        });                         // on other actions
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                // Do something when collapsed
+            public boolean onMenuItemActionCollapse(MenuItem item) {                                // Do something when collapsed
                 return true;  // Return true to collapse action view
             }
-
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                // Do something when expanded
+            public boolean onMenuItemActionExpand(MenuItem item) {                                  // Do something when expanded
                 return true;  // Return true to expand action view
             }
         });
-
-
-
-
-
     }
-
-
-
 }
 
-
-
-
-
-// adapter used for to show your activities as a list view in profile agenda sub tab
+                        // adapter used for to populate activities in home list
 class homeAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
-    // declare variables of this class
+                                // declare variables of this class
     private ArrayList<HomeListData> listData;
     private Context c;
-    ArrayList<String> arraySearchList;
-    ArrayList<HomeListData> backupData;
-
-    // define a function that can be used to declare this custom adapter class
+    private ArrayList<String> arraySearchList;
+    private ArrayList<HomeListData> backupData;
+                                // define a function that can be used to declare this custom adapter class
     homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
-        this.listData = listData;
-        arraySearchList = new ArrayList<>();
+        this.listData = listData;                                                                   // all of the data to be shown
+        arraySearchList = new ArrayList<>();                                                        // contains all available titles, including the ones not shown
         arraySearchList.addAll(activityTitles);
-        backupData = new ArrayList<>();
+        backupData = new ArrayList<>();                                                             // same but for all of the data
         backupData.addAll(listData);
-
-    }
-
-    // class definition used to store different views within the list view to be populated
+    }                          // class definition used to store different views within the list view to be populated
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
         TextView activityPrice;
         ImageView img;
-        ImageView imageView;
-    }
-
-    // function that generates the list view
+        ImageView addToCal;
+    }                          // function that generates the list view, runs for every list item
     @Override
-    public
     @NonNull
-    View getView(final int position, View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
+                                // if the view is empty, get it
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final ViewGroup nullParent = null;
             convertView = inflater.inflate(R.layout.home_list_item, nullParent);
-        }
-        // find the views within the list
+        }                       // find the views within the list
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
-      //  holder.color = (TextView) convertView.findViewById(R.id.sr_color);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
-        holder.imageView = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
-        // populate the title and image with data for a list item
+        holder.addToCal = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
+                                // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).getActivityTitle());
         holder.activityLocation.setText(listData.get(position).getActivityLocation());
         holder.activityPrice.setText(listData.get(position).getActivityPrice());
         listData.get(position).getActivityPic().into(holder.img);
-        View btn = convertView.findViewById(R.id.sr_color);
-        GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();
-        bgShape.setColor(listData.get(position).getColor());
-      //  holder.color.setBackgroundColor(colors[position]);
-        if (this.listData.get(position).getDark()) {
-            Picasso.with(c).load(R.drawable.ic_calendar_white).into(holder.imageView);
+        View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
+        GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();             // get its background
+        bgShape.setColor(listData.get(position).getColor());                                        // set the color of it
+        if (this.listData.get(position).getDark()) {                                                // handle dark or light background
+            Picasso.with(c).load(R.drawable.ic_calendar_white).into(holder.addToCal);
             holder.activityTitle.setTextColor(Color.WHITE);
             holder.activityLocation.setTextColor(Color.WHITE);
             holder.activityPrice.setTextColor(Color.WHITE);
         }
         else {
-            Picasso.with(c).load(R.drawable.ic_calander).into(holder.imageView);
+            Picasso.with(c).load(R.drawable.ic_calander).into(holder.addToCal);
             holder.activityTitle.setTextColor(Color.BLACK);
             holder.activityLocation.setTextColor(Color.BLACK);
             holder.activityPrice.setTextColor(Color.BLACK);
         }
-        // return the updated view
-
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
+                            // add an onclick listener for the add to calendar button
+        holder.addToCal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 MainActivity activity = (MainActivity) getContext();
                 Intent intent = new Intent(activity, EnterDateActivity.class);
-                intent.putExtra("title", holder.activityTitle.getText());
+                intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
                 intent.putExtra("location", holder.activityLocation.getText());
-                activity.startActivityForResult(intent, 1);
-
+                activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
             }
         });
-        return convertView;
+        return convertView;                                                                         // return the updated view
     }
-
     @Override
     public int getCount() {
         return listData.size();
     }
-
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
+    }                               // function to remove list items not containing searched titles
     void filter(String charText) {
-
-        charText = charText.toLowerCase(Locale.getDefault());
-
-        Log.d("juubhjhbmn", arraySearchList.toString());
-        listData.clear();
+        charText = charText.toLowerCase(Locale.getDefault());                                       // get the searched string
+        listData.clear();                                                                           // remove all items from list
         if (charText.length() == 0) {
-            listData.addAll(backupData);
+            listData.addAll(backupData);                                                            // upon first click of search button, add all of the items to the list
 
-        } else {
-            Log.d("jhbmn", arraySearchList.toString());
-            for (int i = 0; i < arraySearchList.size(); i++) {
+        } else {                                                                                    // when text entered
+            for (int i = 0; i < arraySearchList.size(); i++) {                                      // cycle through titles until searched text is contained in a title
                 if (charText.length() != 0 && arraySearchList.get(i).toLowerCase(Locale.getDefault()).contains(charText)) {
-                    listData.add(backupData.get(i));
+                    listData.add(backupData.get(i));                                                // add that list item to the list
                 }
             }
         }
-        notifyDataSetChanged();
+        notifyDataSetChanged();                                                                     // update the list view
     }
-
 }

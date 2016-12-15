@@ -4,19 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.os.Bundle;
 import android.view.View;
 
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Bradley on 13/10/2016.
@@ -48,7 +43,7 @@ class Item {
 
 
     String stringify () {
-        String item = "";
+        String item;
         if (this.MultiSelect)
             item = this.mSelected.toString();
         else {
@@ -60,44 +55,37 @@ class Item {
         return item;
     }
 }
-
+                            // custom class for storing data of a list item on home page
 class HomeListData {
-
+                        // variables
     private String activityTitle;
     private String activityLocation;
     private String activityPrice;
     private RequestCreator activityPic;
     private int color;
     private boolean dark;
-
-    public String getActivityTitle() {return activityTitle;}
-    public void setActivityTitle(String title) { this.activityTitle = title;}
-
-    public String getActivityLocation() {return activityLocation;}
-    public void setActivityLocation(String location) { this.activityLocation = location;}
-
-    public String getActivityPrice() {return activityPrice;}
-    public void setActivityPrice(String price) { this.activityPrice = price;}
-
-    public RequestCreator getActivityPic() {return activityPic;}
+                        // functions to get individual variables
+    String getActivityTitle() {return activityTitle;}
+    String getActivityLocation() {return activityLocation;}
+    String getActivityPrice() {return activityPrice;}
+    RequestCreator getActivityPic() {return activityPic;}
+    int getColor() {return color;}
+    Boolean getDark() {return dark;}
+                        // functions to set individual variables
+    void setActivityTitle(String title) { this.activityTitle = title;}
+    void setActivityLocation(String location) { this.activityLocation = location;}
+    void setActivityPrice(String price) { this.activityPrice = price;}
     public void setActivityPic(RequestCreator data) { this.activityPic = data;}
-
-    public int getColor() {return color;}
-    public void setColor(int color) { this.color = color;}
-
-    public Boolean getDark() {return dark;}
-    public void setDark(Boolean data) { this.dark = data;}
-
-    public HomeListData(String activityTitle, String activityLocation, String activityPrice, RequestCreator rq, int color, Boolean dark) {
+    void setColor(int color) { this.color = color;}
+    void setDark(Boolean data) { this.dark = data;}
+                        // used to initialise the class
+    HomeListData(String activityTitle, String activityLocation, String activityPrice, RequestCreator rq) {
         this.activityTitle = activityTitle;
         this.activityLocation = activityLocation;
         this.activityPrice = activityPrice;
         this.activityPic = rq;
-        this.color = color;
-        this.dark = dark;
     }
 
-    public HomeListData() {}
 }
 
 
@@ -123,7 +111,6 @@ class AgendaClass {
     String activity;
 
     public AgendaClass(){
-
     }
 
     public AgendaClass(String date, String time, String location, String activity) {
@@ -136,7 +123,7 @@ class AgendaClass {
 
 class onClickListenerPosition implements View.OnClickListener {
     int position;
-    public onClickListenerPosition(int pos) {
+    onClickListenerPosition(int pos) {
         this.position = pos;
     }
 
