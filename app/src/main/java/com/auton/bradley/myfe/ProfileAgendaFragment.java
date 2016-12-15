@@ -36,7 +36,7 @@ import java.util.Iterator;
 public class ProfileAgendaFragment extends Fragment {
 
     ArrayList<String> activities = new ArrayList<>();
-    ArrayList<String> companies = new ArrayList<>();
+    ArrayList<String> locations = new ArrayList<>();
     ArrayList<String> dates = new ArrayList<>();
     ArrayList<String> listItems = new ArrayList<>();
 
@@ -84,14 +84,14 @@ public class ProfileAgendaFragment extends Fragment {
                              listItems.remove(key);
                              activities.remove(agendaItem.activity);
                              dates.remove(agendaItem.date);
-                             companies.remove(agendaItem.company);
+                             locations.remove(agendaItem.location);
                          }               // add agenda item to list
                          listItems.add(key);
                          activities.add(agendaItem.activity);
                          dates.add(formatData(agendaItem.date));
-                         companies.add(agendaItem.company);
+                         locations.add(agendaItem.location);
                          // update the list view
-                         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, companies);
+                         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, locations);
                          pa_list.setAdapter(adapter);
                      }
                  }
@@ -106,7 +106,7 @@ public class ProfileAgendaFragment extends Fragment {
     }
 
     private String formatData(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
         String output = "error";
         try {
             Date date = format.parse(input);
@@ -126,21 +126,21 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
     // declare variables of this class
     private ArrayList<String> activities;
     private ArrayList<String> dates;
-    private ArrayList<String> companies;
+    private ArrayList<String> locations;
     private Context c;
     // define a function that can be used to declare this custom adapter class
-    profileAgendaAdapter(Context context, ArrayList<String> activities,ArrayList<String> dates, ArrayList<String> companies) {     // arguments set the context, texts and images for this adapter class
+    profileAgendaAdapter(Context context, ArrayList<String> activities,ArrayList<String> dates, ArrayList<String> locations) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.profile_agenda_list_item,activities);
         this.c=context;
         this.activities=activities;
         this.dates=dates;
-        this.companies=companies;
+        this.locations=locations;
     }
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
         TextView activity;
         TextView date;
-        TextView companies;
+        TextView locations;
     }
     // function that generates the list view
     @Override
@@ -155,11 +155,11 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         final ViewHolder holder=new ViewHolder();
         holder.activity=(TextView) convertView.findViewById(R.id.tv_profile_agenda_activities);
         holder.date=(TextView) convertView.findViewById(R.id.tv_profile_agenda_date);
-        holder.companies=(TextView) convertView.findViewById(R.id.tv_profile_agenda_company);
+        holder.locations=(TextView) convertView.findViewById(R.id.tv_profile_agenda_location);
         // populate the title and image with data for a list item
         holder.activity.setText(activities.get(position));
         holder.date.setText(dates.get(position));
-        holder.companies.setText(companies.get(position));
+        holder.locations.setText(locations.get(position));
         // return the updated view
         return convertView;
     }

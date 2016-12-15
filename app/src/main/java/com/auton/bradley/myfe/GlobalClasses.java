@@ -78,16 +78,16 @@ class FacebookFriendData {
 
 class AgendaClass {
     String date;
-    String company;
+    String location;
     String activity;
 
     public AgendaClass(){
 
     }
 
-    public AgendaClass(String date, String company, String activity) {
+    public AgendaClass(String date, String location, String activity) {
         this.date = date;
-        this.company = company;
+        this.location = location;
         this.activity = activity;
     }
 }

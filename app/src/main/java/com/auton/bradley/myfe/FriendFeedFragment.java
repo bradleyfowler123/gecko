@@ -94,13 +94,13 @@ public class FriendFeedFragment extends Fragment {
                                                 // if already exists in list
                             if (listItems.contains(key)) {          // remove it
                                 listItems.remove(key);
-                                activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.company);
+                                activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.location);
                                 timeAgo.remove(agendaItem.date);
                                 friendNames.remove(friendFBNames.get(i));
                                 picUrls.remove(Picasso.with(getContext()).load(friendFBUrls.get(i)));
                             }               // add agenda item to list
                             listItems.add(key);
-                            activityDescriptions.add(agendaItem.activity + " at " + agendaItem.company);
+                            activityDescriptions.add(agendaItem.activity + " at " + agendaItem.location);
                             timeAgo.add(formatData(agendaItem.date));
                             friendNames.add(friendFBNames.get(i));
                             picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));

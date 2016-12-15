@@ -62,8 +62,7 @@ public class EnterTimeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
-                intent.putExtra("hour", hour);
-                intent.putExtra("min", minute);
+                intent.putExtra("time", Integer.toString(hour) + ":" + Integer.toString(minute));
                 setResult(1,intent);
                 finish();
             }

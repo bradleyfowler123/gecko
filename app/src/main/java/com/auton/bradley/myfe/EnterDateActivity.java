@@ -89,11 +89,8 @@ public class EnterDateActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == 1) {
                 Intent intent = new Intent();
-                intent.putExtra("year", year);
-                intent.putExtra("month", month);
-                intent.putExtra("day", day);
-                intent.putExtra("hour", data.getIntExtra("hour",12));
-                intent.putExtra("min", data.getIntExtra("min",0));
+                intent.putExtra("date", Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year));
+                intent.putExtra("time", data.getStringExtra("time"));
                 intent.putExtra("title", title);
                 intent.putExtra("location", loction);
                 setResult(1,intent);

@@ -191,7 +191,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 MainActivity activity = (MainActivity) getContext();
                 Intent intent = new Intent(activity, EnterDateActivity.class);
                 intent.putExtra("title", holder.activityTitle.getText());
-                intent.putExtra("location", holder.activityTitle.getText());
+                intent.putExtra("location", holder.activityLocation.getText());
                 activity.startActivityForResult(intent, 1);
 
             }

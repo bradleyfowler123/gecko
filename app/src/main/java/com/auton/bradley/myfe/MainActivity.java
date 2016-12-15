@@ -26,8 +26,12 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -92,13 +96,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1) {
             // Make sure the request was successful
             if (resultCode == 1) {
-                ArrayList<Integer> date = new ArrayList<>();
-                date.add(data.getIntExtra("year",2017));
-                date.add(data.getIntExtra("month",0));
-                date.add(data.getIntExtra("day",1));
-                date.add(data.getIntExtra("hour",12));
-                date.add(data.getIntExtra("min",0));
-                Toast.makeText(getBaseContext(),date.toString(),Toast.LENGTH_LONG).show();
                 Snackbar snackbar = Snackbar
                         .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
                         .setAction("UNDO", new View.OnClickListener() {
@@ -108,8 +105,19 @@ public class MainActivity extends AppCompatActivity {
                                 snackbar1.show();
                             }
                         });
-
                 snackbar.show();
+
+                FirebaseUser user = auth.getCurrentUser();
+                if (user!=null) {       // upload selection to there agenda
+                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
+                    HashMap<String, String> pushData = new HashMap<>();
+                    pushData.put("activity",data.getStringExtra("title"));
+                    pushData.put("location",data.getStringExtra("location"));
+                    pushData.put("date",data.getStringExtra("date"));
+                    pushData.put("time",data.getStringExtra("time"));
+                    agendaItem.setValue(pushData);
+                }
             }
         }
 
