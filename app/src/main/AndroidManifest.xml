@@ -24,12 +24,12 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:launchMode="singleTop"
-            android:label="Login"/>
+            android:label="Login"
+            android:launchMode="singleTop" />
         <activity
             android:name=".RegisterActivity"
-            android:parentActivityName=".LoginActivity"
-            android:label="Register"/>
+            android:label="Register"
+            android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".FriendActivity"
             android:parentActivityName=".MainActivity" />
@@ -59,9 +59,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.auton.bradley.myfe.MainActivity" />
         </activity>
-        <activity android:name=".DetailedItemActivity"
+        <activity
+            android:name=".DetailedItemActivity"
+            android:label="Custom"
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity android:name=".EnterDateActivity"
             android:parentActivityName=".MainActivity"
-            android:label="Custom">
+            android:label="Select a day"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.auton.bradley.myfe.MainActivity" />
         </activity>
     </application>
 

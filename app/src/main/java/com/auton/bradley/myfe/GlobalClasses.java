@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Bundle;
+import android.view.View;
 
 import com.squareup.picasso.Transformation;
 
@@ -89,6 +90,15 @@ class AgendaClass {
         this.company = company;
         this.activity = activity;
     }
+}
+
+class onClickListenerPosition implements View.OnClickListener {
+    int position;
+    public onClickListenerPosition(int pos) {
+        this.position = pos;
+    }
+
+    public void onClick(View v) {}
 }
 
 class CircleTransform implements Transformation {

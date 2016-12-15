@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -184,6 +187,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Snackbar snackbar = Snackbar
                         .make(view, "Added " + holder.activityTitle.getText() + " to calendar", Snackbar.LENGTH_SHORT)
                         .setAction("UNDO", new View.OnClickListener() {
@@ -195,8 +199,14 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         });
 
                 snackbar.show();
+                enterDate(view);
             }
         });
         return convertView;
+    }
+
+    void enterDate(View view) {
+        Intent intent = new Intent(getContext(), EnterDateActivity.class);
+        getContext().startActivity(intent);
     }
 }
