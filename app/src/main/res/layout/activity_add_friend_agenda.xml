@@ -79,9 +79,8 @@
             android:layout_weight="1"
             android:layout_marginStart="10dp"
             android:gravity="start|center"
-            android:id="@+id/fty_checkBox_text"
             android:textSize="18dp"
-            android:text="Let Darren know"/>
+            android:text="Let them know"/>
     </LinearLayout>
 
     <Button

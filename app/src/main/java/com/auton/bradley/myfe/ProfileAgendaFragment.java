@@ -44,6 +44,7 @@ public class ProfileAgendaFragment extends Fragment {
     ArrayList<String> activities = new ArrayList<>();
     ArrayList<String> locations = new ArrayList<>();
     ArrayList<String> dates = new ArrayList<>();
+    ArrayList<String> times = new ArrayList<>();
     ArrayList<String> listItems = new ArrayList<>();
 
     public ProfileAgendaFragment() {}
@@ -60,7 +61,7 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        String Uid;
+        final String Uid;
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
             Uid = activity.UIDs.get(activity.index);
@@ -76,6 +77,11 @@ public class ProfileAgendaFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
+                    intent.putExtra("title", activities.get(i));
+                    intent.putExtra("location", locations.get(i));
+                    intent.putExtra("date", dates.get(i));
+                    intent.putExtra("time", times.get(i));
+                    intent.putExtra("friendUid", Uid);
                     startActivity(intent);
                 }
             });
@@ -100,11 +106,13 @@ public class ProfileAgendaFragment extends Fragment {
                              listItems.remove(key);
                              activities.remove(agendaItem.activity);
                              dates.remove(agendaItem.date);
+                             times.remove(agendaItem.time);
                              locations.remove(agendaItem.location);
                          }               // add agenda item to list
                          listItems.add(key);
                          activities.add(agendaItem.activity);
-                         dates.add(formatData(agendaItem.date));
+                         dates.add(agendaItem.date);
+                         times.add(agendaItem.time);
                          locations.add(agendaItem.location);
                          // update the list view
                          profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, locations);
@@ -119,20 +127,6 @@ public class ProfileAgendaFragment extends Fragment {
 
 
         return rootView;
-    }
-
-    private String formatData(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-        String output = "error";
-        try {
-            Date date = format.parse(input);
-         //   String week = (String) android.text.format.DateFormat.format("ww", date);
-         //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
-            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return output;
     }
 }
 
@@ -174,9 +168,23 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         holder.locations=(TextView) convertView.findViewById(R.id.tv_profile_agenda_location);
         // populate the title and image with data for a list item
         holder.activity.setText(activities.get(position));
-        holder.date.setText(dates.get(position));
+        holder.date.setText(formatData(dates.get(position)));
         holder.locations.setText(locations.get(position));
         // return the updated view
         return convertView;
+    }
+
+    private String formatData(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        String output = "error";
+        try {
+            Date date = format.parse(input);
+            //   String week = (String) android.text.format.DateFormat.format("ww", date);
+            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
+            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }
