@@ -1,6 +1,10 @@
 package com.auton.bradley.myfe;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,11 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -64,6 +70,16 @@ public class ProfileAgendaFragment extends Fragment {
             Uid = activity.auth.getCurrentUser().getUid();
         }
 
+                        // if agenda item clicked on friend page
+        if(getActivity().toString().contains("FriendActivity")) {
+            pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
