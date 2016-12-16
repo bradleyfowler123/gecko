@@ -34,7 +34,7 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
         TextView dateTv = (TextView) findViewById(R.id.fty_date_text);
                         // get data
         Intent intent = getIntent();
-        final String title = intent.getStringExtra("title");
+        final String title = intent.getStringExtra("activity");
         final String location = intent.getStringExtra("location");
         final String date = intent.getStringExtra("date");
         final String time = intent.getStringExtra("time");

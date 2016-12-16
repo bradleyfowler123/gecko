@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:id="@+id/fty_activity_text"
+            android:maxLines="2"
             android:layout_weight="1"
             android:gravity="start|center"
             android:textSize="18sp"
