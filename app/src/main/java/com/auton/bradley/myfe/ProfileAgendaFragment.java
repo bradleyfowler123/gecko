@@ -62,6 +62,7 @@ public class ProfileAgendaFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
         final String Uid;
+                                // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
             Uid = activity.UIDs.get(activity.index);
@@ -70,25 +71,9 @@ public class ProfileAgendaFragment extends Fragment {
             final MainActivity activity = (MainActivity) getActivity();
             Uid = activity.auth.getCurrentUser().getUid();
         }
-
-                        // if agenda item clicked on friend page
-        if(getActivity().toString().contains("FriendActivity")) {
-            pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
-                    intent.putExtra("title", activities.get(i));
-                    intent.putExtra("location", locations.get(i));
-                    intent.putExtra("date", dates.get(i));
-                    intent.putExtra("time", times.get(i));
-                    intent.putExtra("friendUid", Uid);
-                    startActivity(intent);
-                }
-            });
-        }
                                         // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
+        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");              // either users or appropriate friends agenda
         agenda.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
@@ -125,6 +110,21 @@ public class ProfileAgendaFragment extends Fragment {
              }
         });
 
+        // if agenda item clicked on friend page
+        if(getActivity().toString().contains("FriendActivity")) {
+            pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
+                    intent.putExtra("title", activities.get(i));
+                    intent.putExtra("location", locations.get(i));
+                    intent.putExtra("date", dates.get(i));
+                    intent.putExtra("time", times.get(i));
+                    intent.putExtra("friendUid", Uid);
+                    startActivity(intent);
+                }
+            });
+        }
 
         return rootView;
     }

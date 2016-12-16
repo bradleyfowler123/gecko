@@ -2,10 +2,8 @@ package com.auton.bradley.myfe;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -26,7 +24,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -38,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,30 +68,35 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
                                    // variable declarations
-        View rootView = inflater.inflate(R.layout.fragment_home,container,false);                           // enables easy access to the root search xml
-        home_list = (ListView) rootView.findViewById(R.id.home_list);                              // locate the list object in the home tab
-                                // get real data
-        final ArrayList<HomeListData> listItems = new ArrayList<>();
-        final ArrayList<String> listTitles = new ArrayList<>();
-        final ArrayList<String> listKeys = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
+        home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
+                                // get activities in cambridge
+                                            // setup variables
+        final ArrayList<HomeListData> listItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
+        final ArrayList<String> listTitles = new ArrayList<>();                                     // stores all of the titles, used to filter results with search
+        final ArrayList<String> listKeys = new ArrayList<>();                                       // unique identifiers for each list item, used to keep track of what list items are currently downloaded so changes in the data on firebase can be acted upon
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
+                                            // get data
         activityDataRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {                                   // runs initially and for every change in the cambridge data
                 GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
-                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);                 // get agenda data
                 if (agendaData != null) {                                                           // if cambridge has activities
                     Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                    Iterator<String> keys = agendaData.keySet().iterator();
+                    Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
+                                            // for each activity in cambridge
                     while (iterator.hasNext()) {
                         String key = keys.next();
                         AgendaClass agendaItem = iterator.next();
+                        Log.d("wbdjk", agendaItem.activity);
                         agendaItem.ref = key;
                         // if already exists in list
                         if (listKeys.contains(key)) {          // remove it
                             listKeys.remove(key);
                             HomeListData listItem = new HomeListData(agendaItem);
+                        //    listItem = setFancyColor(listItem);
                             listItem.setColor(R.color.com_facebook_blue);
                             listItem.setDark(true);
                             listItems.remove(listItem);
@@ -101,36 +104,26 @@ public class HomeFragment extends Fragment {
                         }               // add agenda item to list
                         listKeys.add(key);
                         HomeListData listItem = new HomeListData(agendaItem);
+                    //    listItem = setFancyColor(listItem);
                         listItem.setColor(R.color.com_facebook_blue);
                         listItem.setDark(true);
                         listItems.add(listItem);
                         listTitles.add(agendaItem.activity);
-                        Log.d("skjkmlsd", listItem.getData().familyfriendly.toString());
                     }
-                    // populate the list
+                                            // populate the list
                     adapter = new homeAdapter(getActivity(),listItems,listTitles);                             // note searchTitles the strings that are search able, in this case just the titles
                     home_list.setAdapter(adapter);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d("!!!!!!!!!!!!", databaseError.toString());
+                Log.d("Database Error", databaseError.toString());
             }
         });
-      /*                           // color
-            final Bitmap image = Picasso.with(this).load("http://").get();
-            color[i] = Palette.from(bitmap).generate().getDominantColor(0);
-            element.setColor(Color.argb(200,Color.red(color[i]),Color.green(color[i]),Color.blue(color[i])));
-            double darkness = 1-(0.299*Color.red(color[i]) + 0.587*Color.green(color[i]) + 0.114*Color.blue(color[i]))/255;
-            if(darkness<0.4){
-                element.setDark(false); // It's a light color
-            }else{
-                element.setDark(true); // It's a dark color
-            }
-    */
+
                                    // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
+            @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("data",listItems.get(i).getDataBundle1());
@@ -140,25 +133,44 @@ public class HomeFragment extends Fragment {
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
+
+    HomeListData setFancyColor(HomeListData input) {
+        final Bitmap bitmap;
+        try {
+            bitmap = Picasso.with(getContext()).load(input.getData().image).get();
+            int color = Palette.from(bitmap).generate().getDominantColor(0);
+            input.setColor(Color.argb(200,Color.red(color),Color.green(color),Color.blue(color)));
+            double darkness = 1-(0.299*Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
+            if(darkness<0.4){
+                input.setDark(false); // It's a light color
+            }else{
+                input.setDark(true); // It's a dark color
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            input.setColor(R.color.com_facebook_blue);
+            input.setDark(true);
+        }
+        return input;
+    }
                                 // setup the home menu items
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();                                                                               // remove current menu
         inflater.inflate(R.menu.menu_home,menu);                                                    // add home one
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {                                  // display either login or logout
+                                // display either login or logout
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
         } else {
             menu.getItem(2).setVisible(true);
             menu.getItem(3).setVisible(false);
-        }
-                                // set up search button
+        }                       // set up search button
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-
             }
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -185,7 +197,6 @@ public class HomeFragment extends Fragment {
         });
     }
 }
-
                         // adapter used for to populate activities in home list
 class homeAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
                                 // declare variables of this class
@@ -246,23 +257,23 @@ class homeAdapter extends ArrayAdapter<String> {                                
             holder.activityLocation.setTextColor(Color.BLACK);
             holder.activityPrice.setTextColor(Color.BLACK);
         }
-                            // add an onclick listener for the add to calendar button
+                            // add an onclick listener for the add to calendar button in each list item
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
-                if(FirebaseAuth.getInstance().getCurrentUser()== null) {
+                                    // if user not logged in
+                if(FirebaseAuth.getInstance().getCurrentUser()== null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage("Sign in to add items to your agenda")
                             .setPositiveButton("okay", null)
                             .create()
                             .show();
                 }
-                else {
-                    MainActivity activity = (MainActivity) getContext();
+                else {              // if user logged in
+                    MainActivity activity = (MainActivity) getContext();                            // schedule a time and add it to their agenda
                     Intent intent = new Intent(activity, EnterDateActivity.class);
                     intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
                     intent.putExtra("location", holder.activityLocation.getText());
-                    Log.d("infdjk", listData.get(this.position).getData().ref);
                     intent.putExtra("reference", listData.get(this.position).getData().ref);
                     activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
                 }
