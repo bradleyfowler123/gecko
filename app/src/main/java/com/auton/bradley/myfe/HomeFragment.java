@@ -74,7 +74,6 @@ public class HomeFragment extends Fragment {
                                             // setup variables
         final ArrayList<HomeListData> listItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
         final ArrayList<String> listTitles = new ArrayList<>();                                     // stores all of the titles, used to filter results with search
-        final ArrayList<String> listKeys = new ArrayList<>();                                       // unique identifiers for each list item, used to keep track of what list items are currently downloaded so changes in the data on firebase can be acted upon
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
                                             // get data
@@ -87,23 +86,11 @@ public class HomeFragment extends Fragment {
                     Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                     Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
                                             // for each activity in cambridge
+                    listItems.clear();
                     while (iterator.hasNext()) {
-                        String key = keys.next();
-                        AgendaClass agendaItem = iterator.next();
-                        Log.d("wbdjk", agendaItem.activity);
-                        agendaItem.ref = key;
-                        // if already exists in list
-                        if (listKeys.contains(key)) {          // remove it
-                            listKeys.remove(key);
-                            HomeListData listItem = new HomeListData(agendaItem);
-                        //    listItem = setFancyColor(listItem);
-                            listItem.setColor(R.color.com_facebook_blue);
-                            listItem.setDark(true);
-                            listItems.remove(listItem);
-                            listTitles.remove(agendaItem.activity);
-                        }               // add agenda item to list
-                        listKeys.add(key);
-                        HomeListData listItem = new HomeListData(agendaItem);
+                        AgendaClass agendaItem = iterator.next();                                   // get the agenda item
+                        agendaItem.ref = keys.next();
+                        HomeListData listItem = new HomeListData(agendaItem);                       // add agenda item to list
                     //    listItem = setFancyColor(listItem);
                         listItem.setColor(R.color.com_facebook_blue);
                         listItem.setDark(true);
