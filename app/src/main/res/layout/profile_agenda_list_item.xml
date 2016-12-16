@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:maxLines="1"
             android:textSize="22sp"
             android:id="@+id/tv_profile_agenda_activities"
             android:gravity="center_vertical"/>
@@ -25,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:maxLines="1"
             android:id="@+id/tv_profile_agenda_location" />
 
     </LinearLayout>

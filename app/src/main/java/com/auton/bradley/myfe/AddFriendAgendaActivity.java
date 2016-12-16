@@ -37,8 +37,8 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
         final String title = intent.getStringExtra("title");
         final String location = intent.getStringExtra("location");
         final String date = intent.getStringExtra("date");
-        Log.d("ndkls",date);
         final String time = intent.getStringExtra("time");
+        final String ref = intent.getStringExtra("reference");
         final String uid = intent.getStringExtra("friendUid");
                         // set view data
         activityTv.setText(title);
@@ -57,6 +57,7 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
                 pushData.put("location",location);
                 pushData.put("date",date);
                 pushData.put("time",time);
+                pushData.put("ref", ref);
                 agendaItem.setValue(pushData);
 
                 Toast.makeText(getBaseContext(),"Added",Toast.LENGTH_SHORT).show();

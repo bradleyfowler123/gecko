@@ -41,11 +41,7 @@ import java.util.Iterator;
 
 public class ProfileAgendaFragment extends Fragment {
 
-    ArrayList<String> activities = new ArrayList<>();
-    ArrayList<String> locations = new ArrayList<>();
-    ArrayList<String> dates = new ArrayList<>();
-    ArrayList<String> times = new ArrayList<>();
-    ArrayList<String> listItems = new ArrayList<>();
+    ArrayList<AgendaClass> listItems = new ArrayList<>();
 
     public ProfileAgendaFragment() {}
 
@@ -73,53 +69,45 @@ public class ProfileAgendaFragment extends Fragment {
         }
                                         // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");              // either users or appropriate friends agenda
+        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
                  GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
                  };
                  HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                 if (agendaData != null) {
+                 if (agendaData != null) {                                                          // if user or friend has agenda items
                      Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                     Iterator<String> keys = agendaData.keySet().iterator();
+                     listItems.clear();
+                     ArrayList<String> titles = new ArrayList<>();
                      while (iterator.hasNext()) {
-                         String key = keys.next();
-                         AgendaClass agendaItem = iterator.next();
-                         // if already exists in list
-                         if (listItems.contains(key)) {          // remove it
-                             listItems.remove(key);
-                             activities.remove(agendaItem.activity);
-                             dates.remove(agendaItem.date);
-                             times.remove(agendaItem.time);
-                             locations.remove(agendaItem.location);
-                         }               // add agenda item to list
-                         listItems.add(key);
-                         activities.add(agendaItem.activity);
-                         dates.add(agendaItem.date);
-                         times.add(agendaItem.time);
-                         locations.add(agendaItem.location);
-                         // update the list view
-                         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), activities, dates, locations);
-                         pa_list.setAdapter(adapter);
-                     }
+                         AgendaClass listItem = iterator.next();
+                         listItems.add(listItem);
+                         titles.add(listItem.activity);
+                     }                // populate list
+                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), listItems, titles);
+                     pa_list.setAdapter(adapter);
                  }
              }
              @Override
              public void onCancelled(DatabaseError databaseError) {
+                 Log.d("Datebase Error2", databaseError.toString());
              }
         });
 
-        // if agenda item clicked on friend page
+                                // if agenda item clicked on friend page
         if(getActivity().toString().contains("FriendActivity")) {
             pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    // ask to add the event to users calendar
                     Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
-                    intent.putExtra("title", activities.get(i));
-                    intent.putExtra("location", locations.get(i));
-                    intent.putExtra("date", dates.get(i));
-                    intent.putExtra("time", times.get(i));
+                    AgendaClass listItem = listItems.get(i);
+                    intent.putExtra("activity", listItem.activity);
+                    intent.putExtra("location", listItem.location);
+                    intent.putExtra("date", listItem.date);
+                    intent.putExtra("time", listItem.time);
+                    intent.putExtra("reference", listItem.ref);
                     intent.putExtra("friendUid", Uid);
                     startActivity(intent);
                 }
@@ -134,17 +122,13 @@ public class ProfileAgendaFragment extends Fragment {
                         // adapter used for to show your activities as a list view in profile agenda sub tab
 class profileAgendaAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private ArrayList<String> activities;
-    private ArrayList<String> dates;
-    private ArrayList<String> locations;
+    private ArrayList<AgendaClass> items;
     private Context c;
     // define a function that can be used to declare this custom adapter class
-    profileAgendaAdapter(Context context, ArrayList<String> activities,ArrayList<String> dates, ArrayList<String> locations) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.profile_agenda_list_item,activities);
+    profileAgendaAdapter(Context context, ArrayList<AgendaClass> list, ArrayList<String> titles) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.profile_agenda_list_item, titles);
         this.c=context;
-        this.activities=activities;
-        this.dates=dates;
-        this.locations=locations;
+        this.items = list;
     }
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
@@ -167,9 +151,9 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         holder.date=(TextView) convertView.findViewById(R.id.tv_profile_agenda_date);
         holder.locations=(TextView) convertView.findViewById(R.id.tv_profile_agenda_location);
         // populate the title and image with data for a list item
-        holder.activity.setText(activities.get(position));
-        holder.date.setText(formatData(dates.get(position)));
-        holder.locations.setText(locations.get(position));
+        holder.activity.setText(items.get(position).activity);
+        holder.date.setText(formatData(items.get(position).date));
+        holder.locations.setText(items.get(position).location);
         // return the updated view
         return convertView;
     }
