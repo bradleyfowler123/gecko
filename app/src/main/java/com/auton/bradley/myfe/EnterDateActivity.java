@@ -29,7 +29,8 @@ public class EnterDateActivity extends AppCompatActivity {
     private int month;
     private int day;
     private String title;
-    private String loction;
+    private String location;
+    private String ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,8 @@ public class EnterDateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_enter_date);
 
         title = getIntent().getStringExtra("title");
-        loction = getIntent().getStringExtra("location");
+        location = getIntent().getStringExtra("location");
+        ref = getIntent().getStringExtra("reference");
 
         GridLayout grid = (GridLayout) findViewById(R.id.activity_enter_date);
         LinearLayout line1 = (LinearLayout) grid.getChildAt(1);
@@ -92,7 +94,8 @@ public class EnterDateActivity extends AppCompatActivity {
                 intent.putExtra("date", Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year));
                 intent.putExtra("time", data.getStringExtra("time"));
                 intent.putExtra("title", title);
-                intent.putExtra("location", loction);
+                intent.putExtra("location", location);
+                intent.putExtra("reference", ref);
                 setResult(1,intent);
                 finish();
             }

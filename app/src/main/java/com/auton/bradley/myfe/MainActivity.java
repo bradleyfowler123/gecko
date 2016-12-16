@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                 snackbar.show();
-
                 FirebaseUser user = auth.getCurrentUser();
                 if (user!=null) {       // upload selection to there agenda
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -116,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     pushData.put("location",data.getStringExtra("location"));
                     pushData.put("date",data.getStringExtra("date"));
                     pushData.put("time",data.getStringExtra("time"));
+                    pushData.put("ref", data.getStringExtra("reference"));
                     agendaItem.setValue(pushData);
                 }
             }

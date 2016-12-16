@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 public class DetailedItemActivity extends AppCompatActivity {
 
     @Override
@@ -17,11 +19,10 @@ public class DetailedItemActivity extends AppCompatActivity {
         TextView tv_title = (TextView) findViewById(R.id.adi_title);
                     // get data
         Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
-        int image = intent.getIntExtra("image",R.drawable.ic_sync_black_24dp);
+        Bundle data = intent.getBundleExtra("data");
                     // set data
-        tv_activityImage.setImageResource(image);
-        tv_title.setText(title);
+        Picasso.with(getBaseContext()).load(data.getString("image")).into(tv_activityImage);
+        tv_title.setText(data.getString("title"));
 
     }
 }

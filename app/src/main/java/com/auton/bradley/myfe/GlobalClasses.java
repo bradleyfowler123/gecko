@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.os.Bundle;
 import android.view.View;
 
 import com.squareup.picasso.RequestCreator;
@@ -58,32 +59,31 @@ class Item {
                             // custom class for storing data of a list item on home page
 class HomeListData {
                         // variables
-    private String activityTitle;
-    private String activityLocation;
-    private String activityPrice;
-    private RequestCreator activityPic;
+    private AgendaClass databaseData;
     private int color;
     private boolean dark;
                         // functions to get individual variables
-    String getActivityTitle() {return activityTitle;}
-    String getActivityLocation() {return activityLocation;}
-    String getActivityPrice() {return activityPrice;}
-    RequestCreator getActivityPic() {return activityPic;}
+    AgendaClass getData() {return databaseData;}
+
+    Bundle getDataBundle1() {
+        Bundle output = new Bundle();
+        output.putString("title", databaseData.activity);
+        output.putString("location", databaseData.location);
+        output.putString("image", databaseData.image);
+        output.putString("price", databaseData.price);
+        output.putBoolean("ff", databaseData.familyfriendly);
+        return output;
+    }
+
     int getColor() {return color;}
     Boolean getDark() {return dark;}
                         // functions to set individual variables
-    void setActivityTitle(String title) { this.activityTitle = title;}
-    void setActivityLocation(String location) { this.activityLocation = location;}
-    void setActivityPrice(String price) { this.activityPrice = price;}
-    public void setActivityPic(RequestCreator data) { this.activityPic = data;}
+    void setData(AgendaClass data) { this.databaseData = data;}
     void setColor(int color) { this.color = color;}
     void setDark(Boolean data) { this.dark = data;}
                         // used to initialise the class
-    HomeListData(String activityTitle, String activityLocation, String activityPrice, RequestCreator rq) {
-        this.activityTitle = activityTitle;
-        this.activityLocation = activityLocation;
-        this.activityPrice = activityPrice;
-        this.activityPic = rq;
+    HomeListData(AgendaClass data) {
+        this.databaseData = data;
     }
 
 }
@@ -109,15 +109,21 @@ class AgendaClass {
     String time;
     String location;
     String activity;
+    String price;
+    Boolean familyfriendly;
+    String image;
+    String ref;
 
     public AgendaClass(){
     }
 
-    public AgendaClass(String date, String time, String location, String activity) {
-        this.date = date;
-        this.time = time;
-        this.location = location;
+    public AgendaClass(String activity, String location, String price, String image, Boolean ff, String ref) {
         this.activity = activity;
+        this.location = location;
+        this.price = price;
+        this.image = image;
+        this.familyfriendly = ff;
+        this.ref = ref;
     }
 }
 

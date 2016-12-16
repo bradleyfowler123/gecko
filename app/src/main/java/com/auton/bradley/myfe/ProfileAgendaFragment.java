@@ -86,7 +86,7 @@ public class ProfileAgendaFragment extends Fragment {
                 }
             });
         }
-
+                                        // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {

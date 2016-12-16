@@ -62,7 +62,7 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"Added",Toast.LENGTH_SHORT).show();
 
                 if (checkBox.isChecked()) {
-                    
+
                 }
                 finish();
             }

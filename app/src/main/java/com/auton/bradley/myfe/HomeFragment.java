@@ -1,6 +1,8 @@
 package com.auton.bradley.myfe;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,11 +26,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 
 /*
@@ -59,20 +72,53 @@ public class HomeFragment extends Fragment {
                                    // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                           // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                              // locate the list object in the home tab
-        final MainActivity activity = (MainActivity) getActivity();
-                                // get test data
-        final int[] images={R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers,R.drawable.altontowers,R.drawable.climbing,R.drawable.gym,R.drawable.altontowers};    // get the image data to be shown for the recommendations
-        final String[] titles = getResources().getStringArray(R.array.recommendationsArray);                // get the names of the recommendations to display
-        final String[] pris = getResources().getStringArray(R.array.pricesArray);
-        final String[] locs = getResources().getStringArray(R.array.locationsArray);
-                                    // format test data
-        ArrayList<HomeListData> listData = new ArrayList<>(8);
-        final ArrayList<String> searchTitles = new ArrayList<>(8);
-        int[] color = new int[8];
-        for (int i = 0; i < 8; i++) {
-            HomeListData element = new HomeListData(titles[i],locs[i],pris[i],Picasso.with(getContext()).load(images[i]));
-            searchTitles.add(titles[i]);
-            Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(),images[i]);
+                                // get real data
+        final ArrayList<HomeListData> listItems = new ArrayList<>();
+        final ArrayList<String> listTitles = new ArrayList<>();
+        final ArrayList<String> listKeys = new ArrayList<>();
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
+        activityDataRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                if (agendaData != null) {                                                           // if cambridge has activities
+                    Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                    Iterator<String> keys = agendaData.keySet().iterator();
+                    while (iterator.hasNext()) {
+                        String key = keys.next();
+                        AgendaClass agendaItem = iterator.next();
+                        agendaItem.ref = key;
+                        // if already exists in list
+                        if (listKeys.contains(key)) {          // remove it
+                            listKeys.remove(key);
+                            HomeListData listItem = new HomeListData(agendaItem);
+                            listItem.setColor(R.color.com_facebook_blue);
+                            listItem.setDark(true);
+                            listItems.remove(listItem);
+                            listTitles.remove(agendaItem.activity);
+                        }               // add agenda item to list
+                        listKeys.add(key);
+                        HomeListData listItem = new HomeListData(agendaItem);
+                        listItem.setColor(R.color.com_facebook_blue);
+                        listItem.setDark(true);
+                        listItems.add(listItem);
+                        listTitles.add(agendaItem.activity);
+                        Log.d("skjkmlsd", listItem.getData().familyfriendly.toString());
+                    }
+                    // populate the list
+                    adapter = new homeAdapter(getActivity(),listItems,listTitles);                             // note searchTitles the strings that are search able, in this case just the titles
+                    home_list.setAdapter(adapter);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("!!!!!!!!!!!!", databaseError.toString());
+            }
+        });
+      /*                           // color
+            final Bitmap image = Picasso.with(this).load("http://").get();
             color[i] = Palette.from(bitmap).generate().getDominantColor(0);
             element.setColor(Color.argb(200,Color.red(color[i]),Color.green(color[i]),Color.blue(color[i])));
             double darkness = 1-(0.299*Color.red(color[i]) + 0.587*Color.green(color[i]) + 0.114*Color.blue(color[i]))/255;
@@ -81,20 +127,13 @@ public class HomeFragment extends Fragment {
             }else{
                 element.setDark(true); // It's a dark color
             }
-            listData.add(element);
-        }
-                                   // populate the list
-        adapter = new homeAdapter(getActivity(),listData,searchTitles);                             // note searchTitles the strings that are search able, in this case just the titles
-        home_list.setAdapter(adapter);
+    */
                                    // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
-                intent.putExtra("fbData", activity.facebookData);
-                intent.putExtra("fbCon", activity.facebookConnected);
-                intent.putExtra("title",searchTitles.get(i));
-                intent.putExtra("image",images[i]);
+                intent.putExtra("data",listItems.get(i).getDataBundle1());
                 startActivity(intent);
             }
         });
@@ -187,10 +226,11 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         holder.addToCal = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
                                 // populate the texts and images with data for a list item
-        holder.activityTitle.setText(listData.get(position).getActivityTitle());
-        holder.activityLocation.setText(listData.get(position).getActivityLocation());
-        holder.activityPrice.setText(listData.get(position).getActivityPrice());
-        listData.get(position).getActivityPic().into(holder.img);
+        holder.activityTitle.setText(listData.get(position).getData().activity);
+        holder.activityLocation.setText(listData.get(position).getData().location);
+        holder.activityPrice.setText(listData.get(position).getData().price);
+        RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).getData().image);
+        activityImg.centerCrop().resize(340,200).into(holder.img);
         View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
         GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();             // get its background
         bgShape.setColor(listData.get(position).getColor());                                        // set the color of it
@@ -207,14 +247,25 @@ class homeAdapter extends ArrayAdapter<String> {                                
             holder.activityPrice.setTextColor(Color.BLACK);
         }
                             // add an onclick listener for the add to calendar button
-        holder.addToCal.setOnClickListener(new View.OnClickListener() {
+        holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
-                MainActivity activity = (MainActivity) getContext();
-                Intent intent = new Intent(activity, EnterDateActivity.class);
-                intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
-                intent.putExtra("location", holder.activityLocation.getText());
-                activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
+                if(FirebaseAuth.getInstance().getCurrentUser()== null) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Sign in to add items to your agenda")
+                            .setPositiveButton("okay", null)
+                            .create()
+                            .show();
+                }
+                else {
+                    MainActivity activity = (MainActivity) getContext();
+                    Intent intent = new Intent(activity, EnterDateActivity.class);
+                    intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
+                    intent.putExtra("location", holder.activityLocation.getText());
+                    Log.d("infdjk", listData.get(this.position).getData().ref);
+                    intent.putExtra("reference", listData.get(this.position).getData().ref);
+                    activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
+                }
             }
         });
         return convertView;                                                                         // return the updated view
