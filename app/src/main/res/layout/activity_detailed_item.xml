@@ -105,4 +105,53 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="10dp"
+        android:id="@+id/adi_scheduledView"
+        android:background="#ddff492e">
+
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:padding="5dp"
+            android:layout_marginEnd="10dp"
+            app:srcCompat="@android:drawable/ic_menu_edit"
+            android:id="@+id/adi_scheduled_edit" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/adi_scheduled_edit"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="bottom|start"
+                android:text="Scheduled"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_weight="1.2"
+                android:textStyle="normal|bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/adi_scheduled_text"
+                android:gravity="center_vertical|top"
+                android:text="You are going at 12:00 on 15, Jun"
+                android:textColor="@android:color/white"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </RelativeLayout>

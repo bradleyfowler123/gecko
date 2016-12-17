@@ -97,25 +97,29 @@ public class ProfileAgendaFragment extends Fragment {
                  Log.d("Datebase Error2", databaseError.toString());
              }
         });
-
-                                // if agenda item clicked on friend page
-        if(getActivity().toString().contains("FriendActivity")) {
-            pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    // load custom detailed view
-                    Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
-                    AgendaClass listItem = listItems.get(i);
-                    intent.putExtra("from", "friendPage");
-                    intent.putExtra("ref",listItem.ref);
+                                // if agenda item clicked
+        pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                // load custom detailed view
+                Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
+                AgendaClass listItem = listItems.get(i);
+                if(getActivity().toString().contains("FriendActivity")) {
+                    intent.putExtra("from", "friendPage");                                          // custom detailed friend
                     intent.putExtra("friendDate",listItem.date);
                     intent.putExtra("friendTime",listItem.time);
                     intent.putExtra("friendName", friendName);
                     intent.putExtra("friendUrl", friendUrl);
-                    startActivity(intent);
                 }
-            });
-        }
+                else {
+                    intent.putExtra("from", "profile");
+                    intent.putExtra("date",listItem.date);
+                    intent.putExtra("time",listItem.time);
+                }
+                intent.putExtra("ref",listItem.ref);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }

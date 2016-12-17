@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -105,7 +106,6 @@ public class DetailedItemActivity extends AppCompatActivity {
             tv_friendText.setText("is going at " + formatTime(friendTime) + " on " + formatDate(friendDate));
             Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
 
-
             iv_addToCal.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -118,7 +118,41 @@ public class DetailedItemActivity extends AppCompatActivity {
                     startActivity(intent2);
                 }
             });
+        }
+        else if (from.equals("profile")) {
+            // startup
+            findViewById(R.id.adi_scheduledView).setVisibility(View.VISIBLE);
+            ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
+            final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
+            // get data
+            String ref = intent.getStringExtra("ref");
+            String date = intent.getStringExtra("date");
+            String time = intent.getStringExtra("time");
+            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref);
+            agenda.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
+                    // set data
+                    tv_title.setText(activityData.activity);
+                    Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                    setupMap(activityData.activity,activityData.location);
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("Datebase Error2", databaseError.toString());
+                }
+            });
+            // set data
+            scheduled_text.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
 
+            edit_schedule.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getBaseContext(),"edit",Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
     }
