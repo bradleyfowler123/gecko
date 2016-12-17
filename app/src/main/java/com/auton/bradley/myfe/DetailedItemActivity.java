@@ -1,13 +1,28 @@
 package com.auton.bradley.myfe;
 
+import android.*;
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,23 +37,44 @@ import java.util.Iterator;
 
 public class DetailedItemActivity extends AppCompatActivity {
 
+    private MapView mapView;
     private AgendaClass activityData = new AgendaClass();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detailed_item);
-        String activityImageUrl;
-                    // get vies objects
+        // get vies objects
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
-                        // work out what started activity
+
+        // work out what started activity
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");
         if (from.equals("home")) {
-                        // get and set data
+            // get and set data
             Bundle data = intent.getBundleExtra("data");
             tv_title.setText(data.getString("title"));
             Picasso.with(getBaseContext()).load(data.getString("image")).into(iv_activityImage);
+
+            mapView = (MapView) findViewById(R.id.mapView2);
+            mapView.onCreate(savedInstanceState);
+            // Gets to GoogleMap from the MapView and does initialization stuff
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(0, 0))
+                            .title("Marker"));
+                    googleMap.setMyLocationEnabled(true);
+                    UiSettings uiSettings = googleMap.getUiSettings();
+                    uiSettings.setMyLocationButtonEnabled(true);
+                    uiSettings.setAllGesturesEnabled(true);
+                    uiSettings.setZoomControlsEnabled(true);
+                    uiSettings.setMapToolbarEnabled(true);
+                }
+            });
 
         }else if (from.equals("friendFeed") || from.equals("friendPage")) {
                         // startup
@@ -86,4 +122,37 @@ public class DetailedItemActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
 }

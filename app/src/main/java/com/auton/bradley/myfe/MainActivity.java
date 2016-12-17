@@ -1,9 +1,14 @@
 package com.auton.bradley.myfe;
 
+import android.*;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -57,6 +62,18 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(getApplicationContext());
+                            // check permissions granted
+        ArrayList<String> permissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);}
+        if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);}
+        if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.INTERNET);}
+        if (permissions.size() != 0) {
+            String[] Sarray = permissions.toArray(new String[permissions.size()]);
+            ActivityCompat.requestPermissions(this, Sarray, 3);
+        }
         // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
         // load action bar
@@ -83,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
             auth.signOut();
             facebookConnected = false;
         }
-
         viewPager.setCurrentItem(currentTab);
     }
 
@@ -93,34 +109,47 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);                            // Pass the activity result back to the Facebook SDK
                     // add to calendar button returns data
-        if (requestCode == 1) {
-            // Make sure the request was successful
-            if (resultCode == 1) {
-                Snackbar snackbar = Snackbar
-                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                snackbar1.show();
-                            }
-                        });
-                snackbar.show();
-                FirebaseUser user = auth.getCurrentUser();
-                if (user!=null) {       // upload selection to there agenda
-                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                    DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
-                    HashMap<String, String> pushData = new HashMap<>();
-                    pushData.put("activity",data.getStringExtra("title"));
-                    pushData.put("location",data.getStringExtra("location"));
-                    pushData.put("date",data.getStringExtra("date"));
-                    pushData.put("time",data.getStringExtra("time"));
-                    pushData.put("ref", data.getStringExtra("reference"));
-                    agendaItem.setValue(pushData);
+        switch (requestCode) {
+            case 1: {
+                // Make sure the request was successful
+                if (resultCode == 1) {
+                    Snackbar snackbar = Snackbar
+                            .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
+                                    snackbar1.show();
+                                }
+                            });
+                    snackbar.show();
+                    FirebaseUser user = auth.getCurrentUser();
+                    if (user != null) {       // upload selection to there agenda
+                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
+                        HashMap<String, String> pushData = new HashMap<>();
+                        pushData.put("activity", data.getStringExtra("title"));
+                        pushData.put("location", data.getStringExtra("location"));
+                        pushData.put("date", data.getStringExtra("date"));
+                        pushData.put("time", data.getStringExtra("time"));
+                        pushData.put("ref", data.getStringExtra("reference"));
+                        agendaItem.setValue(pushData);
+                    }
                 }
             }
         }
-
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 3: {
+                for (int i = 0; i < permissions.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,new String[]{permissions[i]},3);
+                    }
+                }
+            }
+        }
     }
 
     private void setupTabIcons() {
