@@ -307,7 +307,14 @@ public class FriendFragment extends Fragment {
         String[] dateComponents = date.split("/");
         int[] currentDCs = {Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH),Calendar.getInstance().get(Calendar.YEAR)};
         if (dateComponents[1].equals(currentDCs[1])) {
-            output = "at " + time;
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+            try {
+                Date date2 = format.parse(time);
+                output = "at " + android.text.format.DateFormat.format("HH:mm", date2);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                output = "error";
+            }
         }
         else {
             SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");

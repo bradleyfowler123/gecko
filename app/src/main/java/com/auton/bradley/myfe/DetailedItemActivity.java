@@ -35,7 +35,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,11 +76,14 @@ public class DetailedItemActivity extends AppCompatActivity {
             findViewById(R.id.adi_friendData).setVisibility(View.VISIBLE);
             final ImageView iv_friendImage = (ImageView) findViewById(R.id.adi_fd_image);
             ImageView iv_addToCal = (ImageView) findViewById(R.id.adi_add_to_calander);
-            final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_text);
+            final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_name);
+            final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
                         // get data
             String ref = intent.getStringExtra("ref");
             String friendName = intent.getStringExtra("friendName");
             String friendImage = intent.getStringExtra("friendUrl");
+            String friendDate = intent.getStringExtra("friendDate");
+            String friendTime = intent.getStringExtra("friendTime");
             DatabaseReference database = FirebaseDatabase.getInstance().getReference();
             DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref);
             agenda.addValueEventListener(new ValueEventListener() {
@@ -96,6 +102,7 @@ public class DetailedItemActivity extends AppCompatActivity {
             });
             // set data
             tv_friendName.setText(friendName);
+            tv_friendText.setText("is going at " + formatTime(friendTime) + " on " + formatDate(friendDate));
             Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
 
 
@@ -113,6 +120,33 @@ public class DetailedItemActivity extends AppCompatActivity {
             });
 
         }
+
+    }
+
+    private String formatDate(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        String output = "error";
+        try {
+            Date date = format.parse(input);
+            //   String week = (String) android.text.format.DateFormat.format("ww", date);
+            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
+            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+    private String formatTime(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String output;
+        try {
+            Date date2 = format.parse(input);
+            output = "at " + android.text.format.DateFormat.format("HH:mm", date2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            output = "error";
+        }
+        return output;
     }
 
     void setupMap(final String title, final String location) {

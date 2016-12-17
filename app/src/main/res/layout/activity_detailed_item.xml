@@ -37,32 +37,57 @@
         android:layout_alignParentStart="true"/>
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
+        android:paddingStart="10dp"
         android:id="@+id/adi_friendData"
-        android:orientation="horizontal"
+        android:background="#95ff492e"
         android:visibility="gone">
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
             android:id="@+id/adi_fd_image"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/adi_fd_text"
-            android:layout_weight="1" />
 
         <ImageView
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
             android:padding="5dp"
             app:srcCompat="@android:drawable/ic_menu_my_calendar"
             android:id="@+id/adi_add_to_calander" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/adi_fd_image"
+            android:layout_toStartOf="@id/adi_add_to_calander"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/adi_fd_name"
+                android:gravity="center_vertical|start"
+                android:text="Darren Norton"
+                android:textSize="20sp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/adi_fd_text"
+                android:gravity="center_vertical|top"
+                android:text="is going at 12:00 on 15, Jun"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </RelativeLayout>
