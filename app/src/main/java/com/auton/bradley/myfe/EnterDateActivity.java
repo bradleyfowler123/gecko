@@ -58,7 +58,7 @@ public class EnterDateActivity extends AppCompatActivity {
             weekDays[i].setOnClickListener(new onClickListenerPosition(i) {
                 @Override
                 public void onClick(View view) {
-                    month = Calendar.getInstance().get(Calendar.MONTH);
+                    month = Calendar.getInstance().get(Calendar.MONTH) + 1;                         // deal with month starting at zero
                     day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)+this.position;
                     year = Calendar.getInstance().get(Calendar.YEAR);
                     Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
@@ -73,6 +73,7 @@ public class EnterDateActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, final int i2) {
                         Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
+                        year = i; month = i1+1; day = i2;
                         startActivityForResult(intent,2);
                     }
                 }, Calendar.getInstance().get(Calendar.YEAR),Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
