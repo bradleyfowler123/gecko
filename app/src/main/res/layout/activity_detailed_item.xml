@@ -7,34 +7,46 @@
     android:layout_height="match_parent"
     tools:context="com.auton.bradley.myfe.DetailedItemActivity">
 
-    <ImageView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/altontowers"
-        android:id="@+id/adi_image"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:adjustViewBounds="true" />
+        android:layout_alignParentTop="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/altontowers"
+                android:id="@+id/adi_image"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:adjustViewBounds="true" />
 
 
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:textSize="30sp"
-        android:layout_below="@id/adi_image"
-        android:id="@+id/adi_title" />
+            <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textSize="30sp"
+                android:layout_below="@id/adi_image"
+                android:id="@+id/adi_title" />
 
-    <com.google.android.gms.maps.MapView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/mapView2"
-        android:layout_below="@+id/adi_title"
-        android:layout_toEndOf="@+id/adi_friendData"
-        android:layout_alignParentStart="true"/>
+            <com.google.android.gms.maps.MapView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:id="@+id/mapView2"
+                android:layout_below="@+id/adi_title"
+                android:layout_alignParentStart="true"/>
+
+        </RelativeLayout>
+    </ScrollView>
+
 
 
     <RelativeLayout
@@ -43,7 +55,7 @@
         android:layout_alignParentBottom="true"
         android:paddingStart="10dp"
         android:id="@+id/adi_friendData"
-        android:background="#95ff492e"
+        android:background="#ddff492e"
         android:visibility="gone">
 
         <ImageView
@@ -75,8 +87,10 @@
                 android:id="@+id/adi_fd_name"
                 android:gravity="center_vertical|start"
                 android:text="Darren Norton"
+                android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textStyle="normal|bold" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -84,6 +98,7 @@
                 android:id="@+id/adi_fd_text"
                 android:gravity="center_vertical|top"
                 android:text="is going at 12:00 on 15, Jun"
+                android:textColor="@android:color/white"
                 android:layout_weight="1" />
 
         </LinearLayout>
