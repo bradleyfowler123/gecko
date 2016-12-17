@@ -5,6 +5,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -31,9 +34,11 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class DetailedItemActivity extends AppCompatActivity {
 
@@ -48,35 +53,22 @@ public class DetailedItemActivity extends AppCompatActivity {
         // get vies objects
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
+        mapView = (MapView) findViewById(R.id.mapView2);
+        mapView.onCreate(savedInstanceState);
 
         // work out what started activity
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");
         if (from.equals("home")) {
             // get and set data
-            Bundle data = intent.getBundleExtra("data");
-            tv_title.setText(data.getString("title"));
+            final Bundle data = intent.getBundleExtra("data");
+            String title = data.getString("title");
+            String location = data.getString("location");
+            tv_title.setText(title);
             Picasso.with(getBaseContext()).load(data.getString("image")).into(iv_activityImage);
-
-            mapView = (MapView) findViewById(R.id.mapView2);
-            mapView.onCreate(savedInstanceState);
-            // Gets to GoogleMap from the MapView and does initialization stuff
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(0, 0))
-                            .title("Marker"));
-                    googleMap.setMyLocationEnabled(true);
-                    UiSettings uiSettings = googleMap.getUiSettings();
-                    uiSettings.setMyLocationButtonEnabled(true);
-                    uiSettings.setAllGesturesEnabled(true);
-                    uiSettings.setZoomControlsEnabled(true);
-                    uiSettings.setMapToolbarEnabled(true);
-                }
-            });
-
-        }else if (from.equals("friendFeed") || from.equals("friendPage")) {
+            setupMap(title, location);
+        }
+        else if (from.equals("friendFeed") || from.equals("friendPage")) {
                         // startup
             findViewById(R.id.adi_friendData).setVisibility(View.VISIBLE);
             final ImageView iv_friendImage = (ImageView) findViewById(R.id.adi_fd_image);
@@ -95,6 +87,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                             // set data
                     tv_title.setText(activityData.activity);
                     Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                    setupMap(activityData.activity,activityData.location);
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
@@ -120,7 +113,36 @@ public class DetailedItemActivity extends AppCompatActivity {
             });
 
         }
+    }
 
+    void setupMap(final String title, final String location) {
+        // Gets to GoogleMap from the MapView and does initialization stuff
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                Geocoder geocoder = new Geocoder(getBaseContext());
+                try {
+                    List<Address> addresses = geocoder.getFromLocationName(location, 1);
+                    if (addresses.size() != 0) {
+                        Address address = addresses.get(0);
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(address.getLatitude(), address.getLongitude()))
+                                .title(title));
+                        CameraPosition camPos = new CameraPosition(new LatLng(address.getLatitude(),address.getLongitude()),12,0,0); // zoom,,rotation
+                        CameraUpdate cu = CameraUpdateFactory.newCameraPosition(camPos);
+                        googleMap.moveCamera(cu);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                googleMap.setMyLocationEnabled(true);
+                UiSettings uiSettings = googleMap.getUiSettings();
+                uiSettings.setMyLocationButtonEnabled(true);
+                uiSettings.setAllGesturesEnabled(true);
+                uiSettings.setZoomControlsEnabled(true);
+                uiSettings.setMapToolbarEnabled(true);
+            }
+        });
     }
 
     @Override
