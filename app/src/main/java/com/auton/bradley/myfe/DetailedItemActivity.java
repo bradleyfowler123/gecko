@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -124,8 +126,9 @@ public class DetailedItemActivity extends AppCompatActivity {
             findViewById(R.id.adi_scheduledView).setVisibility(View.VISIBLE);
             ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
             final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
+            final String[] location = new String[1];                            // tempory, needs to be text view
             // get data
-            String ref = intent.getStringExtra("ref");
+            final String ref = intent.getStringExtra("ref");
             String date = intent.getStringExtra("date");
             String time = intent.getStringExtra("time");
             DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -136,6 +139,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                     activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                     // set data
                     tv_title.setText(activityData.activity);
+                    location[0] = activityData.location;                            // tempory until put into text view
                     Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
                     setupMap(activityData.activity,activityData.location);
                 }
@@ -146,11 +150,16 @@ public class DetailedItemActivity extends AppCompatActivity {
             });
             // set data
             scheduled_text.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
-
+                            // edit schedule is clicked
             edit_schedule.setOnClickListener(new View.OnClickListener() {
-                @Override
+                @Override               // get new date and time
                 public void onClick(View view) {
-                    Toast.makeText(getBaseContext(),"edit",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getBaseContext(), EnterDateActivity.class);
+                    intent.putExtra("title", tv_title.getText());                                   // data need to add item to calendar
+                    intent.putExtra("location", location[0]);
+                    intent.putExtra("reference", ref);
+                    startActivityForResult(intent, 1);                                              // result is handled below
+
                 }
             });
         }
@@ -209,6 +218,20 @@ public class DetailedItemActivity extends AppCompatActivity {
                 uiSettings.setMapToolbarEnabled(true);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // add to calendar button returns data
+        switch (requestCode) {
+            case 1: {
+                // Make sure the request was successful
+                if (resultCode == 1) {
+                    Toast.makeText(getBaseContext(),"Updated!",Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     @Override
