@@ -57,15 +57,18 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        final String Uid;
+        final String Uid; final String friendName; final String friendUrl;
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
             Uid = activity.UIDs.get(activity.index);
+            friendName = activity.names.get(activity.index);
+            friendUrl = activity.Urls.get(activity.index);
         }
         else {
             final MainActivity activity = (MainActivity) getActivity();
             Uid = activity.auth.getCurrentUser().getUid();
+            friendName = null; friendUrl = null;
         }
                                         // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -100,15 +103,15 @@ public class ProfileAgendaFragment extends Fragment {
             pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    // ask to add the event to users calendar
-                    Intent intent = new Intent(getActivity(),AddFriendAgendaActivity.class);
+                                    // load custom detailed view
+                    Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                     AgendaClass listItem = listItems.get(i);
-                    intent.putExtra("activity", listItem.activity);
-                    intent.putExtra("location", listItem.location);
-                    intent.putExtra("date", listItem.date);
-                    intent.putExtra("time", listItem.time);
-                    intent.putExtra("reference", listItem.ref);
-                    intent.putExtra("friendUid", Uid);
+                    intent.putExtra("from", "friendPage");
+                    intent.putExtra("ref",listItem.ref);
+                    intent.putExtra("friendDate",listItem.date);
+                    intent.putExtra("friendTime",listItem.time);
+                    intent.putExtra("friendName", friendName);
+                    intent.putExtra("friendUrl", friendUrl);
                     startActivity(intent);
                 }
             });

@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 public class DetailedItemActivity extends AppCompatActivity {
 
+    private AgendaClass activityData = new AgendaClass();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +32,7 @@ public class DetailedItemActivity extends AppCompatActivity {
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
                         // work out what started activity
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         String from = intent.getStringExtra("from");
         if (from.equals("home")) {
                         // get and set data
@@ -39,10 +40,11 @@ public class DetailedItemActivity extends AppCompatActivity {
             tv_title.setText(data.getString("title"));
             Picasso.with(getBaseContext()).load(data.getString("image")).into(iv_activityImage);
 
-        }else if (from.equals("friendFeed")) {
+        }else if (from.equals("friendFeed") || from.equals("friendPage")) {
                         // startup
             findViewById(R.id.adi_friendData).setVisibility(View.VISIBLE);
             final ImageView iv_friendImage = (ImageView) findViewById(R.id.adi_fd_image);
+            ImageView iv_addToCal = (ImageView) findViewById(R.id.adi_add_to_calander);
             final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_text);
                         // get data
             String ref = intent.getStringExtra("ref");
@@ -53,7 +55,7 @@ public class DetailedItemActivity extends AppCompatActivity {
             agenda.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    AgendaClass activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
+                    activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                             // set data
                     tv_title.setText(activityData.activity);
                     Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
@@ -66,6 +68,20 @@ public class DetailedItemActivity extends AppCompatActivity {
             // set data
             tv_friendName.setText(friendName);
             Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
+
+
+            iv_addToCal.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent2 = new Intent(getBaseContext(),AddFriendAgendaActivity.class);
+                    intent2.putExtra("activity", activityData.activity);
+                    intent2.putExtra("location", activityData.location);
+                    intent2.putExtra("date", intent.getStringExtra("friendDate"));
+                    intent2.putExtra("time", intent.getStringExtra("friendTime"));
+                    intent2.putExtra("reference", activityData.ref);
+                    startActivity(intent2);
+                }
+            });
 
         }
 

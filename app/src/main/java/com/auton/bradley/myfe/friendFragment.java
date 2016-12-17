@@ -289,8 +289,6 @@ public class FriendFragment extends Fragment {
                     Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                     intent.putExtra("from", "friendFeed");
                     AgendaClass listItem = listItemsData.get(i);
-             //       intent.putExtra("activity",listItem.activity);
-             //       intent.putExtra("location",listItem.location);
                     intent.putExtra("ref",listItem.ref);
                     intent.putExtra("friendDate",listItem.date);
                     intent.putExtra("friendTime",listItem.time);
