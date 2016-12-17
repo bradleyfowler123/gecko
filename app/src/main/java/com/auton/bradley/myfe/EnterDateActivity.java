@@ -36,11 +36,11 @@ public class EnterDateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_date);
-
+                            // get data to be returned at finish()
         title = getIntent().getStringExtra("title");
         location = getIntent().getStringExtra("location");
         ref = getIntent().getStringExtra("reference");
-
+                            // get all of the view objects
         GridLayout grid = (GridLayout) findViewById(R.id.activity_enter_date);
         LinearLayout line1 = (LinearLayout) grid.getChildAt(1);
         LinearLayout line2 = (LinearLayout) grid.getChildAt(3);
@@ -49,48 +49,44 @@ public class EnterDateActivity extends AppCompatActivity {
             weekDays[i] = (TextView) line1.getChildAt(i*2 +1);
             weekDays[i+4] = (TextView) line2.getChildAt(i*2 +1);
         }
-
+                            // set text on view weekday text views
         String[] wkNames = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
         int start = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
         for (int i = 0; i < 7; i++) {
             int j = (start+i) % 7;
-            weekDays[i].setText(wkNames[j]);
+            weekDays[i].setText(wkNames[j]);                                                        // arrange so starts from today
             weekDays[i].setOnClickListener(new onClickListenerPosition(i) {
-                @Override
-                public void onClick(View view) {
+                @Override           // when on is clicked
+                public void onClick(View view) {        // get date and then get time
                     month = Calendar.getInstance().get(Calendar.MONTH) + 1;                         // deal with month starting at zero
                     day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)+this.position;
                     year = Calendar.getInstance().get(Calendar.YEAR);
                     Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
-                    startActivityForResult(intent,2);
+                    startActivityForResult(intent,2);                                               // get time
                 }
             });
-        }
+        }                   // when ... is clicked
         weekDays[7].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                                // show date picker dialog
                 DatePickerDialog dpd = new DatePickerDialog(EnterDateActivity.this, AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
-                    @Override
+                    @Override       // get date and then get time
                     public void onDateSet(DatePicker datePicker, int i, int i1, final int i2) {
                         Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);
                         year = i; month = i1+1; day = i2;
-                        startActivityForResult(intent,2);
+                        startActivityForResult(intent,2);                                           // get time
                     }
                 }, Calendar.getInstance().get(Calendar.YEAR),Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
                 dpd.show();
             }
         });
-
-
-
     }
-
-    @Override
+    @Override               // when time is returned
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == 2) {
-            // Make sure the request was successful
-            if (resultCode == 1) {
+        if (requestCode == 2) {                                                                     // get time request code
+            if (resultCode == 1) {                                                                  // Make sure the request was successful
+                                // send date and time back
                 Intent intent = new Intent();
                 intent.putExtra("date", Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year));
                 intent.putExtra("time", data.getStringExtra("time"));
