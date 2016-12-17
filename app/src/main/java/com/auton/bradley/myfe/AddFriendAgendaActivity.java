@@ -39,10 +39,9 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
         final String date = intent.getStringExtra("date");
         final String time = intent.getStringExtra("time");
         final String ref = intent.getStringExtra("reference");
-        final String uid = intent.getStringExtra("friendUid");
                         // set view data
         activityTv.setText(title);
-        dateTv.setText(formatData(date) + " at " + time);
+        dateTv.setText(formatData(date) + " at " + formatTime(time));
 
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -75,11 +74,21 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
         String output = "error";
         try {
             Date date = format.parse(input);
-            //   String week = (String) android.text.format.DateFormat.format("ww", date);
-            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
             output = (String) android.text.format.DateFormat.format("dd, MMM", date);
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+        return output;
+    }
+    private String formatTime(String input) {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String output;
+        try {
+            Date date2 = format.parse(input);
+            output = (String) android.text.format.DateFormat.format("HH:mm", date2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            output = "error";
         }
         return output;
     }
