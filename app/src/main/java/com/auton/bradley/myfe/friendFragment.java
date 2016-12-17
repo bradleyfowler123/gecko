@@ -63,6 +63,7 @@ public class FriendFragment extends Fragment {
     View rootView;
     LoginButton fbLinkButton;
     Bundle FacebookData;
+    private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
     private ArrayList<String> activityDescriptions = new ArrayList<>();
     private ArrayList<String> friendNames = new ArrayList<>();
     private ArrayList<String> timeAgo = new ArrayList<>();
@@ -81,7 +82,6 @@ public class FriendFragment extends Fragment {
         final MainActivity activity = (MainActivity) getActivity();
         final FirebaseUser user = activity.auth.getCurrentUser();
         Boolean fbCon = activity.facebookConnected;
-
                             // if user signed in
         if(user != null) {
                             // if fb connected - show fb screen
@@ -91,7 +91,6 @@ public class FriendFragment extends Fragment {
                 LoggedInView.setVisibility(View.VISIBLE);
                 // load tab bar and tab data into friend layout
                 populateList();
-
             }
             else {         // else show connect fb screen
                 signUp.setVisibility(View.VISIBLE);
@@ -140,21 +139,14 @@ public class FriendFragment extends Fragment {
                         parameters.putString("fields", "id, first_name, last_name, email, gender, birthday, location");
                         request.setParameters(parameters);
                         request.executeAsync();
-
                     }
-
                     @Override
                     public void onCancel() {
-
                     }
-
                     @Override
                     public void onError(FacebookException error) {
-
                     }
                 });
-
-
             }
         }
         else {          // otherwise show sign up screen
@@ -162,12 +154,10 @@ public class FriendFragment extends Fragment {
             fbLinkButton.setVisibility(View.GONE);
             LoggedInView.setVisibility(View.GONE);
         }
-
                                 // return the view
         return rootView;
     }
-
-    // function to get users friends info
+                            // function to get users friends info
     public FacebookFriendData getFacebookFriends(AccessToken accessToken) {
         final FacebookFriendData friendData = new FacebookFriendData();
         new GraphRequest(
@@ -198,7 +188,7 @@ public class FriendFragment extends Fragment {
         ).executeAsync();
         return friendData;
     }
-    // function to format all of the data
+                                // function to format all of the data
     public Bundle getFacebookData(JSONObject object, FacebookFriendData friends) {
         try {
             Bundle bundle = new Bundle();
@@ -235,25 +225,25 @@ public class FriendFragment extends Fragment {
             return null;
         }
     }
-
-
+                                // get friend feed data and populate list
     void populateList() {
-        ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                              // locate the list object in the home tab
+                                // get users friends
+        ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                          // locate the list object in the home tab
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
         MainActivity mActivity = (MainActivity) getActivity();
         Bundle fbData = mActivity.facebookData;                                                     // facebook data
         final ArrayList<String> friendFBNames = fbData.getStringArrayList("friendNames");
-        // if user has friends
+                                // if user has friends
         if (!(friendFBNames==null || friendFBNames.isEmpty())) {
-            // get friend data
+                                    // get friend data
             final ArrayList<String> friendFBUrls = fbData.getStringArrayList("friendUrls");
             final ArrayList<String> friendUIDs = fbData.getStringArrayList("friendUids");
-            // for each friend
+                                    // for each friend
             for (int j = 0; j < friendUIDs.size(); j++) {
-                // get the friends' agenda data
+                                            // get the friends' agenda data
                 final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
                 friend.addValueEventListener(new ValueEventListener() {
-                    @Override       // upon data return
+                    @Override               // upon data return
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // isolate each agenda item along with which friend it is
                         GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
@@ -268,13 +258,15 @@ public class FriendFragment extends Fragment {
                             AgendaClass agendaItem = iterator.next();
                             // if already exists in list
                             if (listItems.contains(key)) {          // remove it
+                                listItemsData.remove(listItems.indexOf(key));
+                                activityDescriptions.remove(listItems.indexOf(key));
+                                timeAgo.remove(listItems.indexOf(key));  // today - date,time
+                                friendNames.remove(listItems.indexOf(key));
+                                picUrls.remove(listItems.indexOf(key));
                                 listItems.remove(key);
-                                activityDescriptions.remove(agendaItem.activity + " at " + agendaItem.location);
-                                timeAgo.remove(formatTime(agendaItem.date,agendaItem.time));  // today - date,time
-                                friendNames.remove(friendFBNames.get(i));
-                                picUrls.remove(Picasso.with(getContext()).load(friendFBUrls.get(i)));
                             }               // add agenda item to list
                             listItems.add(key);
+                            listItemsData.add(agendaItem);
                             activityDescriptions.add(agendaItem.activity + " at " + agendaItem.location);
                             timeAgo.add(formatTime(agendaItem.date,agendaItem.time));
                             friendNames.add(friendFBNames.get(i));
@@ -284,18 +276,28 @@ public class FriendFragment extends Fragment {
                             ff_list.setAdapter(adapter);
                         }
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
             }
-
+                                // upon list item click
             ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Toast.makeText(getContext(), "What do you want me to do?", Toast.LENGTH_SHORT).show();
+                                    // show detailed view with what friend is doing at bottom
+                    Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
+                    intent.putExtra("from", "friendFeed");
+                    AgendaClass listItem = listItemsData.get(i);
+             //       intent.putExtra("activity",listItem.activity);
+             //       intent.putExtra("location",listItem.location);
+                    intent.putExtra("ref",listItem.ref);
+                    intent.putExtra("friendDate",listItem.date);
+                    intent.putExtra("friendTime",listItem.time);
+                    intent.putExtra("friendName", friendFBNames.get(i));
+                    intent.putExtra("friendUrl", friendFBUrls.get(i));
+                    startActivity(intent);
+            //        Toast.makeText(getContext(), listItemsData.get(i).activity, Toast.LENGTH_SHORT).show(); // show detailed activity view
                 }
             });
         }

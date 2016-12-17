@@ -114,6 +114,7 @@ public class HomeFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("data",listItems.get(i).getDataBundle1());
+                intent.putExtra("from", "home");
                 startActivity(intent);
             }
         });
