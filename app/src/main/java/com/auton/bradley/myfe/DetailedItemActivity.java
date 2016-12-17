@@ -128,8 +128,6 @@ public class DetailedItemActivity extends AppCompatActivity {
         String output = "error";
         try {
             Date date = format.parse(input);
-            //   String week = (String) android.text.format.DateFormat.format("ww", date);
-            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
             output = (String) android.text.format.DateFormat.format("dd, MMM", date);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -141,7 +139,7 @@ public class DetailedItemActivity extends AppCompatActivity {
         String output;
         try {
             Date date2 = format.parse(input);
-            output = "at " + android.text.format.DateFormat.format("HH:mm", date2);
+            output = (String) android.text.format.DateFormat.format("HH:mm", date2);
         } catch (ParseException e) {
             e.printStackTrace();
             output = "error";

@@ -267,7 +267,7 @@ public class FriendFragment extends Fragment {
                             }               // add agenda item to list
                             listItems.add(key);
                             listItemsData.add(agendaItem);
-                            activityDescriptions.add(agendaItem.activity + " at " + agendaItem.location);
+                            activityDescriptions.add("on " + agendaItem.activity + " at " + agendaItem.location);
                             timeAgo.add(formatTime(agendaItem.date,agendaItem.time));
                             friendNames.add(friendFBNames.get(i));
                             picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
@@ -310,7 +310,7 @@ public class FriendFragment extends Fragment {
             SimpleDateFormat format = new SimpleDateFormat("HH:mm");
             try {
                 Date date2 = format.parse(time);
-                output = "at " + android.text.format.DateFormat.format("HH:mm", date2);
+                output = (String) android.text.format.DateFormat.format("HH:mm", date2);
             } catch (ParseException e) {
                 e.printStackTrace();
                 output = "error";
@@ -320,7 +320,7 @@ public class FriendFragment extends Fragment {
             SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
             try {
                 Date date1 = format.parse(date);
-                output = "on " + android.text.format.DateFormat.format("dd, MMM", date1);
+                output = (String) android.text.format.DateFormat.format("dd, MMM", date1);
             } catch (ParseException e) {
                 e.printStackTrace();
                 output = "error";
