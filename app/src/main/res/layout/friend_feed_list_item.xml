@@ -1,56 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:id="@+id/friend_feed_list_item"
-    android:layout_height="80dp">
+    android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_height="match_parent"
-        android:layout_width="80dp"
+        android:layout_height="70dp"
+        android:layout_width="70dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:id="@+id/ff_list_item_image"
         android:padding="5dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:contentDescription="@string/friendFeed_imageDescription" />
+        android:contentDescription="@string/friendFeed_imageDescription"
+        app:srcCompat="@drawable/com_facebook_button_icon_blue" />
 
 
     <TextView
         android:layout_width="wrap_content"
-        android:text="@string/test"
+        android:text="Darren Norton"
         android:id="@+id/ff_list_item_friends"
         android:textSize="20sp"
-        android:paddingTop="10dp"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@id/ff_list_item_image"
-        android:gravity="bottom|start"
+        android:gravity="center_vertical|start"
         android:layout_height="40dp" />
 
     <TextView
         android:layout_width="match_parent"
-        android:text="@string/test"
+        android:text="Hip-Hop Dance Workshop, Buxton"
         android:id="@+id/ff_list_item_activity"
         android:layout_below="@id/ff_list_item_friends"
         android:layout_toEndOf="@id/ff_list_item_image"
         android:textSize="15sp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:layout_height="40dp"
-        android:gravity="top" />
+        android:layout_height="20dp"
+        android:gravity="center_vertical" />
 
 
     <TextView
         android:layout_height="match_parent"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:text="3 mins ago"
+        android:layout_marginEnd="10dp"
+        android:text="19:00"
         android:layout_above="@id/ff_list_item_activity"
         android:layout_toEndOf="@id/ff_list_item_friends"
         android:id="@+id/ff_list_item_timeAgo"
         android:textSize="15sp"
-        android:gravity="bottom|center_horizontal" />
+        android:gravity="center_vertical|end" />
 
 
 </RelativeLayout>
