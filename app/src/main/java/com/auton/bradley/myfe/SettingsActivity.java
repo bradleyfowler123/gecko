@@ -139,35 +139,6 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    // create options menu in action bar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            menu.getItem(0).setVisible(false);
-            menu.getItem(1).setVisible(true);
-        } else {
-            menu.getItem(0).setVisible(true);
-            menu.getItem(1).setVisible(false);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            if (!super.onMenuItemSelected(featureId, item)) {
-                NavUtils.navigateUpFromSameTask(this);
-            }
-            return true;
-        }
-        return super.onMenuItemSelected(featureId, item);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
