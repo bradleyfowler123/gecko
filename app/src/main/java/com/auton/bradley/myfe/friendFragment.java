@@ -56,6 +56,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 
 
 // fragment that handles the friends tab
@@ -267,10 +268,10 @@ public class FriendFragment extends Fragment {
                             }               // add agenda item to list
                             listItems.add(key);
                             listItemsData.add(agendaItem);
-                            activityDescriptions.add("on " + agendaItem.activity + " at " + agendaItem.location);
+                            activityDescriptions.add(agendaItem.activity + ", Cambridge");
                             timeAgo.add(formatTime(agendaItem.date,agendaItem.time));
                             friendNames.add(friendFBNames.get(i));
-                            picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)));
+                            picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)).centerCrop().resize(100,100));
                             // update the list view
                             friendAdapter adapter = new friendAdapter(getActivity(), friendNames, activityDescriptions, timeAgo, picUrls);
                             ff_list.setAdapter(adapter);
@@ -302,48 +303,27 @@ public class FriendFragment extends Fragment {
     }
 
 
-    private String formatTime(String date, String time) {
+    private String formatTime(String dateString, String timeString) {
         String output;
-        String[] dateComponents = date.split("/");
-        int[] currentDCs = {Calendar.getInstance().get(Calendar.MONTH),Calendar.getInstance().get(Calendar.DAY_OF_MONTH),Calendar.getInstance().get(Calendar.YEAR)};
-        if (dateComponents[1].equals(currentDCs[1])) {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-            try {
-                Date date2 = format.parse(time);
-                output = (String) android.text.format.DateFormat.format("HH:mm", date2);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                output = "error";
-            }
-        }
-        else {
-            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-            try {
-                Date date1 = format.parse(date);
-                output = (String) android.text.format.DateFormat.format("dd, MMM", date1);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                output = "error";
-            }
-        }
-
-        return output;
-    }
-
-    private String calculateTime(String date, String time) {
-        Date date1 = Calendar.getInstance().getTime();
-       // SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-        Date date2 = new Date();
+        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
         try {
-            date2 = SimpleDateFormat.getInstance().parse(date + " " + time);
+            Date date = formatDate.parse(dateString);
+            Date time = formatTime.parse(timeString);
+            Date dateCurrent = Calendar.getInstance().getTime();
+            int day1 = (int) (date.getTime()/(1000*60*60*24L));
+            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
+            int  daysApart = day1-day2;
+            if (daysApart<7) {
+                if (daysApart<1) output = (String) android.text.format.DateFormat.format("HH:mm", time);   // the same day - show timee
+                else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
+            else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
         } catch (ParseException e) {
             e.printStackTrace();
+            output = "error";
         }
-        Long date3 = date2.getTime()-date1.getTime();
-        String output = date3.toString();
         return output;
     }
-
 }
 
 
