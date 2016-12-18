@@ -3,10 +3,12 @@ package com.auton.bradley.myfe;
 import android.*;
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +30,9 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -82,7 +87,8 @@ public class DetailedItemActivity extends AppCompatActivity {
             final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_name);
             final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
                         // get data
-            String ref = intent.getStringExtra("ref");
+            final String ref = intent.getStringExtra("ref");
+            Log.d("kelds", ref);
             String friendName = intent.getStringExtra("friendName");
             String friendImage = intent.getStringExtra("friendUrl");
             String friendDate = intent.getStringExtra("friendDate");
@@ -116,7 +122,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                     intent2.putExtra("location", activityData.location);
                     intent2.putExtra("date", intent.getStringExtra("friendDate"));
                     intent2.putExtra("time", intent.getStringExtra("friendTime"));
-                    intent2.putExtra("reference", activityData.ref);
+                    intent2.putExtra("reference", ref);
                     startActivity(intent2);
                 }
             });
@@ -129,9 +135,10 @@ public class DetailedItemActivity extends AppCompatActivity {
             final String[] location = new String[1];                            // tempory, needs to be text view
             // get data
             final String ref = intent.getStringExtra("ref");
+            final String userRef = intent.getStringExtra("userRef");
             String date = intent.getStringExtra("date");
             String time = intent.getStringExtra("time");
-            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+            final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
             DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref);
             agenda.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -152,14 +159,36 @@ public class DetailedItemActivity extends AppCompatActivity {
             scheduled_text.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
                             // edit schedule is clicked
             edit_schedule.setOnClickListener(new View.OnClickListener() {
-                @Override               // get new date and time
-                public void onClick(View view) {
-                    Intent intent = new Intent(getBaseContext(), EnterDateActivity.class);
-                    intent.putExtra("title", tv_title.getText());                                   // data need to add item to calendar
-                    intent.putExtra("location", location[0]);
-                    intent.putExtra("reference", ref);
-                    startActivityForResult(intent, 1);                                              // result is handled below
-
+                @Override
+                public void onClick(final View view) {
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(DetailedItemActivity.this);
+                    builder.setMessage("Delete or Reschedule?")
+                            .setPositiveButton("Reschedule", new DialogInterface.OnClickListener() {
+                                @Override        // get new date and time
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(getBaseContext(), EnterDateActivity.class);
+                                    intent.putExtra("title", tv_title.getText());                                   // data need to add item to calendar
+                                    intent.putExtra("location", location[0]);
+                                    intent.putExtra("reference", ref);
+                                    startActivityForResult(intent, 1);                                              // result is handled below
+                                }
+                            })                  // delete item
+                            .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(userRef);
+                                    userItem.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()) {
+                                                finish();
+                                            }
+                                        }
+                                    });
+                                }
+                            })
+                            .create()
+                            .show();
                 }
             });
         }

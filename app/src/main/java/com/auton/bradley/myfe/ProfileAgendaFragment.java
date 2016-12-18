@@ -38,10 +38,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 public class ProfileAgendaFragment extends Fragment {
 
     ArrayList<AgendaClass> listItems = new ArrayList<>();
+    String[] keySet = new String[]{};
 
     public ProfileAgendaFragment() {}
 
@@ -72,7 +74,7 @@ public class ProfileAgendaFragment extends Fragment {
         }
                                         // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
+        final DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
              @Override
              public void onDataChange(DataSnapshot dataSnapshot) {
@@ -81,6 +83,8 @@ public class ProfileAgendaFragment extends Fragment {
                  HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
                  if (agendaData != null) {                                                          // if user or friend has agenda items
                      Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                     keySet = agendaData.keySet().toArray(new String[agendaData.keySet().size()]);
+
                      listItems.clear();
                      ArrayList<String> titles = new ArrayList<>();
                      while (iterator.hasNext()) {
@@ -115,6 +119,7 @@ public class ProfileAgendaFragment extends Fragment {
                     intent.putExtra("from", "profile");
                     intent.putExtra("date",listItem.date);
                     intent.putExtra("time",listItem.time);
+                    intent.putExtra("userRef", keySet[i]);
                 }
                 intent.putExtra("ref",listItem.ref);
                 startActivity(intent);
