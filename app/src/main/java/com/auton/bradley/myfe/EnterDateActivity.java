@@ -30,16 +30,19 @@ public class EnterDateActivity extends AppCompatActivity {
     private int day;
     private String title;
     private String location;
-    private String ref;
+    private String ref;                                                                             // to activity name in ca,bridge list
+    private String activityUserRef;                                                                 // key of activity entry in users agenda, only used when updating item
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_date);
                             // get data to be returned at finish()
-        title = getIntent().getStringExtra("title");
-        location = getIntent().getStringExtra("location");
-        ref = getIntent().getStringExtra("reference");
+        Intent intent = getIntent();
+        title = intent.getStringExtra("title");
+        location = intent.getStringExtra("location");
+        ref = intent.getStringExtra("reference");
+        activityUserRef = intent.getStringExtra("userRef");
                             // get all of the view objects
         GridLayout grid = (GridLayout) findViewById(R.id.activity_enter_date);
         LinearLayout line1 = (LinearLayout) grid.getChildAt(1);
@@ -93,6 +96,7 @@ public class EnterDateActivity extends AppCompatActivity {
                 intent.putExtra("title", title);
                 intent.putExtra("location", location);
                 intent.putExtra("reference", ref);
+                if (activityUserRef != null) intent.putExtra("userRef", activityUserRef);
                 setResult(1,intent);
                 finish();
             }

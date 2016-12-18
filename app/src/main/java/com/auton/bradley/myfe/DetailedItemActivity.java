@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class DetailedItemActivity extends AppCompatActivity {
 
@@ -170,6 +172,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                                     intent.putExtra("title", tv_title.getText());                                   // data need to add item to calendar
                                     intent.putExtra("location", location[0]);
                                     intent.putExtra("reference", ref);
+                                    intent.putExtra("userRef", userRef);
                                     startActivityForResult(intent, 1);                                              // result is handled below
                                 }
                             })                  // delete item
@@ -248,7 +251,7 @@ public class DetailedItemActivity extends AppCompatActivity {
             }
         });
     }
-
+                            // users agenda item reschedule time returned
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -257,7 +260,21 @@ public class DetailedItemActivity extends AppCompatActivity {
             case 1: {
                 // Make sure the request was successful
                 if (resultCode == 1) {
-                    Toast.makeText(getBaseContext(),"Updated!",Toast.LENGTH_LONG).show();
+                    String date = data.getStringExtra("date"); String time = data.getStringExtra("time");
+                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(data.getStringExtra("userRef"));
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("date",date);
+                    map.put("time",time);
+                    userItem.updateChildren(map).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getBaseContext(),"Error Update Failed",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Toast.makeText(getBaseContext(),"Updated",Toast.LENGTH_SHORT).show();
+                    TextView textView = (TextView) findViewById(R.id.adi_scheduled_text);
+                    textView.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
                 }
             }
         }
