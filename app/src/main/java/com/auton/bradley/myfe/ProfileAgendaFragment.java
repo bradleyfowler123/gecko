@@ -35,9 +35,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 public class ProfileAgendaFragment extends Fragment {
@@ -164,22 +166,32 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
         holder.locations=(TextView) convertView.findViewById(R.id.tv_profile_agenda_location);
         // populate the title and image with data for a list item
         holder.activity.setText(items.get(position).activity);
-        holder.date.setText(formatData(items.get(position).date));
+        holder.date.setText(formatTime(items.get(position).date,items.get(position).time));
         holder.locations.setText(items.get(position).location);
         // return the updated view
         return convertView;
     }
 
-    private String formatData(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-        String output = "error";
+    private String formatTime(String dateString, String timeString) {
+        String output;
+        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
         try {
-            Date date = format.parse(input);
-            //   String week = (String) android.text.format.DateFormat.format("ww", date);
-            //   int weekYear = DateFormat.getDateInstance().getCalendar().getWeekYear();
-            output = (String) android.text.format.DateFormat.format("dd, MMM", date);
+            Date date = formatDate.parse(dateString);
+            Date time = formatTime.parse(timeString);
+            Date dateCurrent = Calendar.getInstance().getTime();
+            int day1 = (int) (date.getTime()/(1000*60*60*24L));
+            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
+            int  daysApart = day1-day2;
+            if (daysApart<7) {
+                if (daysApart<1){
+                    if (daysApart<0) output = "Done";                                                   // already been
+                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);}   // the same day - show timee
+                else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
+            else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
         } catch (ParseException e) {
             e.printStackTrace();
+            output = "error";
         }
         return output;
     }
