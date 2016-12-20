@@ -53,6 +53,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,11 +67,8 @@ public class FriendFragment extends Fragment {
     LoginButton fbLinkButton;
     Bundle FacebookData;
     private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
-    private ArrayList<String> activityDescriptions = new ArrayList<>();
-    private ArrayList<String> friendNames = new ArrayList<>();
-    private ArrayList<String> timeAgo = new ArrayList<>();
+    private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // unique identifier for each list item
-    private ArrayList<RequestCreator> picUrls = new ArrayList<>();
     private ListView ff_list;
 
     @Override
@@ -260,21 +259,23 @@ public class FriendFragment extends Fragment {
                             // if already exists in list
                             if (listItems.contains(key)) {          // remove it
                                 listItemsData.remove(listItems.indexOf(key));
-                                activityDescriptions.remove(listItems.indexOf(key));
-                                timeAgo.remove(listItems.indexOf(key));  // today - date,time
-                                friendNames.remove(listItems.indexOf(key));
-                                picUrls.remove(listItems.indexOf(key));
                                 listItems.remove(key);
                             }               // add agenda item to list
-                            listItems.add(key);
-                            listItemsData.add(agendaItem);
-                            activityDescriptions.add(agendaItem.activity + ", Cambridge");
-                            timeAgo.add(formatTime(agendaItem.date,agendaItem.time));
-                            friendNames.add(friendFBNames.get(i));
-                            picUrls.add(Picasso.with(getContext()).load(friendFBUrls.get(i)).centerCrop().resize(100,100));
-                            // update the list view
-                            friendAdapter adapter = new friendAdapter(getActivity(), friendNames, activityDescriptions, timeAgo, picUrls);
-                            ff_list.setAdapter(adapter);
+                            TimeDispNRank timeNRank = formatTime(agendaItem.date,agendaItem.time);
+                            if (!timeNRank.timeDisp.equals("0")) {
+                                agendaItem.rank = timeNRank.rank;
+                                agendaItem.activityDescription = agendaItem.activity + ", Cambridge";
+                                agendaItem.timeAgo = timeNRank.timeDisp;
+                                agendaItem.friendName = friendFBNames.get(i);
+                                agendaItem.picUrl = friendFBUrls.get(i);
+                                listItems.add(key);
+                                listItemsData.add(agendaItem);
+                                sortedList = listItemsData;
+                                Collections.sort(sortedList, new AgendaComparator());
+
+                                friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                                ff_list.setAdapter(adapter);
+                            }
                         }
                     }
                     @Override
@@ -289,12 +290,12 @@ public class FriendFragment extends Fragment {
                                     // show detailed view with what friend is doing at bottom
                     Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                     intent.putExtra("from", "friendFeed");
-                    AgendaClass listItem = listItemsData.get(i);
+                    AgendaClass listItem = sortedList.get(i);
                     intent.putExtra("ref",listItem.ref);
                     intent.putExtra("friendDate",listItem.date);
                     intent.putExtra("friendTime",listItem.time);
-                    intent.putExtra("friendName", friendFBNames.get(i));
-                    intent.putExtra("friendUrl", friendFBUrls.get(i));
+                    intent.putExtra("friendName", listItem.friendName);
+                    intent.putExtra("friendUrl", listItem.picUrl);
                     startActivity(intent);
             //        Toast.makeText(getContext(), listItemsData.get(i).activity, Toast.LENGTH_SHORT).show(); // show detailed activity view
                 }
@@ -303,8 +304,8 @@ public class FriendFragment extends Fragment {
     }
 
 
-    private String formatTime(String dateString, String timeString) {
-        String output;
+    private TimeDispNRank formatTime(String dateString, String timeString) {
+        String output; int rank;
         SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
         try {
@@ -313,16 +314,20 @@ public class FriendFragment extends Fragment {
             Date dateCurrent = Calendar.getInstance().getTime();
             int day1 = (int) (date.getTime()/(1000*60*60*24L));
             int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
-            int  daysApart = day1-day2;
+            int  daysApart = day1-day2; rank = daysApart;
+            rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
+            Log.d("yhvjb", Integer.toString(rank));
             if (daysApart<7) {
-                if (daysApart<1) output = (String) android.text.format.DateFormat.format("HH:mm", time);   // the same day - show timee
+                if (daysApart<1){
+                    if (daysApart<0) output = "0";                                                   // already been
+                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);}   // the same day - show timee
                 else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
             else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
         } catch (ParseException e) {
             e.printStackTrace();
-            output = "error";
+            output = "error"; rank = 0;
         }
-        return output;
+        return new TimeDispNRank(output,rank);
     }
 }
 
@@ -331,19 +336,15 @@ public class FriendFragment extends Fragment {
 // adapter used for friend's activities list view in friend fees tab
 class friendAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
-    private ArrayList<RequestCreator> profilePics;
-    private ArrayList<String> friendNames;
-    private ArrayList<String> activityDescriptions;
-    private ArrayList<String> timeAgo;
+    private ArrayList<AgendaClass> items;
+    private ArrayList<String> idk;
     private Context c;
     // define a function that can be used to declare this custom adapter class
-    friendAdapter(Context context, ArrayList<String> friendNames, ArrayList<String> activityDescriptions, ArrayList<String> timeAgo, ArrayList<RequestCreator> profilePics) {     // arguments set the context, texts and images for this adapter class
-        super(context, R.layout.friend_feed_list_item,friendNames);
+    friendAdapter(Context context, ArrayList<AgendaClass> agendaClassArrayList, ArrayList<String> idk) {     // arguments set the context, texts and images for this adapter class
+        super(context, R.layout.friend_feed_list_item,idk);
         this.c=context;
-        this.friendNames=friendNames;
-        this.activityDescriptions=activityDescriptions;
-        this.timeAgo=timeAgo;
-        this.profilePics=profilePics;
+        this.idk=idk;
+        this.items=agendaClassArrayList;
     }
     // class definition used to store different views within the list view to be populated
     private class ViewHolder {
@@ -368,10 +369,10 @@ class friendAdapter extends ArrayAdapter<String> {                              
         holder.time=(TextView) convertView.findViewById(R.id.ff_list_item_timeAgo);
         holder.img=(ImageView)  convertView.findViewById(R.id.ff_list_item_image);
         // populate the title and image with data for a list item
-        profilePics.get(position).into(holder.img);
-        holder.friends.setText(friendNames.get(position));
-        holder.activity.setText(activityDescriptions.get(position));
-        holder.time.setText(timeAgo.get(position));
+        Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).into(holder.img);
+        holder.friends.setText(items.get(position).friendName);
+        holder.activity.setText(items.get(position).activityDescription);
+        holder.time.setText(items.get(position).timeAgo);
         // return the updated view
         return convertView;
     }

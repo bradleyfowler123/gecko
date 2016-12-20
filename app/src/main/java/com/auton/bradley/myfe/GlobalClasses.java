@@ -13,6 +13,7 @@ import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Created by Bradley on 13/10/2016.
@@ -104,15 +105,34 @@ class FacebookFriendData {
     }
 }
 
+class TimeDispNRank {
+    String timeDisp;
+    int rank;
+
+    public TimeDispNRank(String time, int rank) {
+        this.timeDisp = time;
+        this.rank = rank;
+    }
+}
+
 class AgendaClass {
+                    // always used
+    String activity;
+                    // used when dealing with users or friends stored agenda
     String date;
     String time;
+    String ref;
+                            // subsection - used when trying to display the agenda data only
+    int rank;
+    String activityDescription;
+    String timeAgo;
+    String friendName;
+    String picUrl;
+                    // used when dealing with the activity item in database
     String location;
-    String activity;
     String price;
     Boolean familyfriendly;
     String image;
-    String ref;
 
     public AgendaClass(){
     }
@@ -124,6 +144,16 @@ class AgendaClass {
         this.image = image;
         this.familyfriendly = ff;
         this.ref = ref;
+    }
+}
+
+class AgendaComparator implements Comparator<AgendaClass> {
+    @Override
+    public int compare(AgendaClass self, AgendaClass other) {
+        int s = self.rank; int o = other.rank;
+        if (s>o) return 1;
+        else if (s<o) return -1;
+        else return 0;
     }
 }
 
