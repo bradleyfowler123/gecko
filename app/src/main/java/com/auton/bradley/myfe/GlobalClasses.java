@@ -121,9 +121,9 @@ class AgendaClass {
                     // used when dealing with users or friends stored agenda
     String date;
     String time;
-    String ref;
-                            // subsection - used when trying to display the agenda data only
+    String ref; String key;
     int rank;
+                            // subsection - used when trying to display the agenda data in friend feed only
     String activityDescription;
     String timeAgo;
     String friendName;

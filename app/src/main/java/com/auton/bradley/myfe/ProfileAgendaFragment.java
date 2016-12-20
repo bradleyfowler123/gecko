@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +46,7 @@ import java.util.Set;
 public class ProfileAgendaFragment extends Fragment {
 
     ArrayList<AgendaClass> listItems = new ArrayList<>();
-    String[] keySet = new String[]{};
+    ArrayList<AgendaClass> sortedList = new ArrayList<>();
 
     public ProfileAgendaFragment() {}
 
@@ -78,23 +79,28 @@ public class ProfileAgendaFragment extends Fragment {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
-             @Override
+             @Override                  // all agenda items handled at once
              public void onDataChange(DataSnapshot dataSnapshot) {
                  GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
                  };
                  HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
                  if (agendaData != null) {                                                          // if user or friend has agenda items
                      Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                     keySet = agendaData.keySet().toArray(new String[agendaData.keySet().size()]);
+                     Iterator<String> keySet = agendaData.keySet().iterator();
 
                      listItems.clear();
                      ArrayList<String> titles = new ArrayList<>();
                      while (iterator.hasNext()) {
                          AgendaClass listItem = iterator.next();
+                         listItem.rank = calcRank(listItem.date,listItem.time);
+                         listItem.key = keySet.next();
                          listItems.add(listItem);
                          titles.add(listItem.activity);
                      }                // populate list
-                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), listItems, titles);
+                     sortedList = listItems;
+                     Collections.sort(sortedList, new AgendaComparator());
+
+                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), sortedList, titles);
                      pa_list.setAdapter(adapter);
                  }
              }
@@ -109,7 +115,7 @@ public class ProfileAgendaFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                                 // load custom detailed view
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
-                AgendaClass listItem = listItems.get(i);
+                AgendaClass listItem = sortedList.get(i);
                 if(getActivity().toString().contains("FriendActivity")) {
                     intent.putExtra("from", "friendPage");                                          // custom detailed friend
                     intent.putExtra("friendDate",listItem.date);
@@ -121,7 +127,7 @@ public class ProfileAgendaFragment extends Fragment {
                     intent.putExtra("from", "profile");
                     intent.putExtra("date",listItem.date);
                     intent.putExtra("time",listItem.time);
-                    intent.putExtra("userRef", keySet[i]);
+                    intent.putExtra("userRef", listItem.key);
                 }
                 intent.putExtra("ref",listItem.ref);
                 startActivity(intent);
@@ -129,6 +135,25 @@ public class ProfileAgendaFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private int calcRank(String dateString, String timeString) {
+        int rank;
+        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
+        try {
+            Date date = formatDate.parse(dateString);
+            Date time = formatTime.parse(timeString);
+            Date dateCurrent = Calendar.getInstance().getTime();
+            int day1 = (int) (date.getTime()/(1000*60*60*24L));
+            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
+            int  daysApart = day1-day2;
+            rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
+           } catch (ParseException e) {
+            e.printStackTrace();
+            rank = 0;
+        }
+        return rank;
     }
 }
 

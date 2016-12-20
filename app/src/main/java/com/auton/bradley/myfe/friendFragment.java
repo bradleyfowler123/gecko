@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
@@ -31,7 +28,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,7 +36,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +62,7 @@ public class FriendFragment extends Fragment {
     Bundle FacebookData;
     private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
-    private ArrayList<String> listItems = new ArrayList<>(); // unique identifier for each list item
+    private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
     private ListView ff_list;
 
     @Override
@@ -251,16 +245,19 @@ public class FriendFragment extends Fragment {
                         Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                         Iterator<String> keys = agendaData.keySet().iterator();
                         String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
+                                        // remove all list items of this friend
                         int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
-                        // for each agenda item
+                        String friendUrl = friendFBUrls.get(i);
+                        for (int k = 0; k < listItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
+                            if (listItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
+                                listItemsData.remove(k);
+                                listItems.remove(k);
+                                k = k-1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                            }
+                        }               // all all list items for this friend
+                                                // for each agenda item
                         while (iterator.hasNext()) {
-                            String key = keys.next();
                             AgendaClass agendaItem = iterator.next();
-                            // if already exists in list
-                            if (listItems.contains(key)) {          // remove it
-                                listItemsData.remove(listItems.indexOf(key));
-                                listItems.remove(key);
-                            }               // add agenda item to list
                             TimeDispNRank timeNRank = formatTime(agendaItem.date,agendaItem.time);
                             if (!timeNRank.timeDisp.equals("0")) {
                                 agendaItem.rank = timeNRank.rank;
@@ -268,7 +265,7 @@ public class FriendFragment extends Fragment {
                                 agendaItem.timeAgo = timeNRank.timeDisp;
                                 agendaItem.friendName = friendFBNames.get(i);
                                 agendaItem.picUrl = friendFBUrls.get(i);
-                                listItems.add(key);
+                                listItems.add(agendaItem.activity);
                                 listItemsData.add(agendaItem);
                                 sortedList = listItemsData;
                                 Collections.sort(sortedList, new AgendaComparator());
@@ -314,9 +311,8 @@ public class FriendFragment extends Fragment {
             Date dateCurrent = Calendar.getInstance().getTime();
             int day1 = (int) (date.getTime()/(1000*60*60*24L));
             int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
-            int  daysApart = day1-day2; rank = daysApart;
+            int  daysApart = day1-day2;
             rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
-            Log.d("yhvjb", Integer.toString(rank));
             if (daysApart<7) {
                 if (daysApart<1){
                     if (daysApart<0) output = "0";                                                   // already been
@@ -337,13 +333,11 @@ public class FriendFragment extends Fragment {
 class friendAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
     private ArrayList<AgendaClass> items;
-    private ArrayList<String> idk;
     private Context c;
     // define a function that can be used to declare this custom adapter class
     friendAdapter(Context context, ArrayList<AgendaClass> agendaClassArrayList, ArrayList<String> idk) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.friend_feed_list_item,idk);
         this.c=context;
-        this.idk=idk;
         this.items=agendaClassArrayList;
     }
     // class definition used to store different views within the list view to be populated
