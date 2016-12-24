@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -35,12 +36,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -67,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
     private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
     private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
-    private ArrayList<String> homeListTitles = new ArrayList<>();                                     // stores all of the titles, used to filter results with search
+    private ArrayList<String> homeListRefs = new ArrayList<>();
+    private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
 
 
     @Override
@@ -114,10 +118,10 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
 
-        getNSetHomeFeedData();
         if (facebookConnected != null && facebookConnected) {
             getNSetFriendFeedData();
         }
+        getNSetHomeFeedData();
 
         viewPager.setCurrentItem(currentTab);
     }
@@ -286,13 +290,14 @@ public class MainActivity extends AppCompatActivity {
                                 agendaItem.timeAgo = timeNRank.timeDisp;
                                 agendaItem.friendName = friendFBNames.get(i);
                                 agendaItem.picUrl = friendFBUrls.get(i);
-                                friendFeedListItems.add(agendaItem.activity);
+                                friendFeedListItems.add(agendaItem.ref);
                                 friendFeedListItemsData.add(agendaItem);
                                 friendFeedSortedList = friendFeedListItemsData;
                                 Collections.sort(friendFeedSortedList, new AgendaComparator());
                                 friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
                             }
                         }
+                        findFriendsGoingToActivities();
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -319,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
                     Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                     Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
                     // for each activity in cambridge
-                    homeListItems.clear();
+                    homeListItems.clear(); homeListTitles.clear(); homeListRefs.clear();
                     while (iterator.hasNext()) {
                         AgendaClass agendaItem = iterator.next();                                   // get the agenda item
                         agendaItem.ref = keys.next();
@@ -329,10 +334,10 @@ public class MainActivity extends AppCompatActivity {
                         listItem.setDark(true);
                         homeListItems.add(listItem);
                         homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
                     }
                     // populate the list
                     homeFragment.storeData(homeListItems,homeListTitles);
-
                 }
             }
             @Override
@@ -340,6 +345,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Database Error", databaseError.toString());
             }
         });
+    }
+
+    private void findFriendsGoingToActivities() {
+        Map<String, Integer> occurences = new HashMap<>();
+        for(String value : homeListRefs) {
+            occurences.put(value, Collections.frequency(friendFeedListItems, value));
+        }
+        Toast.makeText(getBaseContext(),occurences.toString(),Toast.LENGTH_LONG).show();
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {

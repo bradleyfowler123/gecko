@@ -93,7 +93,7 @@ public class FriendFragment extends Fragment {
                         // show detailed view with what friend is doing at bottom
                         Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                         intent.putExtra("from", "friendFeed");
-                        AgendaClass listItem = activity.friendFeedSortedList.get(i);
+                        AgendaClass listItem = sortedList.get(i);
                         intent.putExtra("ref",listItem.ref);
                         intent.putExtra("friendDate",listItem.date);
                         intent.putExtra("friendTime",listItem.time);
