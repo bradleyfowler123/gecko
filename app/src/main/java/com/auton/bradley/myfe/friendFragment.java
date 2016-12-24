@@ -61,7 +61,6 @@ public class FriendFragment extends Fragment {
     LoginButton fbLinkButton;
     Bundle FacebookData;
     public ListView ff_list;
-    private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
 
@@ -94,7 +93,7 @@ public class FriendFragment extends Fragment {
                         // show detailed view with what friend is doing at bottom
                         Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                         intent.putExtra("from", "friendFeed");
-                        AgendaClass listItem = activity.sortedList.get(i);
+                        AgendaClass listItem = activity.friendFeedSortedList.get(i);
                         intent.putExtra("ref",listItem.ref);
                         intent.putExtra("friendDate",listItem.date);
                         intent.putExtra("friendTime",listItem.time);

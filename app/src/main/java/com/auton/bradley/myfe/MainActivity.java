@@ -63,9 +63,12 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment = new ProfileFragment();
     private HomeFragment homeFragment = new HomeFragment();
 
-    private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
-    public ArrayList<AgendaClass> sortedList = new ArrayList<>();
-    private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
+    private ArrayList<AgendaClass> friendFeedListItemsData = new ArrayList<>();
+    public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
+    private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
+    private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
+    private ArrayList<String> homeListTitles = new ArrayList<>();                                     // stores all of the titles, used to filter results with search
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
 
+        getNSetHomeFeedData();
         if (facebookConnected != null && facebookConnected) {
             getNSetFriendFeedData();
         }
@@ -239,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+                                    // get friend feed data
     void getNSetFriendFeedData() {
     // get friend feed data and populate list
         // get users friends
@@ -265,10 +269,10 @@ public class MainActivity extends AppCompatActivity {
                         // remove all list items of this friend
                         int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
                         String friendUrl = friendFBUrls.get(i);
-                        for (int k = 0; k < listItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
-                            if (listItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
-                                listItemsData.remove(k);
-                                listItems.remove(k);
+                        for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
+                            if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
+                                friendFeedListItemsData.remove(k);
+                                friendFeedListItems.remove(k);
                                 k = k-1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
                             }
                         }               // all all list items for this friend
@@ -282,11 +286,11 @@ public class MainActivity extends AppCompatActivity {
                                 agendaItem.timeAgo = timeNRank.timeDisp;
                                 agendaItem.friendName = friendFBNames.get(i);
                                 agendaItem.picUrl = friendFBUrls.get(i);
-                                listItems.add(agendaItem.activity);
-                                listItemsData.add(agendaItem);
-                                sortedList = listItemsData;
-                                Collections.sort(sortedList, new AgendaComparator());
-                                friendFragment.storeData(sortedList, listItems);
+                                friendFeedListItems.add(agendaItem.activity);
+                                friendFeedListItemsData.add(agendaItem);
+                                friendFeedSortedList = friendFeedListItemsData;
+                                Collections.sort(friendFeedSortedList, new AgendaComparator());
+                                friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
                             }
                         }
                     }
@@ -300,6 +304,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void getNSetHomeFeedData() {
+       // get activities in cambridge
+        // setup variables
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
+        // get data
+        activityDataRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {                                   // runs initially and for every change in the cambridge data
+                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);                 // get agenda data
+                if (agendaData != null) {                                                           // if cambridge has activities
+                    Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                    Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
+                    // for each activity in cambridge
+                    homeListItems.clear();
+                    while (iterator.hasNext()) {
+                        AgendaClass agendaItem = iterator.next();                                   // get the agenda item
+                        agendaItem.ref = keys.next();
+                        HomeListData listItem = new HomeListData(agendaItem);                       // add agenda item to list
+                        //    listItem = setFancyColor(listItem);
+                        listItem.setColor(R.color.com_facebook_blue);
+                        listItem.setDark(true);
+                        homeListItems.add(listItem);
+                        homeListTitles.add(agendaItem.activity);
+                    }
+                    // populate the list
+                    homeFragment.storeData(homeListItems,homeListTitles);
+
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("Database Error", databaseError.toString());
+            }
+        });
+    }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {
         String output; int rank;

@@ -52,6 +52,8 @@ public class HomeFragment extends Fragment {
 
     private ListView home_list;
     private homeAdapter adapter;
+    private ArrayList<HomeListData> listItems;
+    private ArrayList<String> listTitles;
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -70,45 +72,11 @@ public class HomeFragment extends Fragment {
                                    // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
-                                // get activities in cambridge
-                                            // setup variables
-        final ArrayList<HomeListData> listItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
-        final ArrayList<String> listTitles = new ArrayList<>();                                     // stores all of the titles, used to filter results with search
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
-                                            // get data
-        activityDataRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {                                   // runs initially and for every change in the cambridge data
-                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
-                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);                 // get agenda data
-                if (agendaData != null) {                                                           // if cambridge has activities
-                    Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                    Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
-                                            // for each activity in cambridge
-                    listItems.clear();
-                    while (iterator.hasNext()) {
-                        AgendaClass agendaItem = iterator.next();                                   // get the agenda item
-                        agendaItem.ref = keys.next();
-                        HomeListData listItem = new HomeListData(agendaItem);                       // add agenda item to list
-                    //    listItem = setFancyColor(listItem);
-                        listItem.setColor(R.color.com_facebook_blue);
-                        listItem.setDark(true);
-                        listItems.add(listItem);
-                        listTitles.add(agendaItem.activity);
-                    }
-                                            // populate the list
-                    adapter = new homeAdapter(getActivity(),listItems,listTitles);                             // note searchTitles the strings that are search able, in this case just the titles
-                    home_list.setAdapter(adapter);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("Database Error", databaseError.toString());
-            }
-        });
-
-                                   // handle clicks on the list items
+        if (listTitles!=null) {
+            adapter = new homeAdapter(getActivity(), listItems, listTitles);
+            home_list.setAdapter(adapter);
+        }
+        // handle clicks on the list items
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -120,6 +88,17 @@ public class HomeFragment extends Fragment {
         });
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
+    }
+
+    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings){
+        listItems = sortedList2;
+        listTitles = strings; // some necessary crap
+        if (home_list!=null) {
+            Log.d("tgh", listTitles.toString());
+            adapter = new homeAdapter(getActivity(), listItems, listTitles);
+            home_list.setAdapter(adapter);
+        }
+
     }
 
     HomeListData setFancyColor(HomeListData input) {
