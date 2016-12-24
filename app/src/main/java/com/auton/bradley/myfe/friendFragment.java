@@ -60,10 +60,10 @@ public class FriendFragment extends Fragment {
     View rootView;
     LoginButton fbLinkButton;
     Bundle FacebookData;
+    public ListView ff_list;
     private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
-    private ListView ff_list;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,9 +72,10 @@ public class FriendFragment extends Fragment {
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         final View LoggedInView = rootView.findViewById(R.id.friend_feed_list);
         fbLinkButton = (LoginButton) rootView.findViewById(R.id.connect_with_fb_button);
+        ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);
                                 // get user info
         final MainActivity activity = (MainActivity) getActivity();
-        final FirebaseUser user = activity.auth.getCurrentUser();
+        final FirebaseUser user = activity.user;
         Boolean fbCon = activity.facebookConnected;
                             // if user signed in
         if(user != null) {
@@ -83,8 +84,28 @@ public class FriendFragment extends Fragment {
                 signUp.setVisibility(View.GONE);
                 fbLinkButton.setVisibility(View.GONE);
                 LoggedInView.setVisibility(View.VISIBLE);
+
+                friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                ff_list.setAdapter(adapter);
+
+                ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        // show detailed view with what friend is doing at bottom
+                        Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
+                        intent.putExtra("from", "friendFeed");
+                        AgendaClass listItem = activity.sortedList.get(i);
+                        intent.putExtra("ref",listItem.ref);
+                        intent.putExtra("friendDate",listItem.date);
+                        intent.putExtra("friendTime",listItem.time);
+                        intent.putExtra("friendName", listItem.friendName);
+                        intent.putExtra("friendUrl", listItem.picUrl);
+                        startActivity(intent);
+                        //        Toast.makeText(getContext(), listItemsData.get(i).activity, Toast.LENGTH_SHORT).show(); // show detailed activity view
+                    }
+                });
+
                 // load tab bar and tab data into friend layout
-                populateList();
             }
             else {         // else show connect fb screen
                 signUp.setVisibility(View.VISIBLE);
@@ -150,6 +171,16 @@ public class FriendFragment extends Fragment {
         }
                                 // return the view
         return rootView;
+    }
+
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings){
+        sortedList = sortedList2;
+        listItems = strings; // some necessary crap
+        if (ff_list!=null) {
+            friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
+            ff_list.setAdapter(adapter);
+        }
+
     }
                             // function to get users friends info
     public FacebookFriendData getFacebookFriends(AccessToken accessToken) {
@@ -219,112 +250,7 @@ public class FriendFragment extends Fragment {
             return null;
         }
     }
-                                // get friend feed data and populate list
-    void populateList() {
-                                // get users friends
-        ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);                          // locate the list object in the home tab
-        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
-        MainActivity mActivity = (MainActivity) getActivity();
-        Bundle fbData = mActivity.facebookData;                                                     // facebook data
-        final ArrayList<String> friendFBNames = fbData.getStringArrayList("friendNames");
-                                // if user has friends
-        if (!(friendFBNames==null || friendFBNames.isEmpty())) {
-                                    // get friend data
-            final ArrayList<String> friendFBUrls = fbData.getStringArrayList("friendUrls");
-            final ArrayList<String> friendUIDs = fbData.getStringArrayList("friendUids");
-                                    // for each friend
-            for (int j = 0; j < friendUIDs.size(); j++) {
-                                            // get the friends' agenda data
-                final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
-                friend.addValueEventListener(new ValueEventListener() {
-                    @Override               // upon data return
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // isolate each agenda item along with which friend it is
-                        GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
-                        HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                        Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                        Iterator<String> keys = agendaData.keySet().iterator();
-                        String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
-                                        // remove all list items of this friend
-                        int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
-                        String friendUrl = friendFBUrls.get(i);
-                        for (int k = 0; k < listItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
-                            if (listItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
-                                listItemsData.remove(k);
-                                listItems.remove(k);
-                                k = k-1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
-                            }
-                        }               // all all list items for this friend
-                                                // for each agenda item
-                        while (iterator.hasNext()) {
-                            AgendaClass agendaItem = iterator.next();
-                            TimeDispNRank timeNRank = formatTime(agendaItem.date,agendaItem.time);
-                            if (!timeNRank.timeDisp.equals("0")) {
-                                agendaItem.rank = timeNRank.rank;
-                                agendaItem.activityDescription = agendaItem.activity + ", Cambridge";
-                                agendaItem.timeAgo = timeNRank.timeDisp;
-                                agendaItem.friendName = friendFBNames.get(i);
-                                agendaItem.picUrl = friendFBUrls.get(i);
-                                listItems.add(agendaItem.activity);
-                                listItemsData.add(agendaItem);
-                                sortedList = listItemsData;
-                                Collections.sort(sortedList, new AgendaComparator());
 
-                                friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
-                                ff_list.setAdapter(adapter);
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-            }
-                                // upon list item click
-            ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    // show detailed view with what friend is doing at bottom
-                    Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
-                    intent.putExtra("from", "friendFeed");
-                    AgendaClass listItem = sortedList.get(i);
-                    intent.putExtra("ref",listItem.ref);
-                    intent.putExtra("friendDate",listItem.date);
-                    intent.putExtra("friendTime",listItem.time);
-                    intent.putExtra("friendName", listItem.friendName);
-                    intent.putExtra("friendUrl", listItem.picUrl);
-                    startActivity(intent);
-            //        Toast.makeText(getContext(), listItemsData.get(i).activity, Toast.LENGTH_SHORT).show(); // show detailed activity view
-                }
-            });
-        }
-    }
-
-
-    private TimeDispNRank formatTime(String dateString, String timeString) {
-        String output; int rank;
-        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
-        try {
-            Date date = formatDate.parse(dateString);
-            Date time = formatTime.parse(timeString);
-            Date dateCurrent = Calendar.getInstance().getTime();
-            int day1 = (int) (date.getTime()/(1000*60*60*24L));
-            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
-            int  daysApart = day1-day2;
-            rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
-            if (daysApart<7) {
-                if (daysApart<1){
-                    if (daysApart<0) output = "0";                                                   // already been
-                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);}   // the same day - show timee
-                else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
-            else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
-        } catch (ParseException e) {
-            e.printStackTrace();
-            output = "error"; rank = 0;
-        }
-        return new TimeDispNRank(output,rank);
-    }
 }
 
 
