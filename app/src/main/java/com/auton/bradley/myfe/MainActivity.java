@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     public FirebaseAuth auth; public FirebaseUser user;
     int currentTab = 0;
 
+    private FriendFragment friendFragment = new FriendFragment();
+    private ProfileFragment profileFragment = new ProfileFragment();
+    private HomeFragment homeFragment = new HomeFragment();
+
     private ArrayList<AgendaClass> listItemsData = new ArrayList<>();
     public ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
@@ -86,16 +90,10 @@ public class MainActivity extends AppCompatActivity {
         // load action bar
         toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);                                                               // you can edit action bar style in activity_main.xml
-        // load tab bar and tab data
-        viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
-        FriendFragment friendFragment = setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-        setupTabIcons();                                                                            // add icons to tabs
-                            // if there is user data or search preferences
+        // if there is user data or search preferences
         Intent intent = getIntent();
         if (intent.getExtras() != null) {
-                                // get user data
+            // get user data
             currentTab = intent.getIntExtra("tab", 0);
             facebookConnected = intent.getBooleanExtra("fbConnected", false);
             if (facebookConnected) {
@@ -106,8 +104,15 @@ public class MainActivity extends AppCompatActivity {
             auth.signOut();                     // sign out any firebase user that may be signed in as we have no data on them
             facebookConnected = false;
         }
+        // load tab bar and tab data
+        viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
+        setupViewPager(viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+        setupTabIcons();                                                                            // add icons to tabs
+
         if (facebookConnected != null && facebookConnected) {
-            getNSetFriendFeedData(friendFragment);
+            getNSetFriendFeedData();
         }
 
         viewPager.setCurrentItem(currentTab);
@@ -167,14 +172,12 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
     }
 
-    private FriendFragment setupViewPager(ViewPager viewPager) {
+    private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
-        adapter.addFragment(new HomeFragment(), "Home");
-        FriendFragment myFragment = new FriendFragment();
-        adapter.addFragment(myFragment, "Friend");
-        adapter.addFragment(new ProfileFragment(), "Profile");
+        adapter.addFragment(homeFragment, "Home");
+        adapter.addFragment(friendFragment, "Friend");
+        adapter.addFragment(profileFragment, "Profile");
         viewPager.setAdapter(adapter);// set the adapter to the container
-        return myFragment;
     }
 
 
@@ -237,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    void getNSetFriendFeedData(final FriendFragment friendFragment) {
+    void getNSetFriendFeedData() {
     // get friend feed data and populate list
         // get users friends
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
