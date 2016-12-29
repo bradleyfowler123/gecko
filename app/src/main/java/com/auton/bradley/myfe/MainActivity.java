@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
-
+    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                         homeListRefs.add(agendaItem.ref);
                     }
                     // populate the list
-                    homeFragment.storeData(homeListItems,homeListTitles);
+                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers);
                 }
             }
             @Override
@@ -348,11 +348,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findFriendsGoingToActivities() {
-        Map<String, Integer> occurences = new HashMap<>();
+        activityFriendGoingNumbers.clear();
         for(String value : homeListRefs) {
-            occurences.put(value, Collections.frequency(friendFeedListItems, value));
+            activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
-        Toast.makeText(getBaseContext(),occurences.toString(),Toast.LENGTH_LONG).show();
+        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers);
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {

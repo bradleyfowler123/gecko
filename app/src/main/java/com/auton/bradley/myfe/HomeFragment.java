@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 /*
 Java file to contain all class' related to the home tab
@@ -54,6 +55,7 @@ public class HomeFragment extends Fragment {
     private homeAdapter adapter;
     private ArrayList<HomeListData> listItems;
     private ArrayList<String> listTitles;
+    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -73,7 +75,7 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
         if (listTitles!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers);
             home_list.setAdapter(adapter);
         }
         // handle clicks on the list items
@@ -90,12 +92,13 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 
-    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings){
+    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriNums){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
+        activityFriendGoingNumbers = actFriNums;
         if (home_list!=null) {
             Log.d("tgh", listTitles.toString());
-            adapter = new homeAdapter(getActivity(), listItems, listTitles);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers);
             home_list.setAdapter(adapter);
         }
 
@@ -171,8 +174,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private Context c;
     private ArrayList<String> arraySearchList;
     private ArrayList<HomeListData> backupData;
+    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -180,11 +184,12 @@ class homeAdapter extends ArrayAdapter<String> {                                
         arraySearchList.addAll(activityTitles);
         backupData = new ArrayList<>();                                                             // same but for all of the data
         backupData.addAll(listData);
+        activityFriendGoingNumbers = actFriGoNo;
     }                          // class definition used to store different views within the list view to be populated
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
-        TextView activityPrice;
+        TextView noFriGoing;
         ImageView img;
         ImageView addToCal;
     }                          // function that generates the list view, runs for every list item
@@ -200,31 +205,37 @@ class homeAdapter extends ArrayAdapter<String> {                                
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
-        holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
+        holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         holder.addToCal = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
                                 // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).getData().activity);
         holder.activityLocation.setText(listData.get(position).getData().location);
-        holder.activityPrice.setText(listData.get(position).getData().price);
+        if (!activityFriendGoingNumbers.isEmpty()) {
+            String act = listData.get(position).getData().ref;
+            Log.d("fdnkj", activityFriendGoingNumbers.toString());
+            Log.d("ndkcxj", String.valueOf(activityFriendGoingNumbers.get(act)));
+            Log.d("fdnkj", act);
+            holder.noFriGoing.setText( String.valueOf(activityFriendGoingNumbers.get(act)));
+        }
         RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).getData().image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
-        View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
+   /*     View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
         GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();             // get its background
         bgShape.setColor(listData.get(position).getColor());                                        // set the color of it
         if (this.listData.get(position).getDark()) {                                                // handle dark or light background
             Picasso.with(c).load(R.drawable.ic_calendar_white).into(holder.addToCal);
             holder.activityTitle.setTextColor(Color.WHITE);
             holder.activityLocation.setTextColor(Color.WHITE);
-            holder.activityPrice.setTextColor(Color.WHITE);
+//            holder.activityPrice.setTextColor(Color.WHITE);
         }
         else {
             Picasso.with(c).load(R.drawable.ic_calander).into(holder.addToCal);
             holder.activityTitle.setTextColor(Color.BLACK);
             holder.activityLocation.setTextColor(Color.BLACK);
-            holder.activityPrice.setTextColor(Color.BLACK);
+ //           holder.activityPrice.setTextColor(Color.BLACK);
         }
-                            // add an onclick listener for the add to calendar button in each list item
+ */                           // add an onclick listener for the add to calendar button in each list item
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
