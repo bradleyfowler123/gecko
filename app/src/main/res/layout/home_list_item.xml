@@ -86,65 +86,64 @@
             android:layout_height="40dp"
             android:orientation="horizontal">
 
-
-
-            <Space
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"/>
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/ic_friend_feed_grey"
-                android:padding="5dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:id="@+id/hli_total_going"
-                android:textColor="@android:color/white"/>
-            <Space
+                android:layout_weight="1"
+                android:gravity="center_horizontal">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_friend_feed_grey"
+                    android:padding="5dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:id="@+id/hli_total_going"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                app:srcCompat="@android:drawable/btn_star"
-                android:padding="5dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:id="@+id/hli_friends_interested"
-                android:textColor="@android:color/white"/>
-            <Space
+                android:layout_weight="1"
+                android:gravity="center_horizontal">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@android:drawable/btn_star"
+                    android:padding="5dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:id="@+id/hli_friends_interested"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/ic_calendar_white"
+                android:layout_weight="1"
                 android:id="@+id/sr_add_to_calander"
-                android:padding="5dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="0"
-                android:gravity="center_vertical"
-                android:textSize="20sp"
-                android:id="@+id/hli_friends_going"
-                android:textColor="@android:color/white"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"/>
-
+                android:gravity="center_horizontal">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_calendar_white"
+                    android:padding="5dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="0"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:id="@+id/hli_friends_going"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
         </LinearLayout>
 
     </FrameLayout>

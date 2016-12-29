@@ -165,6 +165,17 @@ class onClickListenerPosition implements View.OnClickListener {
 
     public void onClick(View v) {}
 }
+class onLongClickListenerPosition implements View.OnLongClickListener {
+    int position;
+    onLongClickListenerPosition(int pos) {
+        this.position = pos;
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        return false;
+    }
+}
 
 class CircleTransform implements Transformation {
     @Override

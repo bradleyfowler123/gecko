@@ -24,7 +24,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.ActionCodeResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -97,7 +99,6 @@ public class HomeFragment extends Fragment {
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriNums;
         if (home_list!=null) {
-            Log.d("tgh", listTitles.toString());
             adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers);
             home_list.setAdapter(adapter);
         }
@@ -191,7 +192,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         TextView activityLocation;
         TextView noFriGoing;
         ImageView img;
-        ImageView addToCal;
+        View addToCal;
     }                          // function that generates the list view, runs for every list item
     @Override
     @NonNull
@@ -207,16 +208,13 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
-        holder.addToCal = (ImageView) convertView.findViewById(R.id.sr_add_to_calander);
+        holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
                                 // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).getData().activity);
         holder.activityLocation.setText(listData.get(position).getData().location);
         if (!activityFriendGoingNumbers.isEmpty()) {
             String act = listData.get(position).getData().ref;
-            Log.d("fdnkj", activityFriendGoingNumbers.toString());
-            Log.d("ndkcxj", String.valueOf(activityFriendGoingNumbers.get(act)));
-            Log.d("fdnkj", act);
-            holder.noFriGoing.setText( String.valueOf(activityFriendGoingNumbers.get(act)));
+            holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(act)));
         }
         RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).getData().image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
@@ -236,6 +234,18 @@ class homeAdapter extends ArrayAdapter<String> {                                
  //           holder.activityPrice.setTextColor(Color.BLACK);
         }
  */                           // add an onclick listener for the add to calendar button in each list item
+        holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
+            @Override
+            public boolean onLongClick(View view) {
+                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(position).getData().activity;
+                String message;
+                if (number == "0") message = "None of your friends have added  " + activity + " to their agenda yet";
+                else if (number == "1") message = "1 friend is going to " + activity;
+                else message = number + " friends are going " + activity;
+                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
