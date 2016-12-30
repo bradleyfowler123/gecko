@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> interested = new ArrayList<>();
 
     @Override
@@ -119,10 +120,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();                                                                            // add icons to tabs
 
-        if (facebookConnected != null && facebookConnected) {
-            getNSetFriendFeedData();
-        }
         getNSetHomeFeedData();
+        if (user!=null) {
+            getNSetUserData();
+            if (facebookConnected != null && facebookConnected) {
+                getNSetFriendData();
+            }
+        }
 
         viewPager.setCurrentItem(currentTab);
     }
@@ -248,9 +252,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-                                    // get friend feed data
-    void getNSetFriendFeedData() {
-    // get friend feed data and populate list
+                                    // get friend data
+    void getNSetFriendData() {
         // get users friends
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
         final ArrayList<String> friendFBNames = facebookData.getStringArrayList("friendNames");
@@ -261,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
             final ArrayList<String> friendUIDs = facebookData.getStringArrayList("friendUids");
             // for each friend
             for (int j = 0; j < friendUIDs.size(); j++) {
-                // get the friends' agenda data
+                                         // get and set the friends' agenda data
                 final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
                 friend.addValueEventListener(new ValueEventListener() {
                     @Override               // upon data return
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                         // for each agenda item
                         while (iterator.hasNext()) {
                             AgendaClass agendaItem = iterator.next();
-                            TimeDispNRank timeNRank = formatTime(agendaItem.date,agendaItem.time);
+                            TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time);
                             if (!timeNRank.timeDisp.equals("0")) {
                                 agendaItem.rank = timeNRank.rank;
                                 agendaItem.activityDescription = agendaItem.activity + ", Cambridge";
@@ -304,14 +307,52 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
-            }
-            // upon list item click
 
+                                // get and set friend interest count
+                final DatabaseReference friendInt = database.child("users").child(friendUIDs.get(j)).child("Interested");
+                friendInt.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                        while (snapshotIterator.hasNext()) {
+                            String ref = snapshotIterator.next().getValue().toString();
+                            if (activityFriendInterestedNumbers.containsKey(ref)) {
+                                activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
+                            } else activityFriendInterestedNumbers.put(ref, 1);
+                        }
+                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, interested);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
         }
     }
+                                // set users interests on home screen
+    private void getNSetUserData() {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference interestedRef = database.child("users").child(user.getUid()).child("Interested");
+        interestedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                interested.clear();
+                while (snapshotIterator.hasNext()) {
+                    interested.add(snapshotIterator.next().getValue().toString());
+                }
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+    }
+                                // get and set activities for around cambridge
     private void getNSetHomeFeedData() {
-       // get activities in cambridge
         // setup variables
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
@@ -344,23 +385,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("Database Error", databaseError.toString());
-            }
-        });
-        DatabaseReference interestedRef = database.child("users").child(user.getUid()).child("Interested");
-        interestedRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                interested.clear();
-                while (snapshotIterator.hasNext()) {
-                    interested.add(snapshotIterator.next().getValue().toString());
-                }
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
