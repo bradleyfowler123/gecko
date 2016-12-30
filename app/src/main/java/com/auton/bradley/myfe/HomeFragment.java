@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.graphics.Palette;
@@ -26,8 +27,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,6 +62,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<HomeListData> listItems;
     private ArrayList<String> listTitles;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private ArrayList<String> myInterests = new ArrayList<>();
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -77,7 +82,7 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
         if (listTitles!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
         // handle clicks on the list items
@@ -94,12 +99,13 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 
-    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriNums){
+    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriNums, ArrayList<String> interests){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriNums;
+        myInterests = interests;
         if (home_list!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
 
@@ -172,12 +178,13 @@ public class HomeFragment extends Fragment {
 class homeAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
                                 // declare variables of this class
     private ArrayList<HomeListData> listData;
+    private ArrayList<String> myInterests = new ArrayList<>();
     private Context c;
     private ArrayList<String> arraySearchList;
     private ArrayList<HomeListData> backupData;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -186,17 +193,19 @@ class homeAdapter extends ArrayAdapter<String> {                                
         backupData = new ArrayList<>();                                                             // same but for all of the data
         backupData.addAll(listData);
         activityFriendGoingNumbers = actFriGoNo;
+        myInterests = interests;
     }                          // class definition used to store different views within the list view to be populated
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
         TextView noFriGoing;
         ImageView img;
-        View addToCal;
+        ImageView interestedIV;
+        View addToCal; View interested;
     }                          // function that generates the list view, runs for every list item
     @Override
     @NonNull
-    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull final ViewGroup parent) {
                                 // if the view is empty, get it
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -208,7 +217,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
+        holder.interestedIV= (ImageView) convertView.findViewById(R.id.home_interested_star);
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
+        holder.interested = convertView.findViewById(R.id.home_interested);
                                 // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).getData().activity);
         holder.activityLocation.setText(listData.get(position).getData().location);
@@ -216,6 +227,8 @@ class homeAdapter extends ArrayAdapter<String> {                                
             String act = listData.get(position).getData().ref;
             holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(act)));
         }
+        if (myInterests.contains(listData.get(position).getData().ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
+        else holder.interestedIV.setImageResource(android.R.drawable.star_off);
         RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).getData().image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
    /*     View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
@@ -264,6 +277,36 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     intent.putExtra("location", holder.activityLocation.getText());
                     intent.putExtra("reference", listData.get(this.position).getData().ref);
                     activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
+                }
+            }
+        });
+        holder.interested.setOnClickListener(new onClickListenerPosition(position) {
+            @Override
+            public void onClick(View view) {
+                // if user not logged in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user== null) {                            // tell them to log in
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Sign in to mark items as interested")
+                            .setPositiveButton("okay", null)
+                            .create()
+                            .show();
+                }
+                else {              // if user logged in
+                    if (myInterests.contains(listData.get(position).getData().ref)) {
+                        myInterests.remove(listData.get(position).getData().ref);
+                    }
+                    else {
+                        myInterests.add(listData.get(position).getData().ref);
+                    }
+                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Interested");
+                    agendaItem.setValue(myInterests).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.d("complete?", Boolean.toString(task.isSuccessful()));
+                        }
+                    });
                 }
             }
         });

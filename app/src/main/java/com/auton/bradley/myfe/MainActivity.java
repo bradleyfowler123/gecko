@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private ArrayList<String> interested = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -337,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                         homeListRefs.add(agendaItem.ref);
                     }
                     // populate the list
-                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers);
+                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
                 }
             }
             @Override
@@ -345,6 +346,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Database Error", databaseError.toString());
             }
         });
+        DatabaseReference interestedRef = database.child("users").child(user.getUid()).child("Interested");
+        interestedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                interested.clear();
+                while (snapshotIterator.hasNext()) {
+                    interested.add(snapshotIterator.next().getValue().toString());
+                }
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void findFriendsGoingToActivities() {
@@ -352,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
         for(String value : homeListRefs) {
             activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
-        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers);
+        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {

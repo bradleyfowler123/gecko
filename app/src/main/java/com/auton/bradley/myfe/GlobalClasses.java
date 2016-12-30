@@ -64,7 +64,6 @@ class HomeListData {
     private int color;
     private boolean dark;
                         // functions to get individual variables
-    AgendaClass getData() {return databaseData;}
 
     Bundle getDataBundle1() {
         Bundle output = new Bundle();
@@ -77,6 +76,7 @@ class HomeListData {
     }
 
     int getColor() {return color;}
+    AgendaClass getData() {return databaseData;}
     Boolean getDark() {return dark;}
                         // functions to set individual variables
     void setData(AgendaClass data) { this.databaseData = data;}
