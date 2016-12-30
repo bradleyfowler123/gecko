@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,9 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -36,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -310,7 +305,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 // get and set friend interest count
                 final DatabaseReference friendInt = database.child("users").child(friendUIDs.get(j)).child("Interested");
-                friendInt.addValueEventListener(new ValueEventListener() {
+                                        // note single event listener so doesn't auto update, this is because noway to distinguish in friend removed or added interest
+                friendInt.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
@@ -330,6 +326,13 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+    private void findFriendsGoingToActivities() {
+        activityFriendGoingNumbers.clear();
+        for(String value : homeListRefs) {
+            activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
+        }
+        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
     }
                                 // set users interests on home screen
     private void getNSetUserData() {
@@ -388,14 +391,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void findFriendsGoingToActivities() {
-        activityFriendGoingNumbers.clear();
-        for(String value : homeListRefs) {
-            activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
-        }
-        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {
