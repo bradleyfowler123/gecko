@@ -62,6 +62,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<HomeListData> listItems;
     private ArrayList<String> listTitles;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
 
     public HomeFragment() {        // Required empty public constructor
@@ -82,7 +83,7 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
         if (listTitles!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, myInterests);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
         // handle clicks on the list items
@@ -99,13 +100,14 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 
-    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriNums, ArrayList<String> interests){
+    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
-        activityFriendGoingNumbers = actFriNums;
+        activityFriendGoingNumbers = actFriGoNums;
+        activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
         if (home_list!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, myInterests);
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
 
@@ -183,8 +185,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private ArrayList<String> arraySearchList;
     private ArrayList<HomeListData> backupData;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -192,13 +195,13 @@ class homeAdapter extends ArrayAdapter<String> {                                
         arraySearchList.addAll(activityTitles);
         backupData = new ArrayList<>();                                                             // same but for all of the data
         backupData.addAll(listData);
-        activityFriendGoingNumbers = actFriGoNo;
+        activityFriendGoingNumbers = actFriGoNo; activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
     }                          // class definition used to store different views within the list view to be populated
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
-        TextView noFriGoing;
+        TextView noFriGoing; TextView noFriInt;
         ImageView img;
         ImageView interestedIV;
         View addToCal; View interested;
@@ -216,6 +219,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
+        holder.noFriInt = (TextView) convertView.findViewById(R.id.hli_friends_interested);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         holder.interestedIV= (ImageView) convertView.findViewById(R.id.home_interested_star);
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
@@ -226,6 +230,10 @@ class homeAdapter extends ArrayAdapter<String> {                                
         if (!activityFriendGoingNumbers.isEmpty()) {
             String act = listData.get(position).getData().ref;
             holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(act)));
+        }
+        if (!activityFriendInterestedNumbers.isEmpty()) {
+            String act = listData.get(position).getData().ref;
+            if (activityFriendInterestedNumbers.get(act)!=null) holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(act)));
         }
         if (myInterests.contains(listData.get(position).getData().ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);

@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
                                 activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
                             } else activityFriendInterestedNumbers.put(ref, 1);
                         }
-                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, interested);
+                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
                     }
 
                     @Override
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
                 while (snapshotIterator.hasNext()) {
                     interested.add(snapshotIterator.next().getValue().toString());
                 }
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
                         homeListRefs.add(agendaItem.ref);
                     }
                     // populate the list
-                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
+                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
                 }
             }
             @Override
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
         for(String value : homeListRefs) {
             activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
-        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers, interested);
+        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {
