@@ -3,6 +3,7 @@ package com.auton.bradley.myfe;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -74,17 +75,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        auth = FirebaseAuth.getInstance(); user = auth.getCurrentUser();
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(getApplicationContext());
-                            // check permissions granted
+        // check permissions granted
         ArrayList<String> permissions = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);}
+            permissions.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
         if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);}
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
         if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.INTERNET);}
+            permissions.add(Manifest.permission.INTERNET);
+        }
         if (permissions.size() != 0) {
             String[] Sarray = permissions.toArray(new String[permissions.size()]);
             ActivityCompat.requestPermissions(this, Sarray, 3);
@@ -116,14 +121,47 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();                                                                            // add icons to tabs
 
         getNSetHomeFeedData();
-        if (user!=null) {
+        if (user != null) {
             getNSetUserData();
             if (facebookConnected != null && facebookConnected) {
                 getNSetFriendData();
             }
         }
-
         viewPager.setCurrentItem(currentTab);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Read values from the "savedInstanceState" bundle and put them back into the corresponding textviews
+        currentTab = savedInstanceState.getInt("currentTab");
+        facebookConnected = savedInstanceState.getBoolean("fbCon");
+        facebookData = savedInstanceState.getBundle("fbData");
+        friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
+        friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
+        friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
+        friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("currentTab", currentTab);
+        outState.putBoolean("fbCon", facebookConnected);
+        outState.putBundle("fbData", facebookData);
+        outState.putParcelableArrayList("ffld", friendFeedListItemsData);
+        outState.putParcelableArrayList("ffsl", friendFeedSortedList);
+        outState.putStringArrayList("ffli", friendFeedListItems);
+     /*   friendFeedListItemsData = new ArrayList<>();
+        public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
+        private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
+        private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
+        private ArrayList<String> homeListRefs = new ArrayList<>();
+        private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
+        private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+        private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
+        private ArrayList<String> interested
+      */  // Save the values you need from your textviews into the outState object
     }
 
     // facebook - passes data back to facebook api

@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 
 import com.squareup.picasso.RequestCreator;
@@ -14,6 +16,7 @@ import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Bradley on 13/10/2016.
@@ -91,7 +94,7 @@ class HomeListData {
 
 
                             // class definition
-class FacebookFriendData {
+class FacebookFriendData implements Parcelable{
                             // parameter declarations
     ArrayList<String> names;
     ArrayList<String> ids;
@@ -102,6 +105,31 @@ class FacebookFriendData {
         this.names = new ArrayList<>();
         this.ids = new ArrayList<>();
         this.picUrls = new ArrayList<>();
+    }
+
+    public int describeContents() { return 0;}
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeStringList(names);
+        out.writeStringList(ids);
+        out.writeStringList(picUrls);
+    }
+
+    public static final Parcelable.Creator<FacebookFriendData> CREATOR
+            = new Parcelable.Creator<FacebookFriendData>() {
+        public FacebookFriendData createFromParcel(Parcel in) {
+            return new FacebookFriendData(in);
+        }
+
+        public FacebookFriendData[] newArray(int size) {
+            return new FacebookFriendData[size];
+        }
+    };
+
+    private FacebookFriendData(Parcel in) {
+        in.readStringList(names);
+        in.readStringList(ids);
+        in.readStringList(picUrls);
     }
 }
 
@@ -115,7 +143,7 @@ class TimeDispNRank {
     }
 }
 
-class AgendaClass {
+class AgendaClass implements Parcelable {
                     // always used
     String activity;
                     // used when dealing with users or friends stored agenda
@@ -145,6 +173,70 @@ class AgendaClass {
         this.familyfriendly = ff;
         this.ref = ref;
     }
+/*
+    public Bundle getDataBundle() {
+        Bundle output = new Bundle();
+        output.putString("act", activity);
+        output.putString("dat", date);
+        output.putString("tim", time);
+        output.putString("ref", ref);
+        output.putString("key", key);
+        output.putInt("ran",  rank);
+        output.putString("ade", activityDescription);
+        output.putString("tia", timeAgo);
+        output.putString("frn", friendName);
+        output.putString("pic", picUrl);
+        output.putString("loc", location);
+        output.putString("pri", price);
+        output.putString("ima", image);
+        output.putBoolean("ffr", familyfriendly);
+        return output;
+    }
+    public void setDataBundle(Bundle bundle) {
+        activity = bundle.getString("act");
+        date = bundle.getString("dat");
+        time = bundle.getString("tim");
+        ref = bundle.getString("ref");
+        key = bundle.getString("key");
+        rank = bundle.getInt("ran");
+        activityDescription = bundle.getString("ade");
+
+
+        output.putString("tia", timeAgo);
+        output.putString("frn", friendName);
+        output.putString("pic", picUrl);
+        output.putString("loc", location);
+        output.putString("pri", price);
+        output.putString("ima", image);
+        output.putBoolean("ffr", familyfriendly);
+    }
+*/
+
+    public int describeContents() { return 0;}
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(activity);
+        out.writeString(date);
+        out.writeString(time);
+    }
+
+    public static final Parcelable.Creator<AgendaClass> CREATOR
+            = new Parcelable.Creator<AgendaClass>() {
+        public AgendaClass createFromParcel(Parcel in) {
+            return new AgendaClass(in);
+        }
+
+        public AgendaClass[] newArray(int size) {
+            return new AgendaClass[size];
+        }
+    };
+
+    private AgendaClass(Parcel in) {
+        activity = in.readString();
+        date = in.readString();
+        time = in.readString();
+    }
+
 }
 
 class AgendaComparator implements Comparator<AgendaClass> {

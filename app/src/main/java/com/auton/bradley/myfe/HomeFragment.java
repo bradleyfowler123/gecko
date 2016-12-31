@@ -82,7 +82,9 @@ public class HomeFragment extends Fragment {
                                    // variable declarations
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
+        Log.d("idsnk", "iiksl");
         if (listTitles!=null) {
+            Log.d("!!!!!!!snikz", listTitles.toString());
             adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
