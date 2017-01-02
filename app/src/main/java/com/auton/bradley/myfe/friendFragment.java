@@ -67,6 +67,7 @@ public class FriendFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
                                 // get friend tab layout
+        Log.d("onCreateView", "1");
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         final View LoggedInView = rootView.findViewById(R.id.friend_feed_list);
@@ -168,6 +169,7 @@ public class FriendFragment extends Fragment {
             fbLinkButton.setVisibility(View.GONE);
             LoggedInView.setVisibility(View.GONE);
         }
+        Log.d("onCreateView", ff_list.toString());
                                 // return the view
         return rootView;
     }
@@ -175,6 +177,7 @@ public class FriendFragment extends Fragment {
     public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings){
         sortedList = sortedList2;
         listItems = strings; // some necessary crap
+        Log.d("storeData", listItems.toString());
         if (ff_list!=null) {
             friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
             ff_list.setAdapter(adapter);

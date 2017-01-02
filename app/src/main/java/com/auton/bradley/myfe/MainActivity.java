@@ -3,7 +3,6 @@ package com.auton.bradley.myfe;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
         // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view
-        // load action bar
+        // load action bars
         toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);                                                               // you can edit action bar style in activity_main.xml
         // if there is user data or search preferences
@@ -140,7 +140,15 @@ public class MainActivity extends AppCompatActivity {
         friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
         friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
         friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
-        friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
+        homeListItems = savedInstanceState.getParcelableArrayList("hfld");
+        homeListTitles = savedInstanceState.getStringArrayList("hflt");
+        homeListRefs = savedInstanceState.getStringArrayList("hflr");
+        activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
+        activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
+        interested = savedInstanceState.getStringArrayList("interested");
+
+        friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
+        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
     }
 
     @Override
@@ -152,16 +160,15 @@ public class MainActivity extends AppCompatActivity {
         outState.putParcelableArrayList("ffld", friendFeedListItemsData);
         outState.putParcelableArrayList("ffsl", friendFeedSortedList);
         outState.putStringArrayList("ffli", friendFeedListItems);
-     /*   friendFeedListItemsData = new ArrayList<>();
-        public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
-        private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
-        private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
-        private ArrayList<String> homeListRefs = new ArrayList<>();
-        private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
-        private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
-        private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
-        private ArrayList<String> interested
-      */  // Save the values you need from your textviews into the outState object
+        outState.putParcelableArrayList("hfld", homeListItems);
+        outState.putStringArrayList("hflt", homeListTitles);
+        outState.putStringArrayList("hflr", homeListRefs);
+        outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
+        outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
+        outState.putStringArrayList("interested", interested);
+
+        getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
+        getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
     }
 
     // facebook - passes data back to facebook api
