@@ -104,7 +104,7 @@ class TimeDispNRank {
     String timeDisp;
     int rank;
 
-    public TimeDispNRank(String time, int rank) {
+    TimeDispNRank(String time, int rank) {
         this.timeDisp = time;
         this.rank = rank;
     }
@@ -127,9 +127,10 @@ class AgendaClass implements Parcelable {
     String location;
     String price;
     Boolean familyfriendly;
+    Boolean event;
     String image;
 
-    public AgendaClass(){
+    AgendaClass(){
     }
 
     public AgendaClass(String activity, String location, String price, String image, Boolean ff, String ref) {
@@ -148,6 +149,7 @@ class AgendaClass implements Parcelable {
         output.putString("image", this.image);
         output.putString("price", this.price);
         output.putBoolean("ff", this.familyfriendly);
+        output.putBoolean("event", this.event);
         return output;
     }
 /*

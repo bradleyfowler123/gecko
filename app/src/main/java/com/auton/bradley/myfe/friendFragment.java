@@ -96,6 +96,7 @@ public class FriendFragment extends Fragment {
                         intent.putExtra("from", "friendFeed");
                         AgendaClass listItem = sortedList.get(i);
                         intent.putExtra("ref",listItem.ref);
+                        intent.putExtra("event", listItem.event);
                         intent.putExtra("friendDate",listItem.date);
                         intent.putExtra("friendTime",listItem.time);
                         intent.putExtra("friendName", listItem.friendName);

@@ -204,7 +204,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         TextView noFriGoing; TextView noFriInt;
         ImageView img;
         ImageView interestedIV;
-        View addToCal; View interested;
+        View addToCal; View interested; View totalGoing;
     }                          // function that generates the list view, runs for every list item
     @Override
     @NonNull
@@ -224,37 +224,28 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.interestedIV= (ImageView) convertView.findViewById(R.id.home_interested_star);
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
         holder.interested = convertView.findViewById(R.id.home_interested);
+        holder.totalGoing = convertView.findViewById(R.id.home_total_going);
                                 // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).activity);
         holder.activityLocation.setText(listData.get(position).location);
-        if (!activityFriendGoingNumbers.isEmpty()) {
-            String act = listData.get(position).ref;
-            holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(act)));
-        }
-        if (!activityFriendInterestedNumbers.isEmpty()) {
-            String act = listData.get(position).ref;
-            if (activityFriendInterestedNumbers.get(act)!=null) holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(act)));
-        }
-        if (myInterests.contains(listData.get(position).ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
-        else holder.interestedIV.setImageResource(android.R.drawable.star_off);
         RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
-   /*     View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
-        GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();             // get its background
-        bgShape.setColor(listData.get(position).getColor());                                        // set the color of it
-        if (this.listData.get(position).getDark()) {                                                // handle dark or light background
-            Picasso.with(c).load(R.drawable.ic_calendar_white).into(holder.addToCal);
-            holder.activityTitle.setTextColor(Color.WHITE);
-            holder.activityLocation.setTextColor(Color.WHITE);
-//            holder.activityPrice.setTextColor(Color.WHITE);
+        String ref;
+        if (listData.get(position).event) {
+            holder.totalGoing.setVisibility(View.VISIBLE);
+            ref = "events/" + listData.get(position).ref;
         }
         else {
-            Picasso.with(c).load(R.drawable.ic_calander).into(holder.addToCal);
-            holder.activityTitle.setTextColor(Color.BLACK);
-            holder.activityLocation.setTextColor(Color.BLACK);
- //           holder.activityPrice.setTextColor(Color.BLACK);
+            holder.totalGoing.setVisibility(View.GONE);
+            ref = "activities/" + listData.get(position).ref;
         }
- */                           // add an onclick listener for the add to calendar button in each list item
+        Log.d("jodasl", ref);
+        Log.d("opdsl;", myInterests.toString());
+        if (myInterests.contains(ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
+        else holder.interestedIV.setImageResource(android.R.drawable.star_off);
+        if (!activityFriendGoingNumbers.isEmpty()) holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(ref)));
+        if (!activityFriendInterestedNumbers.isEmpty()) if (activityFriendInterestedNumbers.get(ref)!=null) holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(ref)));
+                             // add an onclick listener for the add to calendar button in each list item
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
@@ -283,7 +274,8 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     Intent intent = new Intent(activity, EnterDateActivity.class);
                     intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
                     intent.putExtra("location", holder.activityLocation.getText());
-                    intent.putExtra("reference", listData.get(this.position).ref);
+                    if (listData.get(this.position).event) intent.putExtra("reference", "events/" + listData.get(this.position).ref);
+                    else intent.putExtra("reference", "activities/" + listData.get(this.position).ref);
                     activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
                 }
             }
@@ -301,11 +293,14 @@ class homeAdapter extends ArrayAdapter<String> {                                
                             .show();
                 }
                 else {              // if user logged in
-                    if (myInterests.contains(listData.get(position).ref)) {
-                        myInterests.remove(listData.get(position).ref);
+                    String ref;
+                    if (listData.get(this.position).event) ref = "events/" + listData.get(this.position).ref;
+                    else ref = "activities/" + listData.get(this.position).ref;
+                    if (myInterests.contains(ref)) {
+                        myInterests.remove(ref);
                     }
                     else {
-                        myInterests.add(listData.get(position).ref);
+                        myInterests.add(ref);
                     }
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Interested");

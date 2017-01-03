@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public CallbackManager callbackManager;
     public FirebaseAuth auth; public FirebaseUser user;
     int currentTab = 0;
+    String location = "cambridge";
 
     private FriendFragment friendFragment = new FriendFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
@@ -167,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
         outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
         outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
         outState.putStringArrayList("interested", interested);
-
         getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
         getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
     }
@@ -364,7 +366,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
                         String ref = dataSnapshot.getValue().toString();
-                        Log.d("yfhbjk", ref);
                         activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() - 1);
                         homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
                     }
@@ -383,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
         for(String value : homeListRefs) {
             activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
+        Log.d("nkiedsklks",activityFriendGoingNumbers.toString());
         homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
     }
                                 // set users interests on home screen
@@ -393,11 +395,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                interested.clear();
+                Log.d("EDSCCCCCCCCCCCCC","Efds");
+            /*    for (int i = 0; i < interested.size(); i++) {
+                    String ref = interested.get(i);
+                    activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() - 1);
+                }
+             */   interested.clear();
                 while (snapshotIterator.hasNext()) {
                     interested.add(snapshotIterator.next().getValue().toString());
                 }
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+         /*       for (int i = 0; i < interested.size(); i++) {
+                    String ref = interested.get(i);
+                    Log.d("yfhj", ref);
+                    if (activityFriendInterestedNumbers.containsKey(ref)) {
+                        activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
+                    }else {
+                        activityFriendInterestedNumbers.put(ref, 1);
+                    }
+                }
+           */     homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -409,35 +425,91 @@ public class MainActivity extends AppCompatActivity {
     private void getNSetHomeFeedData() {
         // setup variables
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference activityDataRef = database.child("activitydata").child("cambridge");
+        DatabaseReference activityDataRef = database.child("activitydata").child(location).child("activities");
         // get data
-        activityDataRef.addValueEventListener(new ValueEventListener() {
+        activityDataRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {                                   // runs initially and for every change in the cambridge data
-                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
-                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);                 // get agenda data
-                if (agendaData != null) {                                                           // if cambridge has activities
-                    Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                    Iterator<String> keys = agendaData.keySet().iterator();                         // parse out the unique identifiers for the list items
-                    // for each activity in cambridge
-                    homeListItems.clear(); homeListTitles.clear(); homeListRefs.clear();
-                    while (iterator.hasNext()) {
-                        AgendaClass agendaItem = iterator.next();                                   // get the agenda item
-                        agendaItem.ref = keys.next();
-                        homeListItems.add(agendaItem);
-                        homeListTitles.add(agendaItem.activity);
-                        homeListRefs.add(agendaItem.ref);
-                    }
-                    // populate the list
-                    homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.event = false;
+                homeListItems.add(agendaItem);
+                homeListTitles.add(agendaItem.activity);
+                homeListRefs.add("activities/" + agendaItem.ref);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("Database Error", databaseError.toString());
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                homeListItems.remove(index);
+                homeListTitles.remove(index);
+                homeListRefs.remove(index);
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.event = false;
+                homeListItems.add(agendaItem);
+                homeListTitles.add(agendaItem.activity);
+                homeListRefs.add("activities/" + agendaItem.ref);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                homeListItems.remove(index);
+                homeListTitles.remove(index);
+                homeListRefs.remove(index);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
         });
-
+                // events
+        DatabaseReference eventsDataRef = database.child("activitydata").child(location).child("events");
+        // get data
+        eventsDataRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.event = true;
+                homeListItems.add(agendaItem);
+                homeListTitles.add(agendaItem.activity);
+                homeListRefs.add("events/" + agendaItem.ref);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                homeListItems.remove(index);
+                homeListTitles.remove(index);
+                homeListRefs.remove(index);
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.event = true;
+                homeListItems.add(agendaItem);
+                homeListTitles.add(agendaItem.activity);
+                homeListRefs.add("events/" + agendaItem.ref);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                homeListItems.remove(index);
+                homeListTitles.remove(index);
+                homeListRefs.remove(index);
+                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {

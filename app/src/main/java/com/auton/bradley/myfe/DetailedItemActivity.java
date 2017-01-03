@@ -90,13 +90,12 @@ public class DetailedItemActivity extends AppCompatActivity {
             final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
                         // get data
             final String ref = intent.getStringExtra("ref");
-            Log.d("kelds", ref);
             String friendName = intent.getStringExtra("friendName");
             String friendImage = intent.getStringExtra("friendUrl");
             String friendDate = intent.getStringExtra("friendDate");
             String friendTime = intent.getStringExtra("friendTime");
             DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref);
+            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
             agenda.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -141,7 +140,7 @@ public class DetailedItemActivity extends AppCompatActivity {
             String date = intent.getStringExtra("date");
             String time = intent.getStringExtra("time");
             final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref);
+            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
             agenda.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
