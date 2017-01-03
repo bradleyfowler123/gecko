@@ -23,14 +23,10 @@ import java.util.Collections;
 
 public class SearchPrefActivity extends AppCompatActivity {
 
-    private Boolean fbCon;
-    private Bundle fbData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_pref);
-        fbCon = getIntent().getBooleanExtra("fbCon",false);
-        fbData = getIntent().getBundleExtra("fbData");
         // variable declarations
         final ExpandableListView elv=(ExpandableListView) findViewById(R.id.search_list);  // locate the elv in this view
         final ArrayList<Item> item=getData();                                                       // generate data which will be used to populate the el
@@ -127,11 +123,10 @@ public class SearchPrefActivity extends AppCompatActivity {
                 for (int i = 0; i < item.size(); i++) {
                     searchPref.putString(Integer.toString(i),item.get(i).stringify());
                 }
+                intent.putExtra("type", "eventsOnly");
                 intent.putExtra("searchPref",searchPref);
-                intent.putExtra("fbConnected",fbCon);
-                intent.putExtra("fbData",fbData);
-                intent.putExtra("tab",0);
-                startActivity(intent);
+                setResult(1,intent);
+                finish();
             }
         });
                                                                         // return the search view (and everything below) to the main activity so it can be shown

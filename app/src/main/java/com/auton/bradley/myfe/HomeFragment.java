@@ -100,17 +100,18 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 
-    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests){
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
         if (home_list!=null && getActivity()!=null) {
-            if (adapter==null){
+            if (adapter==null || forceRemake){
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
                 home_list.setAdapter(adapter);
-            } else {adapter.notifyDataSetChanged();}
+            } else {
+                adapter.notifyDataSetChanged();}
         }
 
     }
@@ -138,6 +139,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();                                                                               // remove current menu
+        final Boolean[] yes = {true};
         inflater.inflate(R.menu.menu_home,menu);                                                    // add home one
                                 // display either login or logout
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -146,12 +148,12 @@ public class HomeFragment extends Fragment {
         } else {
             menu.getItem(2).setVisible(true);
             menu.getItem(3).setVisible(false);
-        }                       // set up search button
+        }        // set up search button
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void onClick(View view) {
             }
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -161,6 +163,11 @@ public class HomeFragment extends Fragment {
             }
             @Override               // on text entered
             public boolean onQueryTextChange(String searchQuery) {
+                if (yes[0]) {
+                    adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
+                    home_list.setAdapter(adapter);
+                    yes[0] = false;
+                }
                 adapter.filter(searchQuery.trim());                                                 // update the list items
                 home_list.invalidate();                                                             // ensure list refresh
                 return true;
@@ -184,8 +191,8 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private ArrayList<AgendaClass> listData;
     private ArrayList<String> myInterests = new ArrayList<>();
     private Context c;
-    private ArrayList<String> arraySearchList;
-    private ArrayList<AgendaClass> backupData;
+    ArrayList<String> arraySearchList;
+    ArrayList<AgendaClass> backupData;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
                                 // define a function that can be used to declare this custom adapter class
@@ -342,7 +349,6 @@ class homeAdapter extends ArrayAdapter<String> {                                
         listData.clear();                                                                           // remove all items from list
         if (charText.length() == 0) {
             listData.addAll(backupData);                                                            // upon first click of search button, add all of the items to the list
-
         } else {                                                                                    // when text entered
             for (int i = 0; i < arraySearchList.size(); i++) {                                      // cycle through titles until searched text is contained in a title
                 if (charText.length() != 0 && arraySearchList.get(i).toLowerCase(Locale.getDefault()).contains(charText)) {
@@ -350,6 +356,6 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 }
             }
         }
-        notifyDataSetChanged();                                                                     // update the list view
+        notifyDataSetChanged();                                                                     // update the list view - NOTE IT WILL SET BACKUP DATA TO THE LAST ONE WHERE THE ADAPTER WAS CREATED, NOT TO THE LATE NOTIFY DATASETCHANGED
     }
 }
