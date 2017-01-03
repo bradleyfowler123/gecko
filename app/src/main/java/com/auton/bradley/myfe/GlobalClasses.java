@@ -125,7 +125,7 @@ class AgendaClass implements Parcelable {
     String picUrl;
                     // used when dealing with the activity item in database
     String location;
-    String price;
+    Integer price;
     Boolean familyfriendly;
     Boolean event;
     String image;
@@ -134,7 +134,7 @@ class AgendaClass implements Parcelable {
     AgendaClass(){
     }
 
-    public AgendaClass(String activity, String location, String price, String image, Boolean ff, String ref) {
+    public AgendaClass(String activity, String location, Integer price, String image, Boolean ff, String ref) {
         this.activity = activity;
         this.location = location;
         this.price = price;
@@ -148,7 +148,7 @@ class AgendaClass implements Parcelable {
         output.putString("title", this.activity);
         output.putString("location", this.location);
         output.putString("image", this.image);
-        output.putString("price", this.price);
+        output.putInt("price", this.price);
         output.putBoolean("ff", this.familyfriendly);
         output.putBoolean("event", this.event);
         return output;

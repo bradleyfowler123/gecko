@@ -181,10 +181,11 @@ public class MainActivity extends AppCompatActivity {
             }
             case 2: {
                 if (resultCode == 1) {
-                    Log.d("opfd;", data.getBundleExtra("searchPref").getString("1"));
+                    Log.d("oldodfl", Integer.toString(data.getIntExtra("cost",0)));
                     filteredHomeListItems.clear(); filteredHomeListTitles.clear();
                     filteredHomeListItems.addAll(homeListItems); filteredHomeListTitles.addAll(homeListTitles);
-                    if (data.getStringExtra("type").equals("eventsOnly")) {
+                                // categories filter
+            /*        if (data.getStringExtra("type").equals("eventsOnly")) {
                         for (int i = 0; i < filteredHomeListItems.size(); i++) {
                             if (!filteredHomeListItems.get(i).event) {
                                 filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
@@ -192,6 +193,15 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
+            */                    // cost filter
+                    int limit = data.getIntExtra("cost",99999999);
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (filteredHomeListItems.get(i).price >= limit) {
+                            filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
+                            i = i-1;
+                        }
+                    }
+
                     if (homeFragment!=null) homeFragment.storeData(filteredHomeListItems,filteredHomeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested, true);
                 }
             }

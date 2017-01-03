@@ -120,11 +120,13 @@ public class SearchPrefActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getBaseContext(),MainActivity.class);
                 Bundle searchPref = new Bundle();
-                for (int i = 0; i < item.size(); i++) {
-                    searchPref.putString(Integer.toString(i),item.get(i).stringify());
-                }
+                int cost; Item costItem = item.get(0);
+                if (costItem.Selected.equals(item.get(0).elements.get(costItem.elements.size()-1)))      cost = Integer.valueOf(costItem.CustomValue.toString());
+                else if (costItem.Selected.equals("Any")) cost = 999999999;
+                else if (costItem.Selected.equals("Free")) cost = 0;
+                else         cost = Integer.valueOf(costItem.Selected.substring(7));
+                intent.putExtra("cost", cost);
                 intent.putExtra("type", "eventsOnly");
-                intent.putExtra("searchPref",searchPref);
                 setResult(1,intent);
                 finish();
             }
