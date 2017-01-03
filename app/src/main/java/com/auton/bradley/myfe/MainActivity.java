@@ -22,6 +22,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -143,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
         homeListItems = savedInstanceState.getParcelableArrayList("hfld");
         homeListTitles = savedInstanceState.getStringArrayList("hflt");
         homeListRefs = savedInstanceState.getStringArrayList("hflr");
-        activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
-        activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
+    //    activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
+    //    activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
         interested = savedInstanceState.getStringArrayList("interested");
 
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
@@ -351,23 +352,28 @@ public class MainActivity extends AppCompatActivity {
                                 // get and set friend interest count
                 final DatabaseReference friendInt = database.child("users").child(friendUIDs.get(j)).child("Interested");
                                         // note single event listener so doesn't auto update, this is because noway to distinguish in friend removed or added interest
-                friendInt.addListenerForSingleValueEvent(new ValueEventListener() {
+                friendInt.addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                        while (snapshotIterator.hasNext()) {
-                            String ref = snapshotIterator.next().getValue().toString();
-                            if (activityFriendInterestedNumbers.containsKey(ref)) {
-                                activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
-                            } else activityFriendInterestedNumbers.put(ref, 1);
-                        }
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String ref = dataSnapshot.getValue().toString();
+                        if (activityFriendInterestedNumbers.containsKey(ref)) {
+                            activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
+                        } else activityFriendInterestedNumbers.put(ref, 1);
                         homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
                     }
-
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        String ref = dataSnapshot.getValue().toString();
+                        Log.d("yfhbjk", ref);
+                        activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() - 1);
+                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
                     }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
                 });
             }
         }
