@@ -129,6 +129,7 @@ class AgendaClass implements Parcelable {
     Boolean familyfriendly;
     Boolean event;
     String image;
+    Integer totalgoing;
 
     AgendaClass(){
     }

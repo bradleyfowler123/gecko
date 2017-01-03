@@ -99,9 +99,10 @@ public class ProfileAgendaFragment extends Fragment {
                      }                // populate list
                      sortedList = listItems;
                      Collections.sort(sortedList, new AgendaComparator());
-
-                     profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), sortedList, titles);
-                     pa_list.setAdapter(adapter);
+                     if (getActivity()!=null) {
+                         profileAgendaAdapter adapter = new profileAgendaAdapter(getActivity(), sortedList, titles);
+                         pa_list.setAdapter(adapter);
+                     }
                  }
              }
              @Override

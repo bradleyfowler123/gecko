@@ -107,8 +107,10 @@ public class HomeFragment extends Fragment {
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
         if (home_list!=null && getActivity()!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
-            home_list.setAdapter(adapter);
+            if (adapter==null){
+                adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
+                home_list.setAdapter(adapter);
+            } else {adapter.notifyDataSetChanged();}
         }
 
     }
@@ -201,7 +203,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private class ViewHolder {
         TextView activityTitle;
         TextView activityLocation;
-        TextView noFriGoing; TextView noFriInt;
+        TextView noFriGoing; TextView noFriInt; TextView noTotGoing;
         ImageView img;
         ImageView interestedIV;
         View addToCal; View interested; View totalGoing;
@@ -220,6 +222,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
         holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
         holder.noFriInt = (TextView) convertView.findViewById(R.id.hli_friends_interested);
+        holder.noTotGoing = (TextView) convertView.findViewById(R.id.hli_total_going);
         holder.img = (ImageView) convertView.findViewById(R.id.sr_list_item_image);
         holder.interestedIV= (ImageView) convertView.findViewById(R.id.home_interested_star);
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
@@ -233,14 +236,13 @@ class homeAdapter extends ArrayAdapter<String> {                                
         String ref;
         if (listData.get(position).event) {
             holder.totalGoing.setVisibility(View.VISIBLE);
+            holder.noTotGoing.setText(Integer.toString(listData.get(position).totalgoing));
             ref = "events/" + listData.get(position).ref;
         }
         else {
             holder.totalGoing.setVisibility(View.GONE);
             ref = "activities/" + listData.get(position).ref;
         }
-        Log.d("jodasl", ref);
-        Log.d("opdsl;", myInterests.toString());
         if (myInterests.contains(ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
         if (!activityFriendGoingNumbers.isEmpty()) holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(ref)));
@@ -311,6 +313,18 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         }
                     });
                 }
+            }
+        });
+        holder.interested.setOnLongClickListener(new onLongClickListenerPosition(position) {
+            @Override
+            public boolean onLongClick(View view) {
+                CharSequence number = holder.noFriInt.getText(); String activity = listData.get(position).activity;
+                String message;
+                if (number == "0") message = "None of your friends have said they are interested in going to " + activity + " yet";
+                else if (number == "1") message = "1 friend is interested in going to " + activity;
+                else message = number + " friends are interested in going to " + activity;
+                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                return true;
             }
         });
         return convertView;                                                                         // return the updated view

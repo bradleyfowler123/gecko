@@ -6,8 +6,6 @@ import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,7 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,6 +73,47 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> interested = new ArrayList<>();
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Read values from the "savedInstanceState" bundle and put them back into the corresponding textviews
+    /*    currentTab = savedInstanceState.getInt("currentTab");
+        facebookConnected = savedInstanceState.getBoolean("fbCon");
+        facebookData = savedInstanceState.getBundle("fbData");
+        friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
+        friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
+        friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
+        homeListItems = savedInstanceState.getParcelableArrayList("hfld");
+        homeListTitles = savedInstanceState.getStringArrayList("hflt");
+        homeListRefs = savedInstanceState.getStringArrayList("hflr");
+    //    activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
+    //    activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
+        interested = savedInstanceState.getStringArrayList("interested");
+*/
+        friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
+        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
+        profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+     /*   outState.putInt("currentTab", currentTab);
+        outState.putBoolean("fbCon", facebookConnected);
+        outState.putBundle("fbData", facebookData);
+        outState.putParcelableArrayList("ffld", friendFeedListItemsData);
+        outState.putParcelableArrayList("ffsl", friendFeedSortedList);
+        outState.putStringArrayList("ffli", friendFeedListItems);
+        outState.putParcelableArrayList("hfld", homeListItems);
+        outState.putStringArrayList("hflt", homeListTitles);
+        outState.putStringArrayList("hflr", homeListRefs);
+        outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
+        outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
+        outState.putStringArrayList("interested", interested);
+      */if (friendFragment != null && friendFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
+        if (homeFragment != null && homeFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
+        if (profileFragment != null && profileFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,47 +171,6 @@ public class MainActivity extends AppCompatActivity {
         }
         viewPager.setCurrentItem(currentTab);
     }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        // Read values from the "savedInstanceState" bundle and put them back into the corresponding textviews
-        currentTab = savedInstanceState.getInt("currentTab");
-        facebookConnected = savedInstanceState.getBoolean("fbCon");
-        facebookData = savedInstanceState.getBundle("fbData");
-        friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
-        friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
-        friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
-        homeListItems = savedInstanceState.getParcelableArrayList("hfld");
-        homeListTitles = savedInstanceState.getStringArrayList("hflt");
-        homeListRefs = savedInstanceState.getStringArrayList("hflr");
-    //    activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
-    //    activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
-        interested = savedInstanceState.getStringArrayList("interested");
-
-        friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
-        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("currentTab", currentTab);
-        outState.putBoolean("fbCon", facebookConnected);
-        outState.putBundle("fbData", facebookData);
-        outState.putParcelableArrayList("ffld", friendFeedListItemsData);
-        outState.putParcelableArrayList("ffsl", friendFeedSortedList);
-        outState.putStringArrayList("ffli", friendFeedListItems);
-        outState.putParcelableArrayList("hfld", homeListItems);
-        outState.putStringArrayList("hflt", homeListTitles);
-        outState.putStringArrayList("hflr", homeListRefs);
-        outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
-        outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
-        outState.putStringArrayList("interested", interested);
-        getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
-        getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
-    }
-
     // facebook - passes data back to facebook api
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -341,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                                 friendFeedListItemsData.add(agendaItem);
                                 friendFeedSortedList = friendFeedListItemsData;
                                 Collections.sort(friendFeedSortedList, new AgendaComparator());
-                                friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
+                                if (friendFragment!= null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
                             }
                         }
                         findFriendsGoingToActivities();
@@ -361,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                         if (activityFriendInterestedNumbers.containsKey(ref)) {
                             activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
                         } else activityFriendInterestedNumbers.put(ref, 1);
-                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
+                        if (homeFragment!= null)homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested);
                     }
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -384,8 +381,7 @@ public class MainActivity extends AppCompatActivity {
         for(String value : homeListRefs) {
             activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
-        Log.d("nkiedsklks",activityFriendGoingNumbers.toString());
-        homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+        if (homeFragment!= null)homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
     }
                                 // set users interests on home screen
     private void getNSetUserData() {
@@ -413,13 +409,14 @@ public class MainActivity extends AppCompatActivity {
                         activityFriendInterestedNumbers.put(ref, 1);
                     }
                 }
-           */     homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+           */    if (homeFragment!=null)homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+        DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
     }
                                 // get and set activities for around cambridge
     private void getNSetHomeFeedData() {
@@ -437,11 +434,11 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("activities/" + agendaItem.ref);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+                if (homeFragment!=null) homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
@@ -456,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
@@ -480,11 +477,11 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("events/" + agendaItem.ref);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
+                if (homeFragment!=null) homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested);
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
@@ -499,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf(dataSnapshot.getKey());
+                int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);

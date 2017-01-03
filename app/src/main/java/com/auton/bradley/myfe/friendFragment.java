@@ -61,6 +61,7 @@ public class FriendFragment extends Fragment {
     LoginButton fbLinkButton;
     Bundle FacebookData;
     public ListView ff_list;
+    private friendAdapter adapter;
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
 
@@ -180,10 +181,12 @@ public class FriendFragment extends Fragment {
         listItems = strings; // some necessary crap
         Log.d("storeData", listItems.toString());
         if (ff_list!=null) {
-            friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
-            ff_list.setAdapter(adapter);
-        }
+            if (adapter==null){
+                adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                ff_list.setAdapter(adapter);
+            } else {adapter.notifyDataSetChanged();}
 
+        }
     }
                             // function to get users friends info
     public FacebookFriendData getFacebookFriends(AccessToken accessToken) {
