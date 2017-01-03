@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<AgendaClass> friendFeedListItemsData = new ArrayList<>();
     public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
     private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
-    private ArrayList<HomeListData> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
+    private ArrayList<AgendaClass> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
@@ -418,11 +418,7 @@ public class MainActivity extends AppCompatActivity {
                     while (iterator.hasNext()) {
                         AgendaClass agendaItem = iterator.next();                                   // get the agenda item
                         agendaItem.ref = keys.next();
-                        HomeListData listItem = new HomeListData(agendaItem);                       // add agenda item to list
-                        //    listItem = setFancyColor(listItem);
-                        listItem.setColor(R.color.com_facebook_blue);
-                        listItem.setDark(true);
-                        homeListItems.add(listItem);
+                        homeListItems.add(agendaItem);
                         homeListTitles.add(agendaItem.activity);
                         homeListRefs.add(agendaItem.ref);
                     }

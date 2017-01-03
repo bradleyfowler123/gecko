@@ -60,39 +60,6 @@ class Item {
         return item;
     }
 }
-                            // custom class for storing data of a list item on home page
-class HomeListData {
-                        // variables
-    private AgendaClass databaseData;
-    private int color;
-    private boolean dark;
-                        // functions to get individual variables
-
-    Bundle getDataBundle1() {
-        Bundle output = new Bundle();
-        output.putString("title", databaseData.activity);
-        output.putString("location", databaseData.location);
-        output.putString("image", databaseData.image);
-        output.putString("price", databaseData.price);
-        output.putBoolean("ff", databaseData.familyfriendly);
-        return output;
-    }
-
-    int getColor() {return color;}
-    AgendaClass getData() {return databaseData;}
-    Boolean getDark() {return dark;}
-                        // functions to set individual variables
-    void setData(AgendaClass data) { this.databaseData = data;}
-    void setColor(int color) { this.color = color;}
-    void setDark(Boolean data) { this.dark = data;}
-                        // used to initialise the class
-    HomeListData(AgendaClass data) {
-        this.databaseData = data;
-    }
-
-}
-
-
                             // class definition
 class FacebookFriendData implements Parcelable{
                             // parameter declarations
@@ -172,6 +139,16 @@ class AgendaClass implements Parcelable {
         this.image = image;
         this.familyfriendly = ff;
         this.ref = ref;
+    }
+
+    Bundle getDataBundle1() {
+        Bundle output = new Bundle();
+        output.putString("title", this.activity);
+        output.putString("location", this.location);
+        output.putString("image", this.image);
+        output.putString("price", this.price);
+        output.putBoolean("ff", this.familyfriendly);
+        return output;
     }
 /*
     public Bundle getDataBundle() {

@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment {
 
     private ListView home_list;
     private homeAdapter adapter;
-    private ArrayList<HomeListData> listItems;
+    private ArrayList<AgendaClass> listItems;
     private ArrayList<String> listTitles;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
@@ -100,20 +100,20 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
 
-    public void storeData(ArrayList<HomeListData> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests){
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
-        if (home_list!=null) {
+        if (home_list!=null && getActivity()!=null) {
             adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
 
     }
 
-    HomeListData setFancyColor(HomeListData input) {
+   /* HomeListData setFancyColor(HomeListData input) {
         final Bitmap bitmap;
         try {
             bitmap = Picasso.with(getContext()).load(input.getData().image).get();
@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment {
         }
         return input;
     }
-                                // setup the home menu items
+  */                              // setup the home menu items
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();                                                                               // remove current menu
@@ -179,15 +179,15 @@ public class HomeFragment extends Fragment {
                         // adapter used for to populate activities in home list
 class homeAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
                                 // declare variables of this class
-    private ArrayList<HomeListData> listData;
+    private ArrayList<AgendaClass> listData;
     private ArrayList<String> myInterests = new ArrayList<>();
     private Context c;
     private ArrayList<String> arraySearchList;
-    private ArrayList<HomeListData> backupData;
+    private ArrayList<AgendaClass> backupData;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<HomeListData> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -225,19 +225,19 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
         holder.interested = convertView.findViewById(R.id.home_interested);
                                 // populate the texts and images with data for a list item
-        holder.activityTitle.setText(listData.get(position).getData().activity);
-        holder.activityLocation.setText(listData.get(position).getData().location);
+        holder.activityTitle.setText(listData.get(position).activity);
+        holder.activityLocation.setText(listData.get(position).location);
         if (!activityFriendGoingNumbers.isEmpty()) {
-            String act = listData.get(position).getData().ref;
+            String act = listData.get(position).ref;
             holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(act)));
         }
         if (!activityFriendInterestedNumbers.isEmpty()) {
-            String act = listData.get(position).getData().ref;
+            String act = listData.get(position).ref;
             if (activityFriendInterestedNumbers.get(act)!=null) holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(act)));
         }
-        if (myInterests.contains(listData.get(position).getData().ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
+        if (myInterests.contains(listData.get(position).ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
-        RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).getData().image);
+        RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
    /*     View btn = convertView.findViewById(R.id.sr_color);                                         // get the background rectangle
         GradientDrawable bgShape = (GradientDrawable) btn.getBackground().getCurrent();             // get its background
@@ -258,7 +258,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
-                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(position).getData().activity;
+                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(position).activity;
                 String message;
                 if (number == "0") message = "None of your friends have added  " + activity + " to their agenda yet";
                 else if (number == "1") message = "1 friend is going to " + activity;
@@ -283,7 +283,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     Intent intent = new Intent(activity, EnterDateActivity.class);
                     intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
                     intent.putExtra("location", holder.activityLocation.getText());
-                    intent.putExtra("reference", listData.get(this.position).getData().ref);
+                    intent.putExtra("reference", listData.get(this.position).ref);
                     activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
                 }
             }
@@ -301,11 +301,11 @@ class homeAdapter extends ArrayAdapter<String> {                                
                             .show();
                 }
                 else {              // if user logged in
-                    if (myInterests.contains(listData.get(position).getData().ref)) {
-                        myInterests.remove(listData.get(position).getData().ref);
+                    if (myInterests.contains(listData.get(position).ref)) {
+                        myInterests.remove(listData.get(position).ref);
                     }
                     else {
-                        myInterests.add(listData.get(position).getData().ref);
+                        myInterests.add(listData.get(position).ref);
                     }
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Interested");
