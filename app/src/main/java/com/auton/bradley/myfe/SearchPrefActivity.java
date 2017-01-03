@@ -126,7 +126,8 @@ public class SearchPrefActivity extends AppCompatActivity {
                 else if (costItem.Selected.equals("Free")) cost = 0;
                 else         cost = Integer.valueOf(costItem.Selected.substring(7));
                 intent.putExtra("cost", cost);
-                intent.putExtra("type", "eventsOnly");
+                intent.putExtra("location", item.get(3).Selected);
+                intent.putExtra("type", item.get(1).mSelected);
                 setResult(1,intent);
                 finish();
             }
@@ -149,9 +150,6 @@ public class SearchPrefActivity extends AppCompatActivity {
         Item i2=new Item(category[0], new ArrayList<>(Arrays.asList(category[1],category[2])),true);      // Item.Option is set by the arg1 and default selection is set by arg 2
         i2.elements.add(category[1]);
         i2.elements.add(category[2]);
-        i2.elements.add(category[3]);
-        i2.elements.add(category[4]);
-        i2.elements.add(category[5]);
 
         String[] when = getResources().getStringArray(R.array.elvWhenItems);
         Item i3=new Item(when[0],new ArrayList<>(Collections.singletonList(when[1])),false);         // ie Item(ListGroupTitle, defaultSelection)

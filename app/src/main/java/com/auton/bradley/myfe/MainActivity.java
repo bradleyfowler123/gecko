@@ -181,11 +181,19 @@ public class MainActivity extends AppCompatActivity {
             }
             case 2: {
                 if (resultCode == 1) {
-                    Log.d("oldodfl", Integer.toString(data.getIntExtra("cost",0)));
                     filteredHomeListItems.clear(); filteredHomeListTitles.clear();
                     filteredHomeListItems.addAll(homeListItems); filteredHomeListTitles.addAll(homeListTitles);
                                 // categories filter
-            /*        if (data.getStringExtra("type").equals("eventsOnly")) {
+                    ArrayList<String> types = data.getStringArrayListExtra("type");
+                    if (!types.contains("Events")) {
+                        for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                            if (filteredHomeListItems.get(i).event) {
+                                filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
+                                i = i-1;
+                            }
+                        }
+                    }
+                    if (!types.contains("Activities")) {
                         for (int i = 0; i < filteredHomeListItems.size(); i++) {
                             if (!filteredHomeListItems.get(i).event) {
                                 filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
@@ -193,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
-            */                    // cost filter
+                                // cost filter
                     int limit = data.getIntExtra("cost",99999999);
                     for (int i = 0; i < filteredHomeListItems.size(); i++) {
                         if (filteredHomeListItems.get(i).price >= limit) {

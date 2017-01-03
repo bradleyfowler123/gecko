@@ -78,11 +78,8 @@
     </array>
     <array name="elvCategoryItems">
         <item>Categories</item>
-        <item>Sports</item>
+        <item>Activities</item>
         <item>Events</item>
-        <item>Food &amp; Drink</item>
-        <item>Entertainment</item>
-        <item>Arts &amp; Craft</item>
     </array>
     <array name="elvWhenItems">
         <item>When</item>
@@ -92,8 +89,8 @@
     </array>
     <array name="elvLocationItems">
         <item>Location</item>
-        <item>Current</item>
-        <item>Set Location</item>
+        <item>cambridge</item>
+        <item>london</item>
     </array>
     <array name="elvDistanceItems">
         <item>Distance</item>
