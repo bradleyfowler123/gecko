@@ -126,8 +126,9 @@ public class SearchPrefActivity extends AppCompatActivity {
                 else if (costItem.Selected.equals("Free")) cost = 0;
                 else         cost = Integer.valueOf(costItem.Selected.substring(7));
                 intent.putExtra("cost", cost);
-                intent.putExtra("location", item.get(3).Selected);
                 intent.putExtra("type", item.get(1).mSelected);
+                intent.putExtra("location", item.get(3).Selected);
+                intent.putExtra("other", item.get(5).mSelected);
                 setResult(1,intent);
                 finish();
             }

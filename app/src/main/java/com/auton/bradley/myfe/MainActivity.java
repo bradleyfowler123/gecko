@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     public FirebaseAuth auth; public FirebaseUser user;
     int currentTab = 0;
     String location = "cambridge";
-    private Bundle searchPrefs;
 
     private FriendFragment friendFragment = new FriendFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
@@ -179,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            case 2: {
+            case 2: {               // home feed preferences set
                 if (resultCode == 1) {
                     filteredHomeListItems.clear(); filteredHomeListTitles.clear();
                     filteredHomeListItems.addAll(homeListItems); filteredHomeListTitles.addAll(homeListTitles);
@@ -209,7 +208,20 @@ public class MainActivity extends AppCompatActivity {
                             i = i-1;
                         }
                     }
+                                // location filter
+                    location = data.getStringExtra("location");
+                                // other- family friendly
+                    ArrayList<String> other = data.getStringArrayListExtra("other");
+                    if (other.contains("Family Friendly Only")) {
+                        for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                            if (!filteredHomeListItems.get(i).familyfriendly) {
+                                filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
+                                i = i-1;
+                            }
+                        }
+                    }
 
+                                // update list
                     if (homeFragment!=null) homeFragment.storeData(filteredHomeListItems,filteredHomeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested, true);
                 }
             }
