@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeResult;
@@ -42,9 +47,11 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -237,7 +244,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.totalGoing = convertView.findViewById(R.id.home_total_going);
                                 // populate the texts and images with data for a list item
         holder.activityTitle.setText(listData.get(position).activity);
-        holder.activityLocation.setText(listData.get(position).location);
+        holder.activityLocation.setText(Double.toString(listData.get(position).distAway) + " km away");
         RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
         String ref;

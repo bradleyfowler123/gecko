@@ -1,8 +1,13 @@
 package com.auton.bradley.myfe;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +25,7 @@ import android.view.View;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -30,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +46,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -349,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                             TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time);
                             if (!timeNRank.timeDisp.equals("0")) {
                                 agendaItem.rank = timeNRank.rank;
-                                agendaItem.activityDescription = agendaItem.activity + ", Cambridge";
+                                agendaItem.activityDescription = agendaItem.activity + ", " + location;
                                 agendaItem.timeAgo = timeNRank.timeDisp;
                                 agendaItem.friendName = friendFBNames.get(i);
                                 agendaItem.picUrl = friendFBUrls.get(i);
@@ -436,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = false;
+                agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("activities/" + agendaItem.ref);
@@ -451,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = false;
+                agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("activities/" + agendaItem.ref);
@@ -479,6 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = true;
+                agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("events/" + agendaItem.ref);
@@ -494,6 +506,7 @@ public class MainActivity extends AppCompatActivity {
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = true;
+                agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("events/" + agendaItem.ref);
@@ -537,6 +550,37 @@ public class MainActivity extends AppCompatActivity {
             output = "error"; rank = 0;
         }
         return new TimeDispNRank(output,rank);
+    }
+
+    double getDistanceAway(String loc) {
+        Geocoder geocoder = new Geocoder(getBaseContext());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(loc, 1);
+            if (addresses.size() != 0) {
+                LatLng StartP = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Location current = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                int Radius = 6371;//radius of earth in Km
+                double lat1 = StartP.latitude;
+                double lat2 = current.getLatitude();
+                double lon1 = StartP.longitude;
+                double lon2 = current.getLongitude();
+                double dLat = Math.toRadians(lat2 - lat1);
+                double dLon = Math.toRadians(lon2 - lon1);
+                double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                double c = 2 * Math.asin(Math.sqrt(a));
+                double valueResult = Radius * c;
+                DecimalFormat newFormat = new DecimalFormat("#####.#");
+                return Double.valueOf(newFormat.format(valueResult));
+            } else {
+                return 0;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 }

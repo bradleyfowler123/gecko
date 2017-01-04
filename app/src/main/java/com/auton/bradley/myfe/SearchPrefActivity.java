@@ -58,12 +58,7 @@ public class SearchPrefActivity extends AppCompatActivity {
                             dialogMessage = dialogMessages[0];
                             before = getString(R.string.search_previewCost); after = "";
                         }
-                        else if (groupPos==2) {     // when
-                            inputType = 2;
-                            dialogMessage = dialogMessages[1];
-                            before = ""; after = "";
-                        }
-                        else if (groupPos==3) {     // location
+                        else if (groupPos==2) {     // location
                             inputType = 1;
                             dialogMessage = dialogMessages[2];
                             before = ""; after = "";
@@ -127,8 +122,8 @@ public class SearchPrefActivity extends AppCompatActivity {
                 else         cost = Integer.valueOf(costItem.Selected.substring(7));
                 intent.putExtra("cost", cost);
                 intent.putExtra("type", item.get(1).mSelected);
-                intent.putExtra("location", item.get(3).Selected);
-                intent.putExtra("other", item.get(5).mSelected);
+                intent.putExtra("location", item.get(2).Selected);
+                intent.putExtra("other", item.get(4).mSelected);
                 setResult(1,intent);
                 finish();
             }
@@ -152,12 +147,6 @@ public class SearchPrefActivity extends AppCompatActivity {
         i2.elements.add(category[1]);
         i2.elements.add(category[2]);
 
-        String[] when = getResources().getStringArray(R.array.elvWhenItems);
-        Item i3=new Item(when[0],new ArrayList<>(Collections.singletonList(when[1])),false);         // ie Item(ListGroupTitle, defaultSelection)
-        i3.elements.add(when[1]);
-        i3.elements.add(when[2]);
-        i3.elements.add(when[3]);
-
         String[] location = getResources().getStringArray(R.array.elvLocationItems);
         Item i4=new Item(location[0],new ArrayList<>(Collections.singletonList(location[1])),false);
         i4.elements.add(location[1]);
@@ -179,7 +168,6 @@ public class SearchPrefActivity extends AppCompatActivity {
         ArrayList<Item> allItems=new ArrayList<>();                                                 // append all Item objects into an ArrayList
         allItems.add(i1);
         allItems.add(i2);
-        allItems.add(i3);
         allItems.add(i4);
         allItems.add(i5);
         allItems.add(i6);
