@@ -68,7 +68,6 @@ public class FriendFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
                                 // get friend tab layout
-        Log.d("onCreateView", "1");
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         final View LoggedInView = rootView.findViewById(R.id.friend_feed_list);

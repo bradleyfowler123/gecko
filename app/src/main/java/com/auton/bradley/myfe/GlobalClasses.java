@@ -124,7 +124,7 @@ class AgendaClass implements Parcelable {
     String friendName;
     String picUrl;
                     // used when dealing with the activity item in database
-    String location; Double distAway;
+    String location; Double distAway; String city;
     Integer price;
     Boolean familyfriendly;
     Boolean event;

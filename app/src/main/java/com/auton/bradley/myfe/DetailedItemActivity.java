@@ -86,12 +86,13 @@ public class DetailedItemActivity extends AppCompatActivity {
                 final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
                 // get data
                 final String ref = intent.getStringExtra("ref");
+                String refItems[] = ref.split("/");
                 String friendName = intent.getStringExtra("friendName");                            // friend specific data
                 String friendImage = intent.getStringExtra("friendUrl");
                 String friendDate = intent.getStringExtra("friendDate");
                 String friendTime = intent.getStringExtra("friendTime");
                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();         // friend feed or pages doesn't have all the info of the event/activity and so this needs to be fetched from firebase
-                DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
+                DatabaseReference agenda = database.child("activitydata").child(refItems[0]).child(refItems[1]).child(refItems[2]);
                 agenda.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -133,11 +134,12 @@ public class DetailedItemActivity extends AppCompatActivity {
                 final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
                 // get data
                 final String ref = intent.getStringExtra("ref");
+                String[] refItems = ref.split("/");
                 final String userRef = intent.getStringExtra("userRef");
                 String date = intent.getStringExtra("date");
                 String time = intent.getStringExtra("time");
                 final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
+                DatabaseReference agenda = database.child("activitydata").child(refItems[0]).child(refItems[1]).child(refItems[2]);
                 agenda.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

@@ -97,6 +97,7 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                MainActivity activity = (MainActivity) getContext();
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("data",listItems.get(i).getDataBundle1());
                 intent.putExtra("from", "home");
@@ -243,19 +244,20 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.interested = convertView.findViewById(R.id.home_interested);
         holder.totalGoing = convertView.findViewById(R.id.home_total_going);
                                 // populate the texts and images with data for a list item
-        holder.activityTitle.setText(listData.get(position).activity);
-        holder.activityLocation.setText(Double.toString(listData.get(position).distAway) + " km away");
-        RequestCreator activityImg = Picasso.with(getContext()).load(listData.get(position).image);
+        AgendaClass listItem = listData.get(position);
+        holder.activityTitle.setText(listItem.activity);
+        holder.activityLocation.setText(Double.toString(listItem.distAway) + " km away");
+        RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image);
         activityImg.centerCrop().resize(340,200).into(holder.img);
-        String ref;
-        if (listData.get(position).event) {
+        String ref = listItem.ref;
+        if (listItem.event) {
             holder.totalGoing.setVisibility(View.VISIBLE);
-            holder.noTotGoing.setText(Integer.toString(listData.get(position).totalgoing));
-            ref = "events/" + listData.get(position).ref;
+            holder.noTotGoing.setText(Integer.toString(listItem.totalgoing));
+       //     ref = listItem.city + "/events/" + listItem.ref;
         }
         else {
             holder.totalGoing.setVisibility(View.GONE);
-            ref = "activities/" + listData.get(position).ref;
+      //      ref = listItem.city + "/activities/" + listItem.ref;
         }
         if (myInterests.contains(ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
@@ -265,7 +267,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
-                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(position).activity;
+                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(this.position).activity;
                 String message;
                 if (number == "0") message = "None of your friends have added  " + activity + " to their agenda yet";
                 else if (number == "1") message = "1 friend is going to " + activity;
@@ -305,7 +307,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         pushData.put("location", listItem.location);
                         pushData.put("date", listItem.date);
                         pushData.put("time", listItem.time);
-                        pushData.put("ref", "events/" + listItem.ref);
+                        pushData.put("ref", listItem.ref);
                         agendaItem.setValue(pushData);
                     }
                     else {
@@ -313,7 +315,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         Intent intent = new Intent(activity, EnterDateActivity.class);
                         intent.putExtra("title", listItem.activity);                           // data need to add item to calendar
                         intent.putExtra("location", listItem.location);
-                        intent.putExtra("reference", "activities/" + listItem.ref);
+                        intent.putExtra("reference", listItem.ref);
                         activity.startActivityForResult(intent, 11);                                         // result is handled by main activity
                     }
                 }
@@ -333,8 +335,8 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 }
                 else {              // if user logged in
                     String ref;
-                    if (listData.get(this.position).event) ref = "events/" + listData.get(this.position).ref;
-                    else ref = "activities/" + listData.get(this.position).ref;
+                    if (listData.get(this.position).event) ref = listData.get(this.position).ref;
+                    else ref = listData.get(this.position).ref;
                     if (myInterests.contains(ref)) {
                         myInterests.remove(ref);
                     }

@@ -485,37 +485,37 @@ public class MainActivity extends AppCompatActivity {
                 GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                 };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
                 agendaItem.event = false;
                 agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
-                homeListRefs.add("activities/" + agendaItem.ref);
+                homeListRefs.add(agendaItem.ref);
                 if (homeFragment != null)
                     homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
+                int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
                 GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                 };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
                 agendaItem.event = false;
                 agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
-                homeListRefs.add("activities/" + agendaItem.ref);
+                homeListRefs.add(agendaItem.ref);
                 homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
+                int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
@@ -539,37 +539,37 @@ public class MainActivity extends AppCompatActivity {
                 GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                 };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
                 agendaItem.event = true;
                 agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
-                homeListRefs.add("events/" + agendaItem.ref);
+                homeListRefs.add(agendaItem.ref);
                 if (homeFragment != null)
                     homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
+                int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
                 GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                 };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = dataSnapshot.getKey();
+                agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
                 agendaItem.event = true;
                 agendaItem.distAway = getDistanceAway(agendaItem.location);
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
-                homeListRefs.add("events/" + agendaItem.ref);
+                homeListRefs.add(agendaItem.ref);
                 homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
+                int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
