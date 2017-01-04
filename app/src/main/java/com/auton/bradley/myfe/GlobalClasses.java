@@ -4,19 +4,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
 
-import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Created by Bradley on 13/10/2016.
@@ -45,43 +41,25 @@ class Item {
         }
         this.MultiSelect=multiSelect;                                                               // variable to store list group type
     }
-
-
-    String stringify () {
-        String item;
-        if (this.MultiSelect)
-            item = this.mSelected.toString();
-        else {
-            if (this.Selected.equals(this.elements.get(this.elements.size()-1)))
-                item = this.CustomValue.toString();
-            else
-                item = this.Selected;
-        }
-        return item;
-    }
 }
-                            // class definition
+                            // class used to store data on a facebook friend
 class FacebookFriendData implements Parcelable{
                             // parameter declarations
     ArrayList<String> names;
     ArrayList<String> ids;
     ArrayList<String> picUrls;
-
                             // function used to initialise a new class
     FacebookFriendData() {
         this.names = new ArrayList<>();
         this.ids = new ArrayList<>();
         this.picUrls = new ArrayList<>();
     }
-
     public int describeContents() { return 0;}
-
     public void writeToParcel(Parcel out, int flags) {
         out.writeStringList(names);
         out.writeStringList(ids);
         out.writeStringList(picUrls);
     }
-
     public static final Parcelable.Creator<FacebookFriendData> CREATOR
             = new Parcelable.Creator<FacebookFriendData>() {
         public FacebookFriendData createFromParcel(Parcel in) {
@@ -92,14 +70,13 @@ class FacebookFriendData implements Parcelable{
             return new FacebookFriendData[size];
         }
     };
-
     private FacebookFriendData(Parcel in) {
         in.readStringList(names);
         in.readStringList(ids);
         in.readStringList(picUrls);
     }
 }
-
+                                // class used to rank list items based on time
 class TimeDispNRank {
     String timeDisp;
     int rank;
@@ -109,7 +86,7 @@ class TimeDispNRank {
         this.rank = rank;
     }
 }
-
+                                // class used when handling a firebase activity/event
 class AgendaClass implements Parcelable {
                     // always used
     String activity;
@@ -124,7 +101,7 @@ class AgendaClass implements Parcelable {
     String friendName;
     String picUrl;
                     // used when dealing with the activity item in database
-    String location; Double distAway; String city;
+    String location; Double distAway;
     Integer price;
     Boolean familyfriendly;
     Boolean event;
@@ -132,15 +109,6 @@ class AgendaClass implements Parcelable {
     Integer totalgoing;
 
     AgendaClass(){
-    }
-
-    public AgendaClass(String activity, String location, Integer price, String image, Boolean ff, String ref) {
-        this.activity = activity;
-        this.location = location;
-        this.price = price;
-        this.image = image;
-        this.familyfriendly = ff;
-        this.ref = ref;
     }
 
     Bundle getDataBundle1() {
@@ -153,45 +121,7 @@ class AgendaClass implements Parcelable {
         output.putBoolean("event", this.event);
         return output;
     }
-/*
-    public Bundle getDataBundle() {
-        Bundle output = new Bundle();
-        output.putString("act", activity);
-        output.putString("dat", date);
-        output.putString("tim", time);
-        output.putString("ref", ref);
-        output.putString("key", key);
-        output.putInt("ran",  rank);
-        output.putString("ade", activityDescription);
-        output.putString("tia", timeAgo);
-        output.putString("frn", friendName);
-        output.putString("pic", picUrl);
-        output.putString("loc", location);
-        output.putString("pri", price);
-        output.putString("ima", image);
-        output.putBoolean("ffr", familyfriendly);
-        return output;
-    }
-    public void setDataBundle(Bundle bundle) {
-        activity = bundle.getString("act");
-        date = bundle.getString("dat");
-        time = bundle.getString("tim");
-        ref = bundle.getString("ref");
-        key = bundle.getString("key");
-        rank = bundle.getInt("ran");
-        activityDescription = bundle.getString("ade");
-
-
-        output.putString("tia", timeAgo);
-        output.putString("frn", friendName);
-        output.putString("pic", picUrl);
-        output.putString("loc", location);
-        output.putString("pri", price);
-        output.putString("ima", image);
-        output.putBoolean("ffr", familyfriendly);
-    }
-*/
-
+        // make parcelable
     public int describeContents() { return 0;}
 
     public void writeToParcel(Parcel out, int flags) {
@@ -218,7 +148,7 @@ class AgendaClass implements Parcelable {
     }
 
 }
-
+                    // class used to rank a list of agenda items
 class AgendaComparator implements Comparator<AgendaClass> {
     @Override
     public int compare(AgendaClass self, AgendaClass other) {
@@ -228,13 +158,12 @@ class AgendaComparator implements Comparator<AgendaClass> {
         else return 0;
     }
 }
-
+                // class used when which list item was clicked on needs to be known
 class onClickListenerPosition implements View.OnClickListener {
     int position;
     onClickListenerPosition(int pos) {
         this.position = pos;
     }
-
     public void onClick(View v) {}
 }
 class onLongClickListenerPosition implements View.OnLongClickListener {
@@ -242,13 +171,12 @@ class onLongClickListenerPosition implements View.OnLongClickListener {
     onLongClickListenerPosition(int pos) {
         this.position = pos;
     }
-
     @Override
     public boolean onLongClick(View view) {
         return false;
     }
 }
-
+                            // used to turn an image into a circular image
 class CircleTransform implements Transformation {
     @Override
     public Bitmap transform(Bitmap source) {
@@ -281,47 +209,5 @@ class CircleTransform implements Transformation {
     @Override
     public String key() {
         return "circle";
-    }
-}
-
-class RoundCornersTransform implements Transformation {
-      @Override
-    public Bitmap transform(Bitmap source) {
-          int width = source.getWidth(); int height = source.getHeight();
-          int radius = 30;
-          int size = Math.min(source.getWidth(), source.getHeight());
-          int x = (source.getWidth() - size) / 2;
-          int y = (source.getHeight() - size) / 2;
-
-
-          Bitmap squaredBitmap = Bitmap.createBitmap(source, x, y, size, size);
-          if (squaredBitmap != source) {
-              source.recycle();
-          }
-
-          Bitmap bitmap = Bitmap.createBitmap(size, size, source.getConfig());
-
-          Canvas canvas = new Canvas(bitmap);
-
-          BitmapShader shader;
-          shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-
-          Paint paint = new Paint();
-          paint.setAntiAlias(true);
-          paint.setShader(shader);
-
-          RectF rect = new RectF(0.0f, 0.0f, width, height);
-
-// rect contains the bounds of the shape
-// radius is the radius in pixels of the rounded corners
-// paint contains the shader that will texture the shape
-          canvas.drawRoundRect(rect, radius, radius, paint);
-          squaredBitmap.recycle();
-          return bitmap;
-    }
-
-    @Override
-    public String key() {
-        return "roundRect";
     }
 }

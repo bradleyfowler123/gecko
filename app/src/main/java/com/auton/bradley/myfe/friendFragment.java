@@ -29,12 +29,6 @@ import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -43,20 +37,13 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
 
 
 // fragment that handles the friends tab
 public class FriendFragment extends Fragment {
+                    // global variable declarations
     View rootView;
     LoginButton fbLinkButton;
     Bundle FacebookData;
@@ -70,7 +57,6 @@ public class FriendFragment extends Fragment {
                                 // get friend tab layout
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
-        final View LoggedInView = rootView.findViewById(R.id.friend_feed_list);
         fbLinkButton = (LoginButton) rootView.findViewById(R.id.connect_with_fb_button);
         ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);
                                 // get user info
@@ -81,13 +67,14 @@ public class FriendFragment extends Fragment {
         if(user != null) {
                             // if fb connected - show fb screen
             if (fbCon) {
+                                // show correct views
                 signUp.setVisibility(View.GONE);
                 fbLinkButton.setVisibility(View.GONE);
-                LoggedInView.setVisibility(View.VISIBLE);
-
+                ff_list.setVisibility(View.VISIBLE);
+                                // populate list
                 friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
                 ff_list.setAdapter(adapter);
-
+                                // on list item click show detailed activity view
                 ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -102,17 +89,14 @@ public class FriendFragment extends Fragment {
                         intent.putExtra("friendName", listItem.friendName);
                         intent.putExtra("friendUrl", listItem.picUrl);
                         startActivity(intent);
-                        //        Toast.makeText(getContext(), listItemsData.get(i).activity, Toast.LENGTH_SHORT).show(); // show detailed activity view
                     }
                 });
-
-                // load tab bar and tab data into friend layout
             }
             else {         // else show connect fb screen
                 signUp.setVisibility(View.VISIBLE);
                 signUp.setText("Link Facebook to see your friends!");
                 fbLinkButton.setVisibility(View.VISIBLE);
-                LoggedInView.setVisibility(View.GONE);
+                ff_list.setVisibility(View.GONE);
 
                 // handle facebook login button press
                 fbLinkButton.setReadPermissions(Arrays.asList("public_profile", "email", "user_friends"));
@@ -121,7 +105,6 @@ public class FriendFragment extends Fragment {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
-                        Log.i("fbAccessToken", accessToken.getToken());
                         final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());  // generate firebase credential
                                                 // make request for facebook user information
                         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -168,22 +151,20 @@ public class FriendFragment extends Fragment {
         else {          // otherwise show sign up screen
             signUp.setVisibility(View.VISIBLE);
             fbLinkButton.setVisibility(View.GONE);
-            LoggedInView.setVisibility(View.GONE);
+            ff_list.setVisibility(View.GONE);
         }
-        Log.d("onCreateView", ff_list.toString());
                                 // return the view
         return rootView;
     }
-
+                                // function to update the list items shown in the friend feed
     public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings){
         sortedList = sortedList2;
         listItems = strings; // some necessary crap
-        Log.d("storeData", listItems.toString());
         if (ff_list!=null) {
-            if (adapter==null){
+            if (adapter==null){     // create new adapter to generate list
                 adapter = new friendAdapter(getActivity(), sortedList, listItems);
                 ff_list.setAdapter(adapter);
-            } else {adapter.notifyDataSetChanged();}
+            } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
 
         }
     }
@@ -198,7 +179,6 @@ public class FriendFragment extends Fragment {
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         JSONObject object = response.getJSONObject();
-                        String friendsNo = "";
                         try {
                             JSONArray jsonArray = object.getJSONArray("data");
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -207,12 +187,9 @@ public class FriendFragment extends Fragment {
                                 friendData.ids.add(i,aFriend.getString("id"));
                                 friendData.picUrls.add(i,"https://graph.facebook.com/" + aFriend.getString("id") + "/picture?width=200&height=150");
                             }
-                            friendsNo = object.getJSONObject("summary").getString("total_count");
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        Log.d("You have friends", friendsNo);
                     }
                 }
         ).executeAsync();
@@ -301,5 +278,4 @@ class friendAdapter extends ArrayAdapter<String> {                              
         // return the updated view
         return convertView;
     }
-
 }

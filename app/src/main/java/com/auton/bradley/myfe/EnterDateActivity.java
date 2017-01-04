@@ -1,30 +1,23 @@
 package com.auton.bradley.myfe;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.GridLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
-import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
+
+/*
+    Dialog activity that allows user to enter a date. A time is then fetched by generating the
+    enter time activity. The date, time and other data it was initialized with is then passed back
+ */
 
 public class EnterDateActivity extends AppCompatActivity {
-
+                    // global variable declarations
     private int year;
     private int month;
     private int day;
@@ -73,7 +66,7 @@ public class EnterDateActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                                 // show date picker dialog
-                DatePickerDialog dpd = new DatePickerDialog(EnterDateActivity.this, AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog dpd = new DatePickerDialog(EnterDateActivity.this, android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {
                     @Override       // get date and then get time
                     public void onDateSet(DatePicker datePicker, int i, int i1, final int i2) {
                         Intent intent = new Intent(EnterDateActivity.this,EnterTimeActivity.class);

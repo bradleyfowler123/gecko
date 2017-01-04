@@ -102,7 +102,6 @@ public class DetailedItemActivity extends AppCompatActivity {
                         Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
                         setupMap(activityData.activity, activityData.location);
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.d("Database Error", databaseError.toString());
@@ -149,7 +148,6 @@ public class DetailedItemActivity extends AppCompatActivity {
                         Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
                         setupMap(activityData.activity, activityData.location);
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.d("Datebase Error", databaseError.toString());
@@ -198,7 +196,7 @@ public class DetailedItemActivity extends AppCompatActivity {
         }
 
     }
-
+                // functions used for displaying date and time nicely on banners
     private String formatDate(String input) {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         String output = "error";
@@ -210,7 +208,6 @@ public class DetailedItemActivity extends AppCompatActivity {
         }
         return output;
     }
-
     private String formatTime(String input) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.US);
         String output;
@@ -223,20 +220,20 @@ public class DetailedItemActivity extends AppCompatActivity {
         }
         return output;
     }
-
+                    // function to setup the google map
     void setupMap(final String title, final String location) {
-        // Gets to GoogleMap from the MapView and does initialization stuff
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(GoogleMap googleMap) {
-                Geocoder geocoder = new Geocoder(getBaseContext());
+            public void onMapReady(GoogleMap googleMap) {                                                        // Gets to GoogleMap from the MapView and does initialization stuff
+                Geocoder geocoder = new Geocoder(getBaseContext());                                 // geocoder process' locations
                 try {
-                    List<Address> addresses = geocoder.getFromLocationName(location, 1);
-                    if (addresses.size() != 0) {
+                    List<Address> addresses = geocoder.getFromLocationName(location, 1);            // get just one address for given location string
+                    if (addresses.size() != 0) {                                                    // if it finds one
                         Address address = addresses.get(0);
-                        googleMap.addMarker(new MarkerOptions()
+                        googleMap.addMarker(new MarkerOptions()                                     // add pin on google map
                                 .position(new LatLng(address.getLatitude(), address.getLongitude()))
                                 .title(title));
+                                                // move camera to that location
                         CameraPosition camPos = new CameraPosition(new LatLng(address.getLatitude(), address.getLongitude()), 12, 0, 0); // zoom,,rotation
                         CameraUpdate cu = CameraUpdateFactory.newCameraPosition(camPos);
                         googleMap.moveCamera(cu);
@@ -244,6 +241,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                                // set blue dot where user is if they have allowed access to their location
                 if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     googleMap.setMyLocationEnabled(true);
                 }
@@ -264,12 +262,14 @@ public class DetailedItemActivity extends AppCompatActivity {
             case 1: {
                 // Make sure the request was successful
                 if (resultCode == 1) {
+                                    // get data return
                     String date = data.getStringExtra("date"); String time = data.getStringExtra("time");
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(data.getStringExtra("userRef"));
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("date",date);
                     map.put("time",time);
+                                    // upload new date and time to firebase
                     userItem.updateChildren(map).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {

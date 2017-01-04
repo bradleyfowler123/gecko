@@ -1,6 +1,5 @@
 package com.auton.bradley.myfe;
 
-import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +9,14 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
+import java.util.Locale;
 
-import java.sql.Time;
+/*
+    Dialog activity that allows user to enter a time. The time is then passed back
+ */
 
 public class EnterTimeActivity extends AppCompatActivity {
-
+                    // global variable declarations
     private int hour = 14;
     private int minute = 0;
 
@@ -31,11 +32,11 @@ public class EnterTimeActivity extends AppCompatActivity {
         time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TimePickerDialog tpd = new TimePickerDialog(EnterTimeActivity.this, AlertDialog.THEME_HOLO_LIGHT, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog tpd = new TimePickerDialog(EnterTimeActivity.this, android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int i3, int i4) {
                         hour=i3; minute=i4;                                                         // set custom time
-                        time.setText(Integer.toString(hour) + ":" + String.format("%02d", minute)); // display custom time
+                        time.setText(Integer.toString(hour) + ":" + String.format(Locale.US,"%02d", minute)); // display custom time
                     }
                 },hour,minute,true);
                 tpd.show();
@@ -46,7 +47,7 @@ public class EnterTimeActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 hour = 7+i; minute = 0;
-                time.setText(Integer.toString(hour) + ":" + String.format("%02d", minute));
+                time.setText(Integer.toString(hour) + ":" + String.format(Locale.US,"%02d", minute));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {

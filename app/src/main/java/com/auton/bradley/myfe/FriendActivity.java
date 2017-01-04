@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,9 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Bradley on 04/11/2016.
- * Java File to hold activity and class related to logging in
- * activity that handles login screen
+ * Activity that displays a friends profile
  */
 
 
@@ -33,35 +30,31 @@ public class FriendActivity extends AppCompatActivity {
     public ArrayList<String> names;
     public ArrayList<String> Urls;
     public int index;
-
                                         // main function
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
+                            // get facebook friend's data
         Intent intent = getIntent();
         UIDs = intent.getStringArrayListExtra("uid");
         names = intent.getStringArrayListExtra("name");
         Urls = intent.getStringArrayListExtra("url");
         index = intent.getIntExtra("index",0);
-
+                            // get views
         TextView naneTv = (TextView) findViewById(R.id.af_tv_profile_name);
         naneTv.setText(names.get(index));
         ImageView imageView = (ImageView) findViewById(R.id.af_img_profile_pic);
         RequestCreator picURL = Picasso.with(getBaseContext()).load(Urls.get(index));
         picURL.transform(new CircleTransform()).into(imageView);
-
-
-        // load tab bar and tab data
+                        // load tab bar and tab data
         viewPager = (ViewPager) findViewById(R.id.af_viewpager_profile);                                       // find view underneith tabs
         setupViewPager(viewPager);
         tabLayout = (TabLayout) findViewById(R.id.af_tabLayout_profile);                                            // find tab layout
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabTitles();                                                                            // add icons to tabs
-
-
     }
-
+                        // add the tabs
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
         adapter.addFragment(new ProfileAgendaFragment(), "Agenda");
@@ -75,20 +68,7 @@ public class FriendActivity extends AppCompatActivity {
         tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
         tabLayout.getTabAt(2).setText("Your Friends");
     }
-
-                                    // respond to action bar item press
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();                                                                  // get pressed item
-        switch (id) {
-            case R.id.action_close:                                                                 // start main activity with no user data if closed clicked
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 }
-
 
 /**
  * Custom adapter used for defining adding fragment tabs to a viewpager
