@@ -212,13 +212,22 @@ public class MainActivity extends AppCompatActivity {
                                 // cost filter
                     int limit = data.getIntExtra("cost",99999999);
                     for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                        if (filteredHomeListItems.get(i).price >= limit) {
+                        if (filteredHomeListItems.get(i).price > limit) {
                             filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
                             i = i-1;
                         }
                     }
                                 // location filter
                     location = data.getStringExtra("location");
+                                // distance filter
+                    double dist = data.getDoubleExtra("distance",0);
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (filteredHomeListItems.get(i).distAway > dist) {
+                            filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
+                            i = i-1;
+                        }
+                    }
+                    Log.d("idnsksdn", Double.toString(dist));
                                 // other- family friendly
                     ArrayList<String> other = data.getStringArrayListExtra("other");
                     if (other.contains("Family Friendly Only")) {
