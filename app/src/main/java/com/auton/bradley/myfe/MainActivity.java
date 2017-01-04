@@ -160,8 +160,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);                            // Pass the activity result back to the Facebook SDK
                     // add to calendar button returns data
-        switch (requestCode) {
-            case 1: {
+        if(requestCode==11) {
                 // Make sure the request was successful
                 if (resultCode == 1) {
                     Snackbar snackbar = Snackbar
@@ -187,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            case 2: {               // home feed preferences set
+            else if (requestCode==12){               // home feed preferences set
+                Log.d("yfhujbjk", Integer.toString(requestCode));
                 if (resultCode == 1) {
                     filteredHomeListItems.clear(); filteredHomeListTitles.clear();
                     filteredHomeListItems.addAll(homeListItems); filteredHomeListTitles.addAll(homeListTitles);
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                     if (homeFragment!=null) homeFragment.storeData(filteredHomeListItems,filteredHomeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested, true);
                 }
             }
-        }
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_preferences:
                 Intent intent3 = new Intent(this, SearchPrefActivity.class);
-                startActivityForResult(intent3, 2);
+                startActivityForResult(intent3, 12);
                 return true;
             case R.id.action_settings:
                 Intent intent4 = new Intent(this, SettingsActivity.class);

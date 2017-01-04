@@ -277,22 +277,45 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
-                                    // if user not logged in
-                if(FirebaseAuth.getInstance().getCurrentUser()== null) {                            // tell them to log in
+                // if user not logged in
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage("Sign in to add items to your agenda")
                             .setPositiveButton("okay", null)
                             .create()
                             .show();
-                }
-                else {              // if user logged in
-                    MainActivity activity = (MainActivity) getContext();                            // schedule a time and add it to their agenda
-                    Intent intent = new Intent(activity, EnterDateActivity.class);
-                    intent.putExtra("title", holder.activityTitle.getText());                           // data need to add item to calendar
-                    intent.putExtra("location", holder.activityLocation.getText());
-                    if (listData.get(this.position).event) intent.putExtra("reference", "events/" + listData.get(this.position).ref);
-                    else intent.putExtra("reference", "activities/" + listData.get(this.position).ref);
-                    activity.startActivityForResult(intent, 1);                                         // result is handled by main activity
+                } else {              // if user logged in
+                    final AgendaClass listItem = listData.get(this.position);
+                    if (listItem.event) {
+                        Snackbar snackbar = Snackbar
+                                .make(view, "Added to calendar", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
+                                        snackbar1.show();
+                                    }
+                                });
+                        snackbar.show();
+                               // upload selection to there agenda
+                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference agendaItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").push();
+                        HashMap<String, String> pushData = new HashMap<>();
+                        pushData.put("activity", listItem.activity);
+                        pushData.put("location", listItem.location);
+                        pushData.put("date", listItem.date);
+                        pushData.put("time", listItem.time);
+                        pushData.put("ref", "events/" + listItem.ref);
+                        agendaItem.setValue(pushData);
+                    }
+                    else {
+                        MainActivity activity = (MainActivity) getContext();                            // schedule a time and add it to their agenda
+                        Intent intent = new Intent(activity, EnterDateActivity.class);
+                        intent.putExtra("title", listItem.activity);                           // data need to add item to calendar
+                        intent.putExtra("location", listItem.location);
+                        intent.putExtra("reference", "activities/" + listItem.ref);
+                        activity.startActivityForResult(intent, 11);                                         // result is handled by main activity
+                    }
                 }
             }
         });
