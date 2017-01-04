@@ -1,18 +1,12 @@
 package com.auton.bradley.myfe;
 
-import android.*;
-import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,171 +28,177 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
+
+/*
+    Activity used to display an activity or event in more detail. Also displays a banner if it is
+    the users or friends with differing actions
+ */
 
 public class DetailedItemActivity extends AppCompatActivity {
-
+    // global variable declarations
     private MapView mapView;
     private AgendaClass activityData = new AgendaClass();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_detailed_item);
-        // get vies objects
+        // get view objects
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
         mapView = (MapView) findViewById(R.id.mapView2);
-        mapView.onCreate(savedInstanceState);
-
-        // work out what started activity
+        mapView.onCreate(savedInstanceState);                                                       // set map view to previous display if there is one
+        // get and display appropriate data and handle button presses
         final Intent intent = getIntent();
-        String from = intent.getStringExtra("from");
-        if (from.equals("home")) {
-            // get and set data
-            final Bundle data = intent.getBundleExtra("data");
-            String title = data.getString("title");
-            String location = data.getString("location");
-            tv_title.setText(title);
-            Picasso.with(getBaseContext()).load(data.getString("image")).into(iv_activityImage);
-            setupMap(title, location);
-        }
-        else if (from.equals("friendFeed") || from.equals("friendPage")) {
-                        // startup
-            findViewById(R.id.adi_friendData).setVisibility(View.VISIBLE);
-            final ImageView iv_friendImage = (ImageView) findViewById(R.id.adi_fd_image);
-            ImageView iv_addToCal = (ImageView) findViewById(R.id.adi_add_to_calander);
-            final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_name);
-            final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
-                        // get data
-            final String ref = intent.getStringExtra("ref");
-            String friendName = intent.getStringExtra("friendName");
-            String friendImage = intent.getStringExtra("friendUrl");
-            String friendDate = intent.getStringExtra("friendDate");
-            String friendTime = intent.getStringExtra("friendTime");
-            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
-            agenda.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
-                            // set data
-                    tv_title.setText(activityData.activity);
-                    Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
-                    setupMap(activityData.activity,activityData.location);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("Datebase Error2", databaseError.toString());
-                }
-            });
-            // set data
-            tv_friendName.setText(friendName);
-            tv_friendText.setText("is going at " + formatTime(friendTime) + " on " + formatDate(friendDate));
-            Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
+        String from = intent.getStringExtra("from");                                                // work out what started this activity - either home feed, friend feed, friend profile, users profile
+        switch (from) {
+            case "home": {      // home list detailed activity view
+                // get and set data
+                final Bundle data = intent.getBundleExtra("data");                                  // home list already has all data and so passes it to this activity
+                String title = data.getString("title");
+                String location = data.getString("location");
+                tv_title.setText(title);
+                Picasso.with(getBaseContext()).load(data.getString("image")).into(iv_activityImage);
+                setupMap(title, location);
+                break;
+            }
+            case "friendFeed":  // friend's detailed activity view
+            case "friendPage": {
+                // get banner view objects
+                findViewById(R.id.adi_friendData).setVisibility(View.VISIBLE);
+                final ImageView iv_friendImage = (ImageView) findViewById(R.id.adi_fd_image);
+                ImageView iv_addToCal = (ImageView) findViewById(R.id.adi_add_to_calander);
+                final TextView tv_friendName = (TextView) findViewById(R.id.adi_fd_name);
+                final TextView tv_friendText = (TextView) findViewById(R.id.adi_fd_text);
+                // get data
+                final String ref = intent.getStringExtra("ref");
+                String friendName = intent.getStringExtra("friendName");                            // friend specific data
+                String friendImage = intent.getStringExtra("friendUrl");
+                String friendDate = intent.getStringExtra("friendDate");
+                String friendTime = intent.getStringExtra("friendTime");
+                DatabaseReference database = FirebaseDatabase.getInstance().getReference();         // friend feed or pages doesn't have all the info of the event/activity and so this needs to be fetched from firebase
+                DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
+                agenda.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        activityData = dataSnapshot.getValue(AgendaClass.class);                    // get agenda data
+                        // set activity/event data
+                        tv_title.setText(activityData.activity);
+                        Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                        setupMap(activityData.activity, activityData.location);
+                    }
 
-            iv_addToCal.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent2 = new Intent(getBaseContext(),AddFriendAgendaActivity.class);
-                    intent2.putExtra("activity", activityData.activity);
-                    intent2.putExtra("location", activityData.location);
-                    intent2.putExtra("date", intent.getStringExtra("friendDate"));
-                    intent2.putExtra("time", intent.getStringExtra("friendTime"));
-                    intent2.putExtra("reference", ref);
-                    startActivity(intent2);
-                }
-            });
-        }
-        else if (from.equals("profile")) {
-            // startup
-            findViewById(R.id.adi_scheduledView).setVisibility(View.VISIBLE);
-            ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
-            final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
-            final String[] location = new String[1];                            // tempory, needs to be text view
-            // get data
-            final String ref = intent.getStringExtra("ref");
-            final String userRef = intent.getStringExtra("userRef");
-            String date = intent.getStringExtra("date");
-            String time = intent.getStringExtra("time");
-            final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
-            agenda.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
-                    // set data
-                    tv_title.setText(activityData.activity);
-                    location[0] = activityData.location;                            // tempory until put into text view
-                    Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
-                    setupMap(activityData.activity,activityData.location);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("Datebase Error2", databaseError.toString());
-                }
-            });
-            // set data
-            scheduled_text.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
-                            // edit schedule is clicked
-            edit_schedule.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View view) {
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(DetailedItemActivity.this);
-                    builder.setMessage("Delete or Reschedule?")
-                            .setPositiveButton("Reschedule", new DialogInterface.OnClickListener() {
-                                @Override        // get new date and time
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    Intent intent = new Intent(getBaseContext(), EnterDateActivity.class);
-                                    intent.putExtra("title", tv_title.getText());                                   // data need to add item to calendar
-                                    intent.putExtra("location", location[0]);
-                                    intent.putExtra("reference", ref);
-                                    intent.putExtra("userRef", userRef);
-                                    startActivityForResult(intent, 1);                                              // result is handled below
-                                }
-                            })                  // delete item
-                            .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(userRef);
-                                    userItem.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()) {
-                                                finish();
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("Database Error", databaseError.toString());
+                    }
+                });
+                // set banner data
+                tv_friendName.setText(friendName);
+                tv_friendText.setText("is going at " + formatTime(friendTime) + " on " + formatDate(friendDate));
+                Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
+                // handle banner add to cal click
+                iv_addToCal.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {    // display AddFriendAgendaActivity dialog which displays a confirmation request
+                        Intent intent2 = new Intent(getBaseContext(), AddFriendAgendaActivity.class);
+                        intent2.putExtra("activity", activityData.activity);
+                        intent2.putExtra("location", activityData.location);
+                        intent2.putExtra("date", intent.getStringExtra("friendDate"));
+                        intent2.putExtra("time", intent.getStringExtra("friendTime"));
+                        intent2.putExtra("reference", ref);
+                        startActivity(intent2);
+                    }
+                });
+                break;
+            }
+            case "profile": {   // user's agenda detailed activity view
+                // get banner view objects
+                findViewById(R.id.adi_scheduledView).setVisibility(View.VISIBLE);
+                ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
+                final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
+                // get data
+                final String ref = intent.getStringExtra("ref");
+                final String userRef = intent.getStringExtra("userRef");
+                String date = intent.getStringExtra("date");
+                String time = intent.getStringExtra("time");
+                final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference agenda = database.child("activitydata").child("cambridge").child(ref.split("/")[0]).child(ref.split("/")[1]);
+                agenda.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
+                        // set activity/event data
+                        tv_title.setText(activityData.activity);
+                        Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                        setupMap(activityData.activity, activityData.location);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("Datebase Error", databaseError.toString());
+                    }
+                });
+                // set users banner data
+                scheduled_text.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
+                // edit schedule is clicked
+                edit_schedule.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+                        // ask to delete or reschedule
+                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(DetailedItemActivity.this);
+                        builder.setMessage("Delete or Reschedule?")
+                                .setPositiveButton("Reschedule", new DialogInterface.OnClickListener() {
+                                    @Override        // get new date and time
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Intent intent = new Intent(getBaseContext(), EnterDateActivity.class);
+                                        intent.putExtra("title", activityData.activity);                                   // data need to add item to calendar
+                                        intent.putExtra("location", activityData.location);
+                                        intent.putExtra("reference", ref);
+                                        intent.putExtra("userRef", userRef);
+                                        startActivityForResult(intent, 1);                                              // result is handled below
+                                    }
+                                })                  // delete item
+                                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(userRef);
+                                        userItem.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    finish();                                       // return to profile page
+                                                }
                                             }
-                                        }
-                                    });
-                                }
-                            })
-                            .create()
-                            .show();
-                }
-            });
+                                        });
+                                    }
+                                })
+                                .create()
+                                .show();
+                    }
+                });
+                break;
+            }
         }
 
     }
 
     private String formatDate(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         String output = "error";
         try {
             Date date = format.parse(input);
@@ -208,8 +208,9 @@ public class DetailedItemActivity extends AppCompatActivity {
         }
         return output;
     }
+
     private String formatTime(String input) {
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.US);
         String output;
         try {
             Date date2 = format.parse(input);
@@ -234,14 +235,16 @@ public class DetailedItemActivity extends AppCompatActivity {
                         googleMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(address.getLatitude(), address.getLongitude()))
                                 .title(title));
-                        CameraPosition camPos = new CameraPosition(new LatLng(address.getLatitude(),address.getLongitude()),12,0,0); // zoom,,rotation
+                        CameraPosition camPos = new CameraPosition(new LatLng(address.getLatitude(), address.getLongitude()), 12, 0, 0); // zoom,,rotation
                         CameraUpdate cu = CameraUpdateFactory.newCameraPosition(camPos);
                         googleMap.moveCamera(cu);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                googleMap.setMyLocationEnabled(true);
+                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    googleMap.setMyLocationEnabled(true);
+                }
                 UiSettings uiSettings = googleMap.getUiSettings();
                 uiSettings.setMyLocationButtonEnabled(true);
                 uiSettings.setAllGesturesEnabled(true);

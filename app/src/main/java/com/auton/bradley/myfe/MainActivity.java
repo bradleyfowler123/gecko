@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
     public Bundle facebookData;
     public Boolean facebookConnected;
     public CallbackManager callbackManager;
-    public FirebaseAuth auth; public FirebaseUser user;
+    public FirebaseAuth auth;
+    public FirebaseUser user;
     int currentTab = 0;
     String location = "cambridge";
 
@@ -118,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
             currentTab = intent.getIntExtra("tab", 0);
             facebookConnected = intent.getBooleanExtra("fbConnected", false);
             if (facebookConnected) {
-                facebookData = intent.getBundleExtra("fbData");}
+                facebookData = intent.getBundleExtra("fbData");
+            }
         } else {            // else - i.e. on first app run
             auth.signOut();                     // sign out any firebase user that may be signed in as we have no data on them
             facebookConnected = false;
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         }
         viewPager.setCurrentItem(currentTab);
     }
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -150,108 +153,120 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (friendFragment != null && friendFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
-        if (homeFragment != null && homeFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
-        if (profileFragment != null && profileFragment.isAdded()) getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
+        if (friendFragment != null && friendFragment.isAdded())
+            getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
+        if (homeFragment != null && homeFragment.isAdded())
+            getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
+        if (profileFragment != null && profileFragment.isAdded())
+            getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
     }
+
     // facebook - passes data back to facebook api
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);                            // Pass the activity result back to the Facebook SDK
-                    // add to calendar button returns data
-        if(requestCode==11) {
-                // Make sure the request was successful
-                if (resultCode == 1) {
-                    Snackbar snackbar = Snackbar
-                            .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                    snackbar1.show();
-                                }
-                            });
-                    snackbar.show();
-                    if (user != null) {       // upload selection to there agenda
-                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                        DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
-                        HashMap<String, String> pushData = new HashMap<>();
-                        pushData.put("activity", data.getStringExtra("title"));
-                        pushData.put("location", data.getStringExtra("location"));
-                        pushData.put("date", data.getStringExtra("date"));
-                        pushData.put("time", data.getStringExtra("time"));
-                        pushData.put("ref", data.getStringExtra("reference"));
-                        agendaItem.setValue(pushData);
-                    }
+        // add to calendar button returns data
+        if (requestCode == 11) {
+            // Make sure the request was successful
+            if (resultCode == 1) {
+                Snackbar snackbar = Snackbar
+                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
+                                snackbar1.show();
+                            }
+                        });
+                snackbar.show();
+                if (user != null) {       // upload selection to there agenda
+                    DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                    DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
+                    HashMap<String, String> pushData = new HashMap<>();
+                    pushData.put("activity", data.getStringExtra("title"));
+                    pushData.put("location", data.getStringExtra("location"));
+                    pushData.put("date", data.getStringExtra("date"));
+                    pushData.put("time", data.getStringExtra("time"));
+                    pushData.put("ref", data.getStringExtra("reference"));
+                    agendaItem.setValue(pushData);
                 }
             }
-            else if (requestCode==12){               // home feed preferences set
-                Log.d("yfhujbjk", Integer.toString(requestCode));
-                if (resultCode == 1) {
-                    filteredHomeListItems.clear(); filteredHomeListTitles.clear();
-                    filteredHomeListItems.addAll(homeListItems); filteredHomeListTitles.addAll(homeListTitles);
-                                // categories filter
-                    ArrayList<String> types = data.getStringArrayListExtra("type");
-                    if (!types.contains("Events")) {
-                        for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                            if (filteredHomeListItems.get(i).event) {
-                                filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
-                                i = i-1;
-                            }
-                        }
-                    }
-                    if (!types.contains("Activities")) {
-                        for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                            if (!filteredHomeListItems.get(i).event) {
-                                filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
-                                i = i-1;
-                            }
-                        }
-                    }
-                                // cost filter
-                    int limit = data.getIntExtra("cost",99999999);
+        } else if (requestCode == 12) {               // home feed preferences set
+            Log.d("yfhujbjk", Integer.toString(requestCode));
+            if (resultCode == 1) {
+                filteredHomeListItems.clear();
+                filteredHomeListTitles.clear();
+                filteredHomeListItems.addAll(homeListItems);
+                filteredHomeListTitles.addAll(homeListTitles);
+                // categories filter
+                ArrayList<String> types = data.getStringArrayListExtra("type");
+                if (!types.contains("Events")) {
                     for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                        if (filteredHomeListItems.get(i).price > limit) {
-                            filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
-                            i = i-1;
+                        if (filteredHomeListItems.get(i).event) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
                         }
                     }
-                                // location filter
-                    location = data.getStringExtra("location");
-                                // distance filter
-                    double dist = data.getDoubleExtra("distance",0);
+                }
+                if (!types.contains("Activities")) {
                     for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                        if (filteredHomeListItems.get(i).distAway > dist) {
-                            filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
-                            i = i-1;
+                        if (!filteredHomeListItems.get(i).event) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
                         }
                     }
-                    Log.d("idnsksdn", Double.toString(dist));
-                                // other- family friendly
-                    ArrayList<String> other = data.getStringArrayListExtra("other");
-                    if (other.contains("Family Friendly Only")) {
-                        for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                            if (!filteredHomeListItems.get(i).familyfriendly) {
-                                filteredHomeListItems.remove(i); filteredHomeListTitles.remove(i);
-                                i = i-1;
-                            }
+                }
+                // cost filter
+                int limit = data.getIntExtra("cost", 99999999);
+                for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                    if (filteredHomeListItems.get(i).price > limit) {
+                        filteredHomeListItems.remove(i);
+                        filteredHomeListTitles.remove(i);
+                        i = i - 1;
+                    }
+                }
+                // location filter
+                location = data.getStringExtra("location");
+                // distance filter
+                double dist = data.getDoubleExtra("distance", 0);
+                for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                    if (filteredHomeListItems.get(i).distAway > dist) {
+                        filteredHomeListItems.remove(i);
+                        filteredHomeListTitles.remove(i);
+                        i = i - 1;
+                    }
+                }
+                Log.d("idnsksdn", Double.toString(dist));
+                // other- family friendly
+                ArrayList<String> other = data.getStringArrayListExtra("other");
+                if (other.contains("Family Friendly Only")) {
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).familyfriendly) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
                         }
                     }
+                }
 
-                                // update list
-                    if (homeFragment!=null) homeFragment.storeData(filteredHomeListItems,filteredHomeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested, true);
-                }
+                // update list
+                if (homeFragment != null)
+                    homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
             }
+        }
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 3: {
                 for (int i = 0; i < permissions.length; i++) {
                     if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this,new String[]{permissions[i]},3);
+                        ActivityCompat.requestPermissions(this, new String[]{permissions[i]}, 3);
                     }
                 }
             }
@@ -329,25 +344,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-                                    // get friend data
+    // get friend data
     void getNSetFriendData() {
         // get users friends
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();           // database data
         final ArrayList<String> friendFBNames = facebookData.getStringArrayList("friendNames");
         // if user has friends
-        if (!(friendFBNames==null || friendFBNames.isEmpty())) {
+        if (!(friendFBNames == null || friendFBNames.isEmpty())) {
             // get friend data
             final ArrayList<String> friendFBUrls = facebookData.getStringArrayList("friendUrls");
             final ArrayList<String> friendUIDs = facebookData.getStringArrayList("friendUids");
             // for each friend
             for (int j = 0; j < friendUIDs.size(); j++) {
-                                         // get and set the friends' agenda data
+                // get and set the friends' agenda data
                 final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
                 friend.addValueEventListener(new ValueEventListener() {
                     @Override               // upon data return
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // isolate each agenda item along with which friend it is
-                        GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {};
+                        GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
+                        };
                         HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
                         Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                         String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
@@ -358,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
                             if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
                                 friendFeedListItemsData.remove(k);
                                 friendFeedListItems.remove(k);
-                                k = k-1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                                k = k - 1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
                             }
                         }               // all all list items for this friend
                         // for each agenda item
@@ -375,19 +391,21 @@ public class MainActivity extends AppCompatActivity {
                                 friendFeedListItemsData.add(agendaItem);
                                 friendFeedSortedList = friendFeedListItemsData;
                                 Collections.sort(friendFeedSortedList, new AgendaComparator());
-                                if (friendFragment!= null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
+                                if (friendFragment != null)
+                                    friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
                             }
                         }
                         findFriendsGoingToActivities();
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
 
-                                // get and set friend interest count
+                // get and set friend interest count
                 final DatabaseReference friendInt = database.child("users").child(friendUIDs.get(j)).child("Interested");
-                                        // note single event listener so doesn't auto update, this is because noway to distinguish in friend removed or added interest
+                // note single event listener so doesn't auto update, this is because noway to distinguish in friend removed or added interest
                 friendInt.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -395,32 +413,43 @@ public class MainActivity extends AppCompatActivity {
                         if (activityFriendInterestedNumbers.containsKey(ref)) {
                             activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() + 1);
                         } else activityFriendInterestedNumbers.put(ref, 1);
-                        if (homeFragment!= null)homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested,false);
+                        if (homeFragment != null)
+                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                     }
+
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
                         String ref = dataSnapshot.getValue().toString();
                         activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref).intValue() - 1);
-                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested,false);
+                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                     }
+
                     @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    }
+
                     @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    }
+
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {}
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
                 });
             }
         }
     }
+
     private void findFriendsGoingToActivities() {
         activityFriendGoingNumbers.clear();
-        for(String value : homeListRefs) {
+        for (String value : homeListRefs) {
             activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
         }
-        if (homeFragment!= null)homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+        if (homeFragment != null)
+            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
     }
-                                // set users interests on home screen
+
+    // set users interests on home screen
     private void getNSetUserData() {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference interestedRef = database.child("users").child(user.getUid()).child("Interested");
@@ -432,8 +461,10 @@ public class MainActivity extends AppCompatActivity {
                 while (snapshotIterator.hasNext()) {
                     interested.add(snapshotIterator.next().getValue().toString());
                 }
-                if (homeFragment!=null)homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                if (homeFragment != null)
+                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -441,7 +472,8 @@ public class MainActivity extends AppCompatActivity {
         });
         DatabaseReference agenda = database.child("users").child(user.getUid()).child("Agenda");
     }
-                                // get and set activities for around cambridge
+
+    // get and set activities for around cambridge
     private void getNSetHomeFeedData() {
         // setup variables
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -450,7 +482,8 @@ public class MainActivity extends AppCompatActivity {
         activityDataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = false;
@@ -458,15 +491,18 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("activities/" + agendaItem.ref);
-                if (homeFragment!=null) homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                if (homeFragment != null)
+                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = false;
@@ -474,28 +510,34 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("activities/" + agendaItem.ref);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 int index = homeListRefs.indexOf("activities/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
-                // events
+        // events
         DatabaseReference eventsDataRef = database.child("activitydata").child(location).child("events");
         // get data
         eventsDataRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = true;
@@ -503,15 +545,18 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("events/" + agendaItem.ref);
-                if (homeFragment!=null) homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                if (homeFragment != null)
+                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                };
                 AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                 agendaItem.ref = dataSnapshot.getKey();
                 agendaItem.event = true;
@@ -519,46 +564,57 @@ public class MainActivity extends AppCompatActivity {
                 homeListItems.add(agendaItem);
                 homeListTitles.add(agendaItem.activity);
                 homeListRefs.add("events/" + agendaItem.ref);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 int index = homeListRefs.indexOf("events/" + dataSnapshot.getKey());
                 homeListItems.remove(index);
                 homeListTitles.remove(index);
                 homeListRefs.remove(index);
-                homeFragment.storeData(homeListItems,homeListTitles,activityFriendGoingNumbers,activityFriendInterestedNumbers, interested,false);
+                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
             }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
     private TimeDispNRank formatTime(String dateString, String timeString) {
-        String output; int rank;
+        String output;
+        int rank;
         SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
         try {
             Date date = formatDate.parse(dateString);
             Date time = formatTime.parse(timeString);
             Date dateCurrent = Calendar.getInstance().getTime();
-            int day1 = (int) (date.getTime()/(1000*60*60*24L));
-            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
-            int  daysApart = day1-day2;
-            rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
-            if (daysApart<7) {
-                if (daysApart<1){
-                    if (daysApart<0) output = "0";                                                   // already been
-                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);}   // the same day - show timee
-                else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
-            else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
+            int day1 = (int) (date.getTime() / (1000 * 60 * 60 * 24L));
+            int day2 = (int) (dateCurrent.getTime() / (1000 * 60 * 60 * 24L));
+            int daysApart = day1 - day2;
+            rank = (int) (time.getTime() / (24 * 60L) + 2500) + daysApart * 100000;
+            if (daysApart < 7) {
+                if (daysApart < 1) {
+                    if (daysApart < 0)
+                        output = "0";                                                   // already been
+                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);
+                }   // the same day - show timee
+                else output = (String) android.text.format.DateFormat.format("E", date);
+            }                   // within a week - show the day
+            else
+                output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
         } catch (ParseException e) {
             e.printStackTrace();
-            output = "error"; rank = 0;
+            output = "error";
+            rank = 0;
         }
-        return new TimeDispNRank(output,rank);
+        return new TimeDispNRank(output, rank);
     }
 
     double getDistanceAway(String loc) {
@@ -568,21 +624,23 @@ public class MainActivity extends AppCompatActivity {
             if (addresses.size() != 0) {
                 LatLng StartP = new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Location current = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                int Radius = 6371;//radius of earth in Km
-                double lat1 = StartP.latitude;
-                double lat2 = current.getLatitude();
-                double lon1 = StartP.longitude;
-                double lon2 = current.getLongitude();
-                double dLat = Math.toRadians(lat2 - lat1);
-                double dLon = Math.toRadians(lon2 - lon1);
-                double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                double c = 2 * Math.asin(Math.sqrt(a));
-                double valueResult = Radius * c;
-                DecimalFormat newFormat = new DecimalFormat("#####.#");
-                return Double.valueOf(newFormat.format(valueResult));
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Location current = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    int Radius = 6371;//radius of earth in Km
+                    double lat1 = StartP.latitude;
+                    double lat2 = current.getLatitude();
+                    double lon1 = StartP.longitude;
+                    double lon2 = current.getLongitude();
+                    double dLat = Math.toRadians(lat2 - lat1);
+                    double dLon = Math.toRadians(lon2 - lon1);
+                    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                    double c = 2 * Math.asin(Math.sqrt(a));
+                    double valueResult = Radius * c;
+                    DecimalFormat newFormat = new DecimalFormat("#####.#");
+                    return Double.valueOf(newFormat.format(valueResult));
+                } else return 0;
             } else {
                 return 0;
             }
