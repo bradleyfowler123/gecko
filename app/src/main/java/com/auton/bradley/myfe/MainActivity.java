@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +38,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -118,52 +120,127 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);                                                               // you can edit action bar style in activity_main.xml
         // if there is user data or search preferences
-        Intent intent = getIntent();
-        if (intent.getExtras() != null) {
-            // get user data
-            currentTab = intent.getIntExtra("tab", 0);
-            facebookConnected = intent.getBooleanExtra("fbConnected", false);
-            if (facebookConnected) {
-                facebookData = intent.getBundleExtra("fbData");
+        if (savedInstanceState == null){
+            Log.d("onCreate!!!!!!!!!!", "tgvj ");
+            Intent intent = getIntent();
+            if (intent.getExtras() != null) {
+                // get user data
+                currentTab = intent.getIntExtra("tab", 0);
+                facebookConnected = intent.getBooleanExtra("fbConnected", false);
+                if (facebookConnected) {
+                    facebookData = intent.getBundleExtra("fbData");
+                }
+            } else {            // else - i.e. on first app run
+                auth.signOut();                     // sign out any firebase user that may be signed in as we have no data on them
+                facebookConnected = false;
             }
-        } else {            // else - i.e. on first app run
-            auth.signOut();                     // sign out any firebase user that may be signed in as we have no data on them
-            facebookConnected = false;
-        }
-        // load tab bar and tab data
-        viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
-        setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-        setupTabIcons();                                                                            // add icons to tabs
-                    // get and set home list data and friend feed data
-        getNSetHomeFeedData();
-        if (user != null) {
-            getNSetUserData();                                                                      // gets users interests
-            if (facebookConnected != null && facebookConnected) {
-                getNSetFriendData();                                                                // gets friends interests and agenda
+            // load tab bar and tab data
+            viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
+            setupViewPager(viewPager);
+            tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+            tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+            setupTabIcons();                                                                            // add icons to tabs
+            // get and set home list data and friend feed data
+            getNSetHomeFeedData();
+            if (user != null) {
+                getNSetUserData();                                                                      // gets users interests
+                if (facebookConnected != null && facebookConnected) {
+                    getNSetFriendData();                                                                // gets friends interests and agenda
+                }
             }
+            viewPager.setCurrentItem(currentTab);
         }
-        viewPager.setCurrentItem(currentTab);
+        else {
+            Log.d("ihikjhik", "yfh");
+            currentTab = savedInstanceState.getInt("currentTab");
+            facebookConnected = savedInstanceState.getBoolean("fbCon");
+            facebookData = savedInstanceState.getBundle("fbData");
+            friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
+            friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
+            friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
+            homeListItems = savedInstanceState.getParcelableArrayList("hfld");
+            homeListTitles = savedInstanceState.getStringArrayList("hflt");
+            filteredHomeListItems = savedInstanceState.getParcelableArrayList("fhld");
+            filteredHomeListTitles = savedInstanceState.getStringArrayList("fhlt");
+            homeListRefs = savedInstanceState.getStringArrayList("hflr");
+            activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
+            activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
+            interested = savedInstanceState.getStringArrayList("interested");
+        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        Log.d("onRestore?????????????/", ">DDDDDDDDDD");
+     /*   currentTab = savedInstanceState.getInt("currentTab");
+        facebookConnected = savedInstanceState.getBoolean("fbCon");
+        facebookData = savedInstanceState.getBundle("fbData");
+        friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
+        friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
+        friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
+        homeListItems = savedInstanceState.getParcelableArrayList("hfld");
+        homeListTitles = savedInstanceState.getStringArrayList("hflt");
+        filteredHomeListItems = savedInstanceState.getParcelableArrayList("fhld");
+        filteredHomeListTitles = savedInstanceState.getStringArrayList("fhlt");
+        homeListRefs = savedInstanceState.getStringArrayList("hflr");
+        activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
+        activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
+        Log.d("uybujk", homeListTitles.toString());
+        interested = savedInstanceState.getStringArrayList("interested");
+*/
+        HomeFragment homeFragment2 = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
+        if (homeFragment2==null) homeFragment = new HomeFragment();
+        else homeFragment = homeFragment2;
+        // load tab bar and tab data
+        viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
+        setupViewPager(viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+        setupTabIcons();
+    //    viewPager.setCurrentItem(currentTab);
+
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
-        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
+        Log.d("uybujk", homeListTitles.toString());Log.d("uybujk", homeListItems.toString()); Log.d("uybujk", activityFriendInterestedNumbers.toString()); Log.d("uybujk", activityFriendGoingNumbers.toString()); Log.d("uybujk", interested.toString());
+      //  if (homeFragment2!=null) {
+        //    homeFragment = homeFragment2;
+            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+      //  }
+      //  else {
+        //    Log.d("WTF???????/", "dtgfh");
+        //    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+       // }
+        // if (homeFragment!=null)homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+        if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        Log.d("onSave","!!!!!!!!!!!!!");
         if (friendFragment != null && friendFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
         if (homeFragment != null && homeFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
         if (profileFragment != null && profileFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
+        outState.putBoolean("theKeySaved", true);
+        outState.putInt("currentTab", currentTab);
+        outState.putBoolean("fbCon", facebookConnected);
+        outState.putBundle("fbData", facebookData);
+        outState.putParcelableArrayList("ffld", friendFeedListItemsData);
+        outState.putParcelableArrayList("ffsl", friendFeedSortedList);
+        outState.putStringArrayList("ffli", friendFeedListItems);
+        outState.putParcelableArrayList("hfld", homeListItems);
+        outState.putStringArrayList("hflt", homeListTitles);
+        outState.putParcelableArrayList("fhld", filteredHomeListItems);
+        outState.putStringArrayList("fhlt", filteredHomeListTitles);
+        outState.putStringArrayList("hflr", homeListRefs);
+        outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
+        outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
+        outState.putStringArrayList("interested", interested);
+        super.onSaveInstanceState(outState);
     }
 
 
