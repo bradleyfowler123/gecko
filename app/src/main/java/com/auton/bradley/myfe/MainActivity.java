@@ -189,9 +189,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("uybujk", homeListTitles.toString());
         interested = savedInstanceState.getStringArrayList("interested");
 */
-        HomeFragment homeFragment2 = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
-        if (homeFragment2==null) homeFragment = new HomeFragment();
-        else homeFragment = homeFragment2;
         // load tab bar and tab data
         viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
         setupViewPager(viewPager);
@@ -200,17 +197,11 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();
     //    viewPager.setCurrentItem(currentTab);
 
+        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
         Log.d("uybujk", homeListTitles.toString());Log.d("uybujk", homeListItems.toString()); Log.d("uybujk", activityFriendInterestedNumbers.toString()); Log.d("uybujk", activityFriendGoingNumbers.toString()); Log.d("uybujk", interested.toString());
-      //  if (homeFragment2!=null) {
-        //    homeFragment = homeFragment2;
-            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
-      //  }
-      //  else {
-        //    Log.d("WTF???????/", "dtgfh");
-        //    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
-       // }
+        if (homeFragment!=null) homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         // if (homeFragment!=null)homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
 
@@ -225,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
         if (profileFragment != null && profileFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
+        // begin transaction
         outState.putBoolean("theKeySaved", true);
         outState.putInt("currentTab", currentTab);
         outState.putBoolean("fbCon", facebookConnected);
@@ -460,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
                         // for each agenda item
                         while (iterator.hasNext()) {
                             AgendaClass agendaItem = iterator.next();
+                            Log.d("ijk,mlk", dataSnapshot.toString());
                             TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
                             if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
                                 agendaItem.rank = timeNRank.rank;

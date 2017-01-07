@@ -1,51 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:id="@+id/home_list_item"
     android:orientation="vertical"
-    android:layout_height="160dp"
+    android:layout_height="250dp"
     android:padding="10dp">
 
-
-    <FrameLayout
+    <ImageView
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="100dp">
+        android:id="@+id/sr_list_item_image"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/altontowers"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/sr_color"
-            android:background="@drawable/homerectangle" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-            <ImageView
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:id="@+id/sr_list_item_image"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/altontowers" />
-
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="50dp"
+            android:orientation="vertical"
+            android:background="#7f801325"
+            android:padding="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toEndOf="@id/sr_list_item_image"
-                android:layout_alignParentEnd="true"
                 android:textColor="@android:color/white"
                 android:text="Alton Towers"
                 android:id="@+id/sr_list_item_title"
                 android:maxLines="2"
+                android:maxWidth="200dp"
                 android:textSize="20sp"
                 android:gravity="bottom|start"
                 android:textStyle="normal|bold" />
@@ -54,9 +47,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_below="@id/sr_list_item_title"
-                android:layout_toEndOf="@id/sr_list_item_image"
                 android:text="2 km away"
                 android:id="@+id/sr_list_item_location"
                 android:textSize="15sp"
@@ -65,27 +55,15 @@
                 android:maxLines="1"
                 android:gravity="center_vertical" />
 
-        </RelativeLayout>
 
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp">
-
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/homerectangle" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:layout_alignParentBottom="true"
+            android:background="#7f801325">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -150,9 +128,8 @@
             </LinearLayout>
         </LinearLayout>
 
-    </FrameLayout>
+    </RelativeLayout>
 
 
 
-
-</LinearLayout>
+</FrameLayout>

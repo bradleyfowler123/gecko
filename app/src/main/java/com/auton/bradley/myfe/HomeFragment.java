@@ -184,7 +184,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.activityTitle.setText(listItem.activity);
         holder.activityLocation.setText(String.format("%s km away", Double.toString(listItem.distAway)));
         RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image);
-        activityImg.centerCrop().resize(340,200).into(holder.img);
+        activityImg.centerCrop().resize(1000,600).into(holder.img);
         if (listItem.event) {
             holder.totalGoing.setVisibility(View.VISIBLE);
             holder.noTotGoing.setText(String.format("%s", Integer.toString(listItem.totalgoing)));
