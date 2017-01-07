@@ -226,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
                                         if (!task.getException().getMessage().contains("A network error")){
                                                                                     // allow them to reset password
                                             final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                            builder.setMessage("Login Failed - Email or password incorrect.")
+                                            builder.setMessage("Login Failed - " + task.getException().getMessage())
                                                     .setPositiveButton(getString(R.string.login_retry_button), null)
                                                     .setNegativeButton("reset password", new DialogInterface.OnClickListener() {
                                                                 public void onClick(DialogInterface dialog, int id) {

@@ -368,9 +368,11 @@ public class MainActivity extends AppCompatActivity {
         if (user != null) {
             menu.getItem(0).setVisible(false);
             menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(true);   // settings
         } else {
             menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(false);   // settings
         }
         return true;
     }

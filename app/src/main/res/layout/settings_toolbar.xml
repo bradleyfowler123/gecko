@@ -5,9 +5,9 @@
     android:id="@+id/toolbar2"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     android:background="?attr/colorPrimary"
-    app:navigationContentDescription="kmlam"
     app:navigationIcon="?attr/homeAsUpIndicator"
     app:title="@string/action_settings"
-    />
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    app:titleTextColor="@android:color/white"
+    android:theme="@style/AppTheme" />

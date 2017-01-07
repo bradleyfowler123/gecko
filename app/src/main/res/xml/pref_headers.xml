@@ -5,7 +5,7 @@
     <header
         android:fragment="com.auton.bradley.myfe.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_general" />
+        android:title="Account" />
 
     <header
         android:fragment="com.auton.bradley.myfe.SettingsActivity$NotificationPreferenceFragment"

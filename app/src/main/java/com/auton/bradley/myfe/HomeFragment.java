@@ -106,9 +106,11 @@ public class HomeFragment extends Fragment {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
+            menu.getItem(4).setVisible(true);   // settings
         } else {
             menu.getItem(2).setVisible(true);
             menu.getItem(3).setVisible(false);
+            menu.getItem(4).setVisible(false);   // settings
         }        // set up search button
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
