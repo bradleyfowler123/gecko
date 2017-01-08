@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.auton.bradley.myfe.MainActivity">
+
+    <item
+        android:id="@+id/action_interestedActivity"
+        android:title="Toggle interested"
+        app:showAsAction="ifRoom"
+        android:icon="@android:drawable/btn_star_big_off"/>
+    <item
+        android:id="@+id/action_addActivity"
+        android:title="Add to agenda"
+        android:icon="@drawable/ic_calendar_white"
+        app:showAsAction="ifRoom"
+        />
+</menu>

@@ -73,7 +73,7 @@ public class HomeFragment extends Fragment {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
-                intent.putExtra("data",listItems.get(i).getDataBundle1());
+                intent.putExtra("ref",listItems.get(i).ref);
                 intent.putExtra("from", "home");
                 startActivity(intent);
             }
