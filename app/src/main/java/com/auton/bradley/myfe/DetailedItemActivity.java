@@ -72,7 +72,6 @@ public class DetailedItemActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");                                                // work out what started this activity - either home feed, friend feed, friend profile, users profile
         myInterests = intent.getStringArrayListExtra("interests");
-        Log.d("!Grrrrrrrrrrrrrrrr", myInterests.toString());
         switch (from) {
             case "home": {      // home list detailed activity view
                 findViewById(R.id.adi_space).setVisibility(View.GONE);
@@ -199,6 +198,13 @@ public class DetailedItemActivity extends AppCompatActivity {
                     if (myInterests.contains(activityData.ref)) menu.getItem(0).setIcon(android.R.drawable.star_on);
                     else menu.getItem(0).setIcon(android.R.drawable.star_off);
                 }
+                if (activityData.familyfriendly!=null && activityData.familyfriendly) findViewById(R.id.adi_iconList_family).setVisibility(View.VISIBLE);
+                if (activityData.disabled!=null && activityData.disabled) findViewById(R.id.adi_iconList_disabled).setVisibility(View.VISIBLE);
+                if (activityData.indoor!=null && activityData.indoor) findViewById(R.id.adi_iconList_indoor).setVisibility(View.VISIBLE);
+                if (activityData.parking!=null && activityData.parking) findViewById(R.id.adi_iconList_parking).setVisibility(View.VISIBLE);
+                if (activityData.pet!=null && activityData.pet) findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
+
+
                 setupMap(activityData.activity, activityData.location);
             }
             @Override

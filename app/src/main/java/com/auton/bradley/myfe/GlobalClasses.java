@@ -104,7 +104,7 @@ class AgendaClass implements Parcelable {
     String activityDescription;
     String url;
     Integer price;
-    Boolean familyfriendly;
+    Boolean familyfriendly; Boolean disabled; Boolean indoor; Boolean parking; Boolean pet; Boolean toilet;
     Boolean event;
     String image;
     Integer totalgoing;

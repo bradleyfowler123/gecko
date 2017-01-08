@@ -39,22 +39,44 @@
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    app:srcCompat="@android:drawable/ic_menu_search"
+                    app:srcCompat="@drawable/ic_disabled"
+                    android:id="@+id/adi_iconList_disabled"
+                    android:visibility="gone"
                     android:background="#b88c34" />
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    app:srcCompat="@android:drawable/ic_menu_set_as"
-                    android:background="#d0c5b0" />
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@android:drawable/ic_menu_always_landscape_portrait"
+                    app:srcCompat="@drawable/ic_family"
+                    android:id="@+id/adi_iconList_family"
+                    android:visibility="gone"
                     android:background="#b88c34" />
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    app:srcCompat="@android:drawable/ic_menu_camera"
+                    app:srcCompat="@drawable/ic_indoor"
+                    android:id="@+id/adi_iconList_indoor"
+                    android:visibility="gone"
+                    android:background="#b88c34" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_parking"
+                    android:id="@+id/adi_iconList_parking"
+                    android:visibility="gone"
+                    android:background="#b88c34" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_pet"
+                    android:id="@+id/adi_iconList_pet"
+                    android:visibility="gone"
+                    android:background="#b88c34" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_toilet"
+                    android:id="@+id/adi_iconList_toilet"
+                    android:visibility="gone"
                     android:background="#b88c34" />
 
             </LinearLayout>
