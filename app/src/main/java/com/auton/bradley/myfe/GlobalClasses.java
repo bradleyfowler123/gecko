@@ -96,12 +96,13 @@ class AgendaClass implements Parcelable {
     String ref; String key;
     int rank;
                             // subsection - used when trying to display the agenda data in friend feed only
-    String activityDescription;
     String timeAgo;
     String friendName;
     String picUrl;
                     // used when dealing with the activity item in database
     String location; Double distAway;
+    String activityDescription;
+    String url;
     Integer price;
     Boolean familyfriendly;
     Boolean event;
@@ -109,17 +110,6 @@ class AgendaClass implements Parcelable {
     Integer totalgoing;
 
     AgendaClass(){
-    }
-
-    Bundle getDataBundle1() {
-        Bundle output = new Bundle();
-        output.putString("title", this.activity);
-        output.putString("location", this.location);
-        output.putString("image", this.image);
-        output.putInt("price", this.price);
-        output.putBoolean("ff", this.familyfriendly);
-        output.putBoolean("event", this.event);
-        return output;
     }
         // make parcelable
     public int describeContents() { return 0;}

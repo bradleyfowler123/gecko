@@ -44,7 +44,7 @@ public class ProfileFriendsListFragment extends Fragment {
 
     // function that generates the view
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_profile_friends, container, false);        // enables easy access to the root search xml
@@ -54,12 +54,14 @@ public class ProfileFriendsListFragment extends Fragment {
         final ArrayList<String> friendNames;
         final ArrayList<String> friendUids;
         final ArrayList<String> profilePicUrls;
+        final ArrayList<String> interested;
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {                           // if friend activity
             final FriendActivity activity = (FriendActivity) getActivity();                         // get users friend list
             friendNames = activity.names;
             friendUids = activity.UIDs;
             profilePicUrls = activity.Urls;
+            interested = activity.Interested;
         }
         else {                                                                                      // if main activity
             final MainActivity activity = (MainActivity) getActivity();                             // get users friend list
@@ -67,6 +69,7 @@ public class ProfileFriendsListFragment extends Fragment {
             friendNames = activity.facebookData.getStringArrayList("friendNames");
             friendUids = activity.facebookData.getStringArrayList("friendUids");
             profilePicUrls = activity.facebookData.getStringArrayList("friendUrls");
+            interested = activity.interested;
         }
                                 // populate friends list
         friendsListAdapter adapter = new friendsListAdapter(getActivity(),friendNames,profilePicUrls);
@@ -80,6 +83,7 @@ public class ProfileFriendsListFragment extends Fragment {
                 intent.putStringArrayListExtra("uid", friendUids);
                 intent.putStringArrayListExtra("name", friendNames);
                 intent.putStringArrayListExtra("url", profilePicUrls);
+                intent.putStringArrayListExtra("interests", interested);
                 intent.putExtra("index", i);
                 startActivity(intent);
             }

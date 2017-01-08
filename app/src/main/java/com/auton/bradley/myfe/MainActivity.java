@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
-    private ArrayList<String> interested = new ArrayList<>();
+    public ArrayList<String> interested = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

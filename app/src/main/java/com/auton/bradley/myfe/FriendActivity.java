@@ -29,6 +29,7 @@ public class FriendActivity extends AppCompatActivity {
     public ArrayList<String> UIDs;
     public ArrayList<String> names;
     public ArrayList<String> Urls;
+    public ArrayList<String> Interested;
     public int index;
                                         // main function
     @Override
@@ -40,6 +41,7 @@ public class FriendActivity extends AppCompatActivity {
         UIDs = intent.getStringArrayListExtra("uid");
         names = intent.getStringArrayListExtra("name");
         Urls = intent.getStringArrayListExtra("url");
+        Interested = intent.getStringArrayListExtra("interests");
         index = intent.getIntExtra("index",0);
                             // get views
         TextView naneTv = (TextView) findViewById(R.id.af_tv_profile_name);

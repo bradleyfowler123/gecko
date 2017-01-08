@@ -62,18 +62,20 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        final String Uid; final String friendName; final String friendUrl;
+        final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
             Uid = activity.UIDs.get(activity.index);
             friendName = activity.names.get(activity.index);
             friendUrl = activity.Urls.get(activity.index);
+            myInterests = activity.Interested;
         }
         else {
             final MainActivity activity = (MainActivity) getActivity();
             Uid = activity.auth.getCurrentUser().getUid();
             friendName = null; friendUrl = null;
+            myInterests = activity.interested;
         }
                                         // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -123,12 +125,14 @@ public class ProfileAgendaFragment extends Fragment {
                     intent.putExtra("friendTime",listItem.time);
                     intent.putExtra("friendName", friendName);
                     intent.putExtra("friendUrl", friendUrl);
+                    intent.putExtra("interests", myInterests);
                 }
                 else {
                     intent.putExtra("from", "profile");
                     intent.putExtra("date",listItem.date);
                     intent.putExtra("time",listItem.time);
                     intent.putExtra("userRef", listItem.key);
+                    intent.putExtra("interests", myInterests);
                 }
                 intent.putExtra("ref",listItem.ref);
                 startActivity(intent);

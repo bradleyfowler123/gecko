@@ -75,6 +75,7 @@ public class HomeFragment extends Fragment {
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("ref",listItems.get(i).ref);
                 intent.putExtra("from", "home");
+                intent.putExtra("interests", ((MainActivity) getActivity()).interested);
                 startActivity(intent);
             }
         });

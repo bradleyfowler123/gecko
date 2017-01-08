@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -43,6 +44,7 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +59,7 @@ public class DetailedItemActivity extends AppCompatActivity {
     // global variable declarations
     private MapView mapView;
     private AgendaClass activityData = new AgendaClass();
+    private ArrayList<String> myInterests; private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +71,11 @@ public class DetailedItemActivity extends AppCompatActivity {
         // get and display appropriate data and handle button presses
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");                                                // work out what started this activity - either home feed, friend feed, friend profile, users profile
+        myInterests = intent.getStringArrayListExtra("interests");
+        Log.d("!Grrrrrrrrrrrrrrrr", myInterests.toString());
         switch (from) {
             case "home": {      // home list detailed activity view
+                findViewById(R.id.adi_space).setVisibility(View.GONE);
                 // get and set data
                 String ref = intent.getStringExtra("ref");                              // for now, because it saves a lot of work, when item click on in home feed just get the data again. I think firebase is actually smart so uses saved copies offline
                 getNSetData(ref);
@@ -172,6 +178,9 @@ public class DetailedItemActivity extends AppCompatActivity {
     private void getNSetData(final String ref) {
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
+        final TextView tv_desc = (TextView) findViewById(R.id.adi_decription);
+        final TextView tv_link = (TextView) findViewById(R.id.adi_link);
+        final TextView tv_other = (TextView) findViewById(R.id.adi_other);
         final String[] refItems = ref.split("/");
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference agenda = database.child("activitydata").child(refItems[0]).child(refItems[1]).child(refItems[2]);
@@ -182,12 +191,30 @@ public class DetailedItemActivity extends AppCompatActivity {
                 activityData.event = refItems[1].equals("events");  // set activity/event data
                 activityData.ref = ref;
                 tv_title.setText(activityData.activity);
+                tv_desc.setText(activityData.activityDescription);
+                tv_link.setText("Visit: " + activityData.url);
+                tv_other.setText("Prices from £" + activityData.price);
                 Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                if (menu!=null) {
+                    if (myInterests.contains(activityData.ref)) menu.getItem(0).setIcon(android.R.drawable.star_on);
+                    else menu.getItem(0).setIcon(android.R.drawable.star_off);
+                }
                 setupMap(activityData.activity, activityData.location);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("Datebase Error", databaseError.toString());
+            }
+        });
+
+        tv_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (activityData.url!=null) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(activityData.url));
+                    startActivity(i);
+                }
             }
         });
     }
@@ -311,6 +338,11 @@ public class DetailedItemActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_detailedactivity, menu);
+        this.menu = menu;
+        if (myInterests!=null) {
+            if (myInterests.contains(activityData.ref)) menu.getItem(0).setIcon(android.R.drawable.star_on);
+            else menu.getItem(0).setIcon(android.R.drawable.star_off);
+        }
         return true;
     }
 
@@ -365,12 +397,10 @@ public class DetailedItemActivity extends AppCompatActivity {
 
                 return true;
             case R.id.action_interestedActivity:
-
-
-           /*     // if user not logged in
+                // if user not logged in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user== null) {                            // tell them to log in
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(DetailedItemActivity.this);
                     builder.setMessage("Sign in to mark items as interested")
                             .setPositiveButton("okay", null)
                             .create()
@@ -380,9 +410,11 @@ public class DetailedItemActivity extends AppCompatActivity {
                     String ref = activityData.ref;
                     if (myInterests.contains(ref)) {
                         myInterests.remove(ref);
+                        menu.getItem(0).setIcon(android.R.drawable.star_off);
                     }
                     else {
                         myInterests.add(ref);
+                        menu.getItem(0).setIcon(android.R.drawable.star_on);
                     }
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Interested");
@@ -393,8 +425,6 @@ public class DetailedItemActivity extends AppCompatActivity {
                         }
                     });
                 }
-             */
-
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -95,6 +95,7 @@ public class FriendFragment extends Fragment {
                         intent.putExtra("friendTime",listItem.time);
                         intent.putExtra("friendName", listItem.friendName);
                         intent.putExtra("friendUrl", listItem.picUrl);
+                        intent.putExtra("interests", activity.interested);
                         startActivity(intent);
                     }
                 });
