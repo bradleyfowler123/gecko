@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
-        Log.d("uybujk", homeListTitles.toString());Log.d("uybujk", homeListItems.toString()); Log.d("uybujk", activityFriendInterestedNumbers.toString()); Log.d("uybujk", activityFriendGoingNumbers.toString()); Log.d("uybujk", interested.toString());
+    //    Log.d("uybujk", homeListTitles.toString());Log.d("uybujk", homeListItems.toString()); Log.d("uybujk", activityFriendInterestedNumbers.toString()); Log.d("uybujk", activityFriendGoingNumbers.toString()); Log.d("uybujk", interested.toString());
         if (homeFragment!=null) homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         // if (homeFragment!=null)homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
@@ -516,7 +516,8 @@ public class MainActivity extends AppCompatActivity {
         activityFriendGoingNumbers.clear();
                         // get numbers
         for (String value : homeListRefs) {
-            activityFriendGoingNumbers.put(value, Collections.frequency(friendFeedListItems, value));
+            int freq = Collections.frequency(friendFeedListItems, value);
+            if (freq != 0) activityFriendGoingNumbers.put(value, freq);                             // don't show 0 values
         }              // update list
         if (homeFragment != null)
             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);

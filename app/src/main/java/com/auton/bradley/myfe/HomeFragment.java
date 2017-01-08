@@ -198,7 +198,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     // display numbers and stars on bottom banners
         if (myInterests.contains(listItem.ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
-        if (!activityFriendGoingNumbers.isEmpty()) holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(listItem.ref)));
+        if (!activityFriendGoingNumbers.isEmpty()) if (activityFriendGoingNumbers.get(listItem.ref)!=null) holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(listItem.ref)));
         if (!activityFriendInterestedNumbers.isEmpty()) if (activityFriendInterestedNumbers.get(listItem.ref)!=null) holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(listItem.ref)));
                              // add an on long click listener for the add to calendar button in each list item
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
@@ -206,7 +206,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
             public boolean onLongClick(View view) {     // inform user of how many friends are going
                 CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(this.position).activity;
                 String message;
-                if (number == "0") message = "None of your friends have added  " + activity + " to their agenda yet";
+                if (number == "") message = "None of your friends have added  " + activity + " to their agenda yet";
                 else if (number == "1") message = "1 friend is going to " + activity;
                 else message = number + " friends are going " + activity;
                 Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
@@ -294,7 +294,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
             public boolean onLongClick(View view) {
                 CharSequence number = holder.noFriInt.getText(); String activity = listData.get(position).activity;
                 String message;
-                if (number == "0") message = "None of your friends have said they are interested in going to " + activity + " yet";
+                if (number == "") message = "None of your friends have said they are interested in going to " + activity + " yet";
                 else if (number == "1") message = "1 friend is interested in going to " + activity;
                 else message = number + " friends are interested in going to " + activity;
                 Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();

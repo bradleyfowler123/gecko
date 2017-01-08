@@ -203,6 +203,8 @@ public class DetailedItemActivity extends AppCompatActivity {
                 if (activityData.indoor!=null && activityData.indoor) findViewById(R.id.adi_iconList_indoor).setVisibility(View.VISIBLE);
                 if (activityData.parking!=null && activityData.parking) findViewById(R.id.adi_iconList_parking).setVisibility(View.VISIBLE);
                 if (activityData.pet!=null && activityData.pet) findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
+                if (activityData.toilet!=null && activityData.toilet) findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
+
 
 
                 setupMap(activityData.activity, activityData.location);
