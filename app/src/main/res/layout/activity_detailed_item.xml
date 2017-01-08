@@ -27,22 +27,95 @@
                 android:adjustViewBounds="true" />
 
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="-20dp"
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/adi_image"
+                android:id="@+id/adi_iconList">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@android:drawable/ic_menu_search"
+                    android:background="#b88c34" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@android:drawable/ic_menu_set_as"
+                    android:background="#d0c5b0" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@android:drawable/ic_menu_always_landscape_portrait"
+                    android:background="#b88c34" />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@android:drawable/ic_menu_camera"
+                    android:background="#b88c34" />
+
+            </LinearLayout>
 
             <TextView
-                android:text="TextView"
-                android:layout_width="wrap_content"
+                android:text="Indoor Climbing"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="2"
                 android:layout_alignParentStart="true"
                 android:textSize="30sp"
-                android:layout_below="@id/adi_image"
-                android:id="@+id/adi_title" />
+                android:layout_below="@id/adi_iconList"
+                android:id="@+id/adi_title"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
+
+            <TextView
+                android:text="For adults (18+) who are interested in taking well-being, dance and fitness classes. Find information on all our classes including: Yoga, Pilates, Massage Therapies, Ballet, Jazz, Tap, Contemporary, Street Dance, Commercial, Zumba, Weekend Workout and Barre."
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textSize="15sp"
+                android:layout_below="@id/adi_title"
+                android:id="@+id/adi_decription"
+                android:padding="10dp"/>
+
+            <TextView
+                android:text="Prices from £20"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textSize="15sp"
+                android:layout_below="@id/adi_decription"
+                android:id="@+id/adi_other"
+                android:padding="10dp"/>
+
 
             <com.google.android.gms.maps.MapView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="200dp"
                 android:id="@+id/mapView2"
-                android:layout_below="@+id/adi_title"
-                android:layout_alignParentStart="true"/>
+                android:layout_below="@+id/adi_decription"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@id/adi_other"/>
+
+            <TextView
+                android:text="Visit: http://www.bodyworkcompany.co.uk/adult-dance-and-fitness-class/dance/"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_below="@id/mapView2"
+                android:id="@+id/adi_link"
+                android:maxLines="2"
+                android:padding="10dp"/>
+
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/adi_link"/>
 
         </RelativeLayout>
     </ScrollView>
