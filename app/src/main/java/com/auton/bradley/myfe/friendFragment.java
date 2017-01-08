@@ -115,13 +115,6 @@ public class FriendFragment extends Fragment {
                                 if(FacebookData.getString("email").equals(user.getEmail())) {
                                     user.linkWithCredential(credential);
                                     Toast.makeText(getContext(),"FB Linked",Toast.LENGTH_SHORT).show();
-                                                    // restart main activity to display new user state
-                                    Intent intent = new Intent();
-                                    intent.putExtra("tab", 3);
-                                    intent.putExtra("fbConnected", true);
-                                    intent.putExtra("fbData", FacebookData);
-                                    activity.setIntent(intent);
-                                    activity.recreate();
                                 }
                                 else {
                                     LoginManager.getInstance().logOut();
@@ -190,6 +183,14 @@ public class FriendFragment extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+                        // restart main activity to display new user state
+                        MainActivity activity = (MainActivity) getActivity();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.putExtra("tab", 1);
+                        intent.putExtra("fbConnected", true);
+                        intent.putExtra("fbData", FacebookData);
+                        startActivity(intent);
                     }
                 }
         ).executeAsync();

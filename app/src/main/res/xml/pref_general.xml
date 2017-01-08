@@ -27,10 +27,6 @@
         android:title="@string/pref_title_display_name"
         android:inputType="text"/>
 
-    <Preference android:title="Profile Picture"
-        android:key="profilePic_pref">
-        <intent android:action="android.intent.action.PICK" />
-    </Preference>
     <SwitchPreference
         android:defaultValue="true"
         android:key="fbCon_switch"

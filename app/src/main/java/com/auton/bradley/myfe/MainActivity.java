@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
             } else {            // else - i.e. on first app run
                 auth.signOut();                     // sign out any firebase user that may be signed in as we have no data on them
                 facebookConnected = false;
+                LoginManager.getInstance().logOut();
             }
             // load tab bar and tab data
             viewPager = (ViewPager) findViewById(R.id.container);                                       // find view underneith tabs
@@ -394,6 +395,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_settings:
                 Intent intent4 = new Intent(this, SettingsActivity.class);
+                intent4.putExtra("fbCon", facebookConnected);
+                intent4.putExtra("tab", currentTab);
                 startActivity(intent4);
                 return true;
             case R.id.action_logout:
