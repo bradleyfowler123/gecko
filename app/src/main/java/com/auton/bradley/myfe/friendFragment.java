@@ -28,7 +28,13 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -51,6 +57,7 @@ public class FriendFragment extends Fragment {
     private friendAdapter adapter;
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
+    private ArrayList<String> friendFirebaseIDs; private int friendCount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -183,19 +190,82 @@ public class FriendFragment extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        // restart main activity to display new user state
-                        MainActivity activity = (MainActivity) getActivity();
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        intent.putExtra("tab", 1);
-                        intent.putExtra("fbConnected", true);
-                        intent.putExtra("fbData", FacebookData);
-                        startActivity(intent);
+                        FacebookData.putStringArrayList("friendNames",friendData.names);
+                        FacebookData.putStringArrayList("friendIds",friendData.ids);
+                        FacebookData.putStringArrayList("friendUrls",friendData.picUrls);
+                        storeFbFriendsInFirebase();
                     }
                 }
         ).executeAsync();
         return friendData;
     }
+
+    public void storeFbFriendsInFirebase() {
+        // store friends in firebase
+        // store users uid and fb id in database lookup table - need not run every time
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
+        myFacebookIDRef.setValue(user.getUid());
+        // if you have no friends run main activity
+        final ArrayList<String> facebookFriendIDs = FacebookData.getStringArrayList("friendIds");
+        //      Log.d("yughj", friendFirebaseIDs.toString());
+        if (facebookFriendIDs == null || facebookFriendIDs.isEmpty()) {
+            DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
+            friends.removeValue();
+            // restart main activity to display new user state
+            MainActivity activity = (MainActivity) getActivity();
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("tab", 1);
+            intent.putExtra("fbConnected", true);
+            intent.putExtra("fbData", FacebookData);
+            activity.finish();
+            startActivity(intent);
+        }
+        else {          // else store friends UIDs in the users friend list on firebase
+            // initialise variables
+            friendFirebaseIDs = new ArrayList<>();                          // will hold the list of friend UIDs
+            for (int i = 0; i < facebookFriendIDs.size(); i++) {
+                friendFirebaseIDs.add(i, "");
+            }
+            friendCount = facebookFriendIDs.size();
+            // for every facebook friend, get their uid
+            for (int i = 0; i < facebookFriendIDs.size(); i++) {
+                Log.d("rfdfd",facebookFriendIDs.get(i));
+                DatabaseReference firebaseIDRef = database.child("facebookIDs").child(facebookFriendIDs.get(i));
+                firebaseIDRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // store their uid in list
+                        int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());
+                        friendFirebaseIDs.set(index, dataSnapshot.getValue().toString());
+                        friendCount = friendCount - 1;
+                        // once all UIDs stored, store friends UIDs in user entry of database
+                        if (friendCount == 0) {
+                            DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
+                            friends.setValue(friendFirebaseIDs);
+                            FacebookData.putStringArrayList("friendUids", friendFirebaseIDs);
+                            //        Log.d("uuhjv", FacebookData.getStringArrayList("friendUids").toString());
+                            // restart main activity to display new user state
+                            MainActivity activity = (MainActivity) getActivity();
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            intent.putExtra("tab", 1);
+                            intent.putExtra("fbConnected", true);
+                            intent.putExtra("fbData", FacebookData);
+                            activity.finish();
+                            startActivity(intent);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
+    }
+
+
                                 // function to format all of the data
     public Bundle getFacebookData(JSONObject object, FacebookFriendData friends) {
         try {
@@ -229,7 +299,7 @@ public class FriendFragment extends Fragment {
             return bundle;
         }
         catch(JSONException e) {
-            Log.d("idk","Error parsing JSON");
+            Log.d("idkbbjnm", e.toString());
             return null;
         }
     }
