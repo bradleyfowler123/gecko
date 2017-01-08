@@ -115,7 +115,6 @@ public class SettingsActivity extends PreferenceActivity {
 
             } else {                    // For all other preferences
                 preference.setSummary(stringValue);                                                 // set the summary to the value's simple string representation
-                Log.d("kidsklx", preference.getKey());
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (preference.getKey().equals("email_text")){
                     if (start[0] || stringValue.isEmpty()) {
@@ -271,7 +270,6 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
-            setHasOptionsMenu(true);
 
             start[0] = true; start[1] = true; start[2] = true;
             bindPreferenceSummaryToValue(findPreference("email_text"));
@@ -491,18 +489,6 @@ public class SettingsActivity extends PreferenceActivity {
                 }
             }
         }
-
-
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     //This fragment shows notification preferences only
@@ -512,17 +498,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_notification);
-            setHasOptionsMenu(true);
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        }
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+        //    bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
         }
     }
 
@@ -533,17 +509,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_data_sync);
-            setHasOptionsMenu(true);
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-        }
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+       //     bindPreferenceSummaryToValue(findPreference("sync_frequency"));
         }
     }
 }

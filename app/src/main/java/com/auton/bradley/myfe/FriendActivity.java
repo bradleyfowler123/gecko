@@ -58,15 +58,15 @@ public class FriendActivity extends AppCompatActivity {
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
         adapter.addFragment(new ProfileAgendaFragment(), "Agenda");
-        adapter.addFragment(new ProfilePhotosFragment(), "Photos");
+    //    adapter.addFragment(new ProfilePhotosFragment(), "Photos");
         adapter.addFragment(new ProfileFriendsListFragment(), "Friends");
         viewPager.setAdapter(adapter);
     }
 
     private void setupTabTitles() {
         tabLayout.getTabAt(0).setText(getString(R.string.profileAgenda_tabName));
-        tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
-        tabLayout.getTabAt(2).setText("Your Friends");
+    //    tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
+        tabLayout.getTabAt(1).setText("Your Friends");
     }
 }
 
