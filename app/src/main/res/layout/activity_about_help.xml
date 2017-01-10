@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_about_help"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.auton.bradley.myfe.AboutHelpActivity"
+    android:orientation="vertical">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:id="@+id/aboutHelp__list"
+        android:nestedScrollingEnabled="true">
+    </ListView>
+
+
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container111">
+    </android.support.v4.view.ViewPager>
+
+</LinearLayout>

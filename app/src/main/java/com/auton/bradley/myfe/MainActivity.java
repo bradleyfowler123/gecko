@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 // location filter
-                location = data.getStringExtra("location");
+        //        location = data.getStringExtra("location");
                 // distance filter
                 double dist = data.getDoubleExtra("distance", 0);
                 for (int i = 0; i < filteredHomeListItems.size(); i++) {
@@ -398,6 +398,11 @@ public class MainActivity extends AppCompatActivity {
                 intent4.putExtra("fbCon", facebookConnected);
                 intent4.putExtra("tab", currentTab);
                 startActivity(intent4);
+                return true;
+            case R.id.action_about_help:
+                Intent intent5 = new Intent(this, AboutHelpActivity.class);
+                intent5.putExtra("tab", currentTab);
+                startActivity(intent5);
                 return true;
             case R.id.action_logout:
                 //     if (facebookConnected) {

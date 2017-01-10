@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -46,6 +47,7 @@ public class HomeFragment extends Fragment {
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -62,6 +64,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
                                    // variable declarations
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
         if (listTitles!=null) {
@@ -72,6 +75,16 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Bundle params = new Bundle();
+                params.putString("activity_name", listItems.get(i).activity);
+                params.putBoolean("event", listItems.get(i).event);
+                params.putInt("price", listItems.get(i).price);
+                params.putDouble("distance_away", listItems.get(i).distAway);
+                params.putInt("position_in_list", i);
+                params.putBoolean("signed_in", (FirebaseAuth.getInstance().getCurrentUser()!=null));
+                mFirebaseAnalytics.logEvent("home_list_click", params);
+
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("ref",listItems.get(i).ref);
                 intent.putExtra("from", "home");

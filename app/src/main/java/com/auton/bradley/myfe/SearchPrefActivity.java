@@ -51,7 +51,7 @@ public class SearchPrefActivity extends AppCompatActivity {
                 }
                 else {                                                                              // if group is single select
                     String[] dialogMessages = getResources().getStringArray(R.array.elvCustomDialogMessages);
-                    if(listGroup.elements.size()==childPos+1) {                                     // handle custom requests
+                    if(listGroup.elements.size()==childPos+1 && groupPos != 2) {                                     // handle custom requests
                         int inputType;                                                              // dialog input data type
                         final String dialogMessage, before, after;                                  // dialog title message, elv preview variables for custom entry
                         if(groupPos==0) {           // cost
@@ -155,7 +155,6 @@ public class SearchPrefActivity extends AppCompatActivity {
         String[] location = getResources().getStringArray(R.array.elvLocationItems);
         Item i4=new Item(location[0],new ArrayList<>(Collections.singletonList(location[1])),false);
         i4.elements.add(location[1]);
-        i4.elements.add(location[2]);
 
         String[] distance = getResources().getStringArray(R.array.elvDistanceItems);
         Item i5=new Item(distance[0],new ArrayList<>(Collections.singletonList(distance[2])),false);
@@ -256,7 +255,7 @@ class searchPrefAdapter extends BaseExpandableListAdapter {                     
             }
         }
         else {                                                                                      // if single selection
-            if (i.elements.get(i.elements.size()-1).equals(i.Selected)) {                           // if it was a custom on
+            if (i.elements.get(i.elements.size()-1).equals(i.Selected) && !option.equals("City")) {                           // if it was a custom on
                 selected = i.CustomValuePreview;                                                    // set the preview selection to the custom value
             }
             else {

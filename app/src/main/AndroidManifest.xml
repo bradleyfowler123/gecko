@@ -2,9 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.auton.bradley.myfe">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -90,6 +93,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.auton.bradley.myfe.MainActivity" />
+        </activity>
+        <activity
+            android:name=".AboutHelpActivity"
+            android:label="About and Help"
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity android:name=".AboutHelpActivityItem"
+            android:parentActivityName=".AboutHelpActivity"
+            android:label="About and Help">
         </activity>
     </application>
 

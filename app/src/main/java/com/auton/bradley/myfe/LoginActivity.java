@@ -33,6 +33,7 @@ import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
@@ -75,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
     private Boolean Pass = false;                                                                   // variable used to prevent main activity loading in certain case
     private int friendCount;
     private ArrayList<String> friendFirebaseIDs;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
                                         // cycle functions
     @Override
@@ -93,6 +95,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    //    mFirebaseAnalytics.setUserProperty("test", "some string");
         mAuth = FirebaseAuth.getInstance();
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -104,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.loginProgressBar);
         final EditText etEmail = (EditText) findViewById(R.id.editText_login_email);
         final EditText etPassword = (EditText) findViewById(R.id.editText_login_password);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         if(intent.getExtras()!=null) { currentTab = intent.getIntExtra("tab",0);}
         else { currentTab = 0;}
                                         // function that runs every time user logs in or out in this activity
@@ -172,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }
                         } else {                                                                          // if facebook is not linked
-                            if(!user.isEmailVerified()) {
+                            if(!user.isEmailVerified() && !intent.getExtras().containsKey("verificationPass")) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                 builder.setMessage("Your email address has not been verified yet. Please follow the link we sent you after you registered")
                                         .setPositiveButton("Resend Verification",
@@ -223,7 +227,7 @@ public class LoginActivity extends AppCompatActivity {
                                     } else {                                                              // if fail
                                         progressBar.setVisibility(View.INVISIBLE);                          // hide progress bar
                                                                             // if fails due to not a network error
-                                        if (!task.getException().getMessage().contains("A network error")){
+                                        if (task.getException().getMessage().contains("The password is invalid")){
                                                                                     // allow them to reset password
                                             final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                             builder.setMessage("Login Failed - " + task.getException().getMessage())
@@ -248,7 +252,7 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         else {                          // if login fails due to other reason, tell them why
                                             AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                            builder.setMessage("Login Failed - Network error.")
+                                            builder.setMessage("Login Failed - " + task.getException().getMessage())
                                                     .setPositiveButton(getString(R.string.login_retry_button), null)
                                                     .create()
                                                     .show();
@@ -292,7 +296,7 @@ public class LoginActivity extends AppCompatActivity {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                                     builder.setView(promptsView);                                                                   // set input_prompts.xml to alert dialog builder
                                     final EditText userInput = (EditText) promptsView.findViewById(R.id.InputPromptUserInput);      // enable easy access to object
-                                    userInput.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);                                 // set the dialog input data type
+                                    userInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);                                 // set the dialog input data type
                                     final TextView promptMessage = (TextView) promptsView.findViewById(R.id.InputPromptMessage);
                                     promptMessage.setVisibility(View.GONE);
                                     builder.setMessage(FacebookData.getString("first_name")+ ", you have not yet linked Facebook to your Myfe account. Please enter your Myfe password below to link it.")

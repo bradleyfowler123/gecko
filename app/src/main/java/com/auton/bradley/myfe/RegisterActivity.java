@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     // global variables
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseAnalytics mFirebaseAnalytics;
                                     // cycle functions
     @Override
     public void onStart() {
@@ -48,6 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_register);                                                 // set the xml file to be viewed
                                     // declarations
@@ -63,6 +66,9 @@ public class RegisterActivity extends AppCompatActivity {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {                                                                 // User is signed in
                     Log.d("TAGr1", "onAuthStateChanged:signed_in:" + user.getUid());
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.SIGN_UP_METHOD, "password");
+                    mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle);
                                     // add name and profile pic
                     final String name = etName.getText().toString();
                     UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -77,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         Log.d("DisplayNameAdded", "User profile updated.");
                                                         // start Main activity
                                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                        intent.putExtra("verificationPass",true);
                                         startActivity(intent);
                                     }
                                 }
