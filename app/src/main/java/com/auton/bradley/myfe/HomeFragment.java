@@ -75,7 +75,7 @@ public class HomeFragment extends Fragment {
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                            // analytics
                 Bundle params = new Bundle();
                 params.putString("activity_name", listItems.get(i).activity);
                 params.putBoolean("event", listItems.get(i).event);
@@ -84,7 +84,7 @@ public class HomeFragment extends Fragment {
                 params.putInt("position_in_list", i);
                 params.putBoolean("signed_in", (FirebaseAuth.getInstance().getCurrentUser()!=null));
                 mFirebaseAnalytics.logEvent("home_list_click", params);
-
+                            // show detailed view
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 intent.putExtra("ref",listItems.get(i).ref);
                 intent.putExtra("from", "home");
@@ -155,6 +155,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private ArrayList<AgendaClass> backupData;
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
+    private FirebaseAnalytics mFirebaseAnalytics;
                                 // define a function that can be used to declare this custom adapter class
     homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
@@ -183,7 +184,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
             LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final ViewGroup nullParent = null;
             convertView = inflater.inflate(R.layout.home_list_item, nullParent);
-        }                       // find the views within the list
+        }
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+                        // find the views within the list
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
@@ -259,6 +262,22 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         pushData.put("time", listItem.time);
                         pushData.put("ref", listItem.ref);
                         agendaItem.setValue(pushData);
+                                            // analytics
+                        Bundle params = new Bundle();
+                        params.putString("from", "home_feed");
+                        params.putString("activity_name", listItem.activity);
+                        params.putBoolean("event", listItem.event);
+                        params.putInt("price", listItem.price);
+                        params.putDouble("distance_away", listItem.distAway);
+                        params.putInt("position_in_list", this.position);
+                        int interested; int going;
+                        if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
+                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                        params.putInt("friends_interested", interested);
+                        if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
+                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                        params.putInt("friends_going", going);
+                        mFirebaseAnalytics.logEvent("item_added_to_agenda", params);
                     }
                     else {              // if activity get a date and time and then add it in main activity
                         MainActivity activity = (MainActivity) getContext();                            // schedule a time and add it to their agenda
@@ -284,12 +303,45 @@ class homeAdapter extends ArrayAdapter<String> {                                
                             .show();
                 }
                 else {              // if user logged in
-                    String ref = listData.get(this.position).ref;
+                    final AgendaClass listItem = listData.get(this.position);
+                    String ref = listItem.ref;
                     if (myInterests.contains(ref)) {
                         myInterests.remove(ref);
+                        // analytics
+                        Bundle params = new Bundle();
+                        params.putString("from", "home_feed");
+                        params.putString("activity_name", listItem.activity);
+                        params.putBoolean("event", listItem.event);
+                        params.putInt("price", listItem.price);
+                        params.putDouble("distance_away", listItem.distAway);
+                        params.putInt("position_in_list", this.position);
+                        int interested; int going;
+                        if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
+                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                        params.putInt("friends_interested", interested);
+                        if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
+                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                        params.putInt("friends_going", going);
+                        mFirebaseAnalytics.logEvent("item_unmarked_as_interested", params);
                     }
                     else {
                         myInterests.add(ref);
+                        // analytics
+                        Bundle params = new Bundle();
+                        params.putString("from", "home_feed");
+                        params.putString("activity_name", listItem.activity);
+                        params.putBoolean("event", listItem.event);
+                        params.putInt("price", listItem.price);
+                        params.putDouble("distance_away", listItem.distAway);
+                        params.putInt("position_in_list", this.position);
+                        int interested; int going;
+                        if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
+                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                        params.putInt("friends_interested", interested);
+                        if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
+                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                        params.putInt("friends_going", going);
+                        mFirebaseAnalytics.logEvent("item_marked_as_interested", params);
                     }
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                     DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Interested");
@@ -299,6 +351,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                             Log.d("complete?", Boolean.toString(task.isSuccessful()));
                         }
                     });
+
                 }
             }
         });                         // flash how many friends are interested going

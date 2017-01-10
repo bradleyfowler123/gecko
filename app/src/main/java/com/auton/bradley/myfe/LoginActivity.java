@@ -287,6 +287,11 @@ public class LoginActivity extends AppCompatActivity {
                             public void onSuccess(ProviderQueryResult providerQueryResult) {
                                final List provs =  providerQueryResult.getProviders();
                                 if (provs == null || provs.isEmpty() || provs.contains("facebook.com")) {              // if new user; if used facebook before
+                                    if (provs == null || provs.isEmpty()) {
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString(FirebaseAnalytics.Param.SIGN_UP_METHOD, "facebook");
+                                        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle);
+                                    }
                                     mAuth.signInWithCredential(credential);                         // create an account; log them in
                                 }
                                 else {  // if they have a myfe account, but have not connected facebook yet
