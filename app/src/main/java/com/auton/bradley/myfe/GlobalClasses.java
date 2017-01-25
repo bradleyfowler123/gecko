@@ -89,25 +89,25 @@ class TimeDispNRank {
                                 // class used when handling a firebase activity/event
 class AgendaClass implements Parcelable {
                     // always used
-    String activity;
+    public String activity;
                     // used when dealing with users or friends stored agenda
-    String date;
-    String time;
-    String ref; String key;
-    int rank;
+    public String date;
+    public String time;
+    public String ref; public String key;
+    public int rank;
                             // subsection - used when trying to display the agenda data in friend feed only
-    String timeAgo;
-    String friendName;
-    String picUrl;
+    public String timeAgo;
+    public String friendName;
+    public String picUrl;
                     // used when dealing with the activity item in database
-    String location; Double distAway;
-    String activityDescription;
-    String url;
-    Integer price;
-    Boolean familyfriendly; Boolean disabled; Boolean indoor; Boolean parking; Boolean pet; Boolean toilet;
-    Boolean event;
-    String image;
-    Integer totalgoing;
+    public String location; public Double distAway;
+    public String activityDescription;
+    public String url;
+    public Integer price;
+    public Boolean familyfriendly; public Boolean disabled; public Boolean indoor; public Boolean parking; public Boolean pet; public Boolean toilet;
+    public Boolean event;
+    public String image;
+    public Integer totalgoing;
 
     AgendaClass(){
     }

@@ -192,7 +192,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                 tv_title.setText(activityData.activity);
                 tv_desc.setText(activityData.activityDescription);
                 tv_link.setText("Visit: " + activityData.url);
-                tv_other.setText("Prices from £" + activityData.price);
+                if (activityData.event) tv_other.setText("Prices from £" + activityData.price + "\n \nStarts at " + formatTime(activityData.time) + " on " + formatDate(activityData.date));
                 Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
                 if (menu!=null) {
                     if (myInterests.contains(activityData.ref)) menu.getItem(0).setIcon(android.R.drawable.star_on);

@@ -55,6 +55,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -75,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private Boolean Pass = false;                                                                   // variable used to prevent main activity loading in certain case
     private int friendCount;
-    private ArrayList<String> friendFirebaseIDs;
+    private HashMap<String, Boolean> friendFirebaseIDs;
     private FirebaseAnalytics mFirebaseAnalytics;
 
                                         // cycle functions
@@ -138,10 +139,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                                 else {          // else store friends UIDs in the users friend list on firebase
                                                         // initialise variables
-                                    friendFirebaseIDs = new ArrayList<>();                          // will hold the list of friend UIDs
-                                    for (int i = 0; i < facebookFriendIDs.size(); i++) {
-                                        friendFirebaseIDs.add(i, "");
-                                    }
+                                    friendFirebaseIDs = new HashMap<>();                          // will hold the list of friend UIDs
                                     friendCount = facebookFriendIDs.size();
                                                     // for every facebook friend, get their uid
                                     for (int i = 0; i < facebookFriendIDs.size(); i++) {
@@ -151,14 +149,14 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                         // store their uid in list
                                                 int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());
-                                                friendFirebaseIDs.set(index, dataSnapshot.getValue().toString());
+                                                friendFirebaseIDs.put(dataSnapshot.getValue().toString(),true);
                                                 friendCount = friendCount - 1;
                                                             // once all UIDs stored, store friends UIDs in user entry of database
                                                 if (friendCount == 0) {
                                                     DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
                                                     friends.setValue(friendFirebaseIDs);
-                                                    FacebookData.putStringArrayList("friendUids", friendFirebaseIDs);
-                                            //        Log.d("uuhjv", FacebookData.getStringArrayList("friendUids").toString());
+                                                    ArrayList<String> arrayList = new ArrayList<>(friendFirebaseIDs.keySet());
+                                                    FacebookData.putStringArrayList("friendUids", arrayList);
                                                                 // start main activity
                                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);     // if there is facebook data
                                                     intent.putExtra("tab", currentTab);                                     // start main activity and pass relevant data
