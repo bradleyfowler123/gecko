@@ -192,7 +192,14 @@ public class DetailedItemActivity extends AppCompatActivity {
                 tv_title.setText(activityData.activity);
                 tv_desc.setText(activityData.activityDescription);
                 tv_link.setText("Visit: " + activityData.url);
-                if (activityData.event) tv_other.setText("Prices from £" + activityData.price + "\n \nStarts at " + formatTime(activityData.time) + " on " + formatDate(activityData.date));
+                if (activityData.event) {
+                    if (activityData.price != 0) {
+                        tv_other.setText("Prices from £" + activityData.price + "\n \nTimings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
+                    }
+                    else {
+                        tv_other.setText("Timings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
+                    }
+                }
                 Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
                 if (menu!=null) {
                     if (myInterests.contains(activityData.ref)) menu.getItem(0).setIcon(android.R.drawable.star_on);
@@ -204,8 +211,6 @@ public class DetailedItemActivity extends AppCompatActivity {
                 if (activityData.parking!=null && activityData.parking) findViewById(R.id.adi_iconList_parking).setVisibility(View.VISIBLE);
                 if (activityData.pet!=null && activityData.pet) findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
                 if (activityData.toilet!=null && activityData.toilet) findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
-
-
 
                 setupMap(activityData.activity, activityData.location);
             }
@@ -289,10 +294,8 @@ public class DetailedItemActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // add to calendar button returns data
-        switch (requestCode) {
-            case 1: {
-                // Make sure the request was successful
-                if (resultCode == 1) {
+        if (resultCode == 1) {
+            if (requestCode==1){
                                     // get data return
                     String date = data.getStringExtra("date"); String time = data.getStringExtra("time");
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -307,23 +310,16 @@ public class DetailedItemActivity extends AppCompatActivity {
                             Toast.makeText(getBaseContext(),"Error Update Failed",Toast.LENGTH_SHORT).show();
                         }
                     });
-                    Toast.makeText(getBaseContext(),"Updated",Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar
+                            .make(findViewById(R.id.activity_detailed_item), "Updated", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                     TextView textView = (TextView) findViewById(R.id.adi_scheduled_text);
                     textView.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
-                }
             }
-            case 32: {
-                if (resultCode == 1) {
+            else if (requestCode==32) {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     Snackbar snackbar = Snackbar
-                            .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                    snackbar1.show();
-                                }
-                            });
+                            .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG);
                     snackbar.show();
                     if (user != null) {       // upload selection to their agenda
                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -336,7 +332,6 @@ public class DetailedItemActivity extends AppCompatActivity {
                         pushData.put("ref", data.getStringExtra("reference"));
                         agendaItem.setValue(pushData);
                     }
-                }
             }
         }
     }
@@ -372,14 +367,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                     final AgendaClass listItem = activityData;
                     if (listItem.event) {           // if event add it straight away
                         Snackbar snackbar = Snackbar
-                                .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG)
-                                .setAction("UNDO", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                        snackbar1.show();
-                                    }
-                                });
+                                .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG);
                         snackbar.show();
                         // upload selection to there agenda
                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -397,6 +385,7 @@ public class DetailedItemActivity extends AppCompatActivity {
                         intent.putExtra("title", listItem.activity);                           // data need to add item to calendar
                         intent.putExtra("location", listItem.location);
                         intent.putExtra("reference", listItem.ref);
+                        Log.d("CCCCCCCC", "d");
                         startActivityForResult(intent, 32);
                          // result is handled by main activity
                     }
@@ -417,10 +406,16 @@ public class DetailedItemActivity extends AppCompatActivity {
                 else {              // if user logged in
                     String ref = activityData.ref;
                     if (myInterests.contains(ref)) {
+                        Snackbar snackbar = Snackbar
+                                .make(findViewById(R.id.activity_detailed_item), "Unmarked as interested", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                         myInterests.remove(ref);
                         menu.getItem(0).setIcon(android.R.drawable.star_off);
                     }
                     else {
+                        Snackbar snackbar = Snackbar
+                                .make(findViewById(R.id.activity_detailed_item), "Marked as interested", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                         myInterests.add(ref);
                         menu.getItem(0).setIcon(android.R.drawable.star_on);
                     }

@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -61,7 +62,9 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
                 pushData.put("ref", ref);
                 agendaItem.setValue(pushData);
 
-                Toast.makeText(getBaseContext(),"Added",Toast.LENGTH_SHORT).show();
+                Snackbar snackbar = Snackbar
+                        .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG);
+                snackbar.show();
                 if (checkBox.isChecked()) {
                     // send notification to appropriate friend
                 }

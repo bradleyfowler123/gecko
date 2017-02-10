@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
@@ -246,14 +247,7 @@ public class MainActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == 1) {
                 Snackbar snackbar = Snackbar
-                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                snackbar1.show();
-                            }
-                        });
+                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG);
                 snackbar.show();
                 if (user != null) {       // upload selection to their agenda
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -606,8 +600,9 @@ public class MainActivity extends AppCompatActivity {
 
         // get and set all events
         DatabaseReference eventsDataRef = database.child("activitydata").child(location).child("events");
+        Query ordered = eventsDataRef.orderByChild("date");
         // get data
-        eventsDataRef.addChildEventListener(new ChildEventListener() {
+        ordered.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {

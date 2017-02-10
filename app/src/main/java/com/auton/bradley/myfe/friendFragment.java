@@ -232,7 +232,6 @@ public class FriendFragment extends Fragment {
             friendCount = facebookFriendIDs.size();
             // for every facebook friend, get their uid
             for (int i = 0; i < facebookFriendIDs.size(); i++) {
-                Log.d("rfdfd",facebookFriendIDs.get(i));
                 DatabaseReference firebaseIDRef = database.child("facebookIDs").child(facebookFriendIDs.get(i));
                 firebaseIDRef.addValueEventListener(new ValueEventListener() {
                     @Override

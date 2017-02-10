@@ -2,6 +2,7 @@ package com.auton.bradley.myfe;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -231,7 +232,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         });                                 // add item to your calendar
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 // if user not logged in
                 if (FirebaseAuth.getInstance().getCurrentUser() == null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -242,42 +243,44 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 } else {              // if user logged in
                     final AgendaClass listItem = listData.get(this.position);
                     if (listItem.event) {           // if event add it straight away
-                        Snackbar snackbar = Snackbar
-                                .make(view, "Added to calendar", Snackbar.LENGTH_LONG)
-                                .setAction("UNDO", new View.OnClickListener() {
+                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                        builder.setMessage("Add event to your calendar?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(View view) {
-                                        Snackbar snackbar1 = Snackbar.make(view, "Removed from calendar", Snackbar.LENGTH_SHORT);
-                                        snackbar1.show();
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Snackbar snackbar = Snackbar
+                                                .make(view, "Added to calendar", Snackbar.LENGTH_LONG);
+                                        snackbar.show();
+                                        // upload selection to there agenda
+                                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                                        DatabaseReference agendaItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").push();
+                                        HashMap<String, String> pushData = new HashMap<>();
+                                        pushData.put("activity", listItem.activity);
+                                        pushData.put("location", listItem.location);
+                                        pushData.put("date", listItem.date);
+                                        pushData.put("time", listItem.time);
+                                        pushData.put("ref", listItem.ref);
+                                        agendaItem.setValue(pushData);
+                                        // analytics
+                                        Bundle params = new Bundle();
+                                        params.putString("from", "home_feed");
+                                        params.putString("activity_name", listItem.activity);
+                                        params.putBoolean("event", listItem.event);
+                                        params.putInt("price", listItem.price);
+                                        params.putDouble("distance_away", listItem.distAway);
+                                        int interested; int going;
+                                        if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
+                                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                                        params.putInt("friends_interested", interested);
+                                        if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
+                                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                                        params.putInt("friends_going", going);
+                                        mFirebaseAnalytics.logEvent("item_added_to_agenda", params);
                                     }
-                                });
-                        snackbar.show();
-                               // upload selection to there agenda
-                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                        DatabaseReference agendaItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").push();
-                        HashMap<String, String> pushData = new HashMap<>();
-                        pushData.put("activity", listItem.activity);
-                        pushData.put("location", listItem.location);
-                        pushData.put("date", listItem.date);
-                        pushData.put("time", listItem.time);
-                        pushData.put("ref", listItem.ref);
-                        agendaItem.setValue(pushData);
-                                            // analytics
-                        Bundle params = new Bundle();
-                        params.putString("from", "home_feed");
-                        params.putString("activity_name", listItem.activity);
-                        params.putBoolean("event", listItem.event);
-                        params.putInt("price", listItem.price);
-                        params.putDouble("distance_away", listItem.distAway);
-                        params.putInt("position_in_list", this.position);
-                        int interested; int going;
-                        if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
-                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
-                        params.putInt("friends_interested", interested);
-                        if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
-                        else going = activityFriendGoingNumbers.get(listItem.ref);
-                        params.putInt("friends_going", going);
-                        mFirebaseAnalytics.logEvent("item_added_to_agenda", params);
+                                })                  // delete item
+                                .setNegativeButton("No", null)
+                                .create()
+                                .show();
                     }
                     else {              // if activity get a date and time and then add it in main activity
                         MainActivity activity = (MainActivity) getContext();                            // schedule a time and add it to their agenda
@@ -307,6 +310,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     String ref = listItem.ref;
                     if (myInterests.contains(ref)) {
                         myInterests.remove(ref);
+                        Snackbar snackbar = Snackbar
+                                .make(view, "Unmarked as interested", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                         // analytics
                         Bundle params = new Bundle();
                         params.putString("from", "home_feed");
@@ -326,6 +332,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     }
                     else {
                         myInterests.add(ref);
+                        Snackbar snackbar = Snackbar
+                                .make(view, "Marked as interested", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                         // analytics
                         Bundle params = new Bundle();
                         params.putString("from", "home_feed");

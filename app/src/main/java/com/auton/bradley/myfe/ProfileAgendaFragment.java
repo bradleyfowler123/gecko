@@ -1,11 +1,7 @@
 package com.auton.bradley.myfe;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -15,23 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Set;
 
 public class ProfileAgendaFragment extends Fragment {
 
@@ -96,8 +84,10 @@ public class ProfileAgendaFragment extends Fragment {
                          AgendaClass listItem = iterator.next();
                          listItem.rank = calcRank(listItem.date,listItem.time);
                          listItem.key = keySet.next();
-                         listItems.add(listItem);
-                         titles.add(listItem.activity);
+                         if (listItem.rank != -1) {
+                             listItems.add(listItem);
+                             titles.add(listItem.activity);
+                         }
                      }                // populate list
                      sortedList = listItems;
                      Collections.sort(sortedList, new AgendaComparator());
@@ -144,16 +134,16 @@ public class ProfileAgendaFragment extends Fragment {
 
     private int calcRank(String dateString, String timeString) {
         int rank;
-        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
+        SimpleDateFormat formatDT = new SimpleDateFormat("MM/dd/yyyy-HH:mm", Locale.US);
         try {
-            Date date = formatDate.parse(dateString);
-            Date time = formatTime.parse(timeString);
+            Date dt = formatDT.parse(dateString + '-' + timeString);
             Date dateCurrent = Calendar.getInstance().getTime();
-            int day1 = (int) (date.getTime()/(1000*60*60*24L));
-            int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
-            int  daysApart = day1-day2;
-            rank = (int) (time.getTime()/(24*60L)+2500) + daysApart*100000;
+            if (dateCurrent.compareTo(dt)>0) {
+                rank = -1;
+            }
+            else {
+                rank = (int) ((dt.getTime()-dateCurrent.getTime())/60000L);
+            }
            } catch (ParseException e) {
             e.printStackTrace();
             rank = 0;
@@ -204,19 +194,19 @@ class profileAgendaAdapter extends ArrayAdapter<String> {                       
 
     private String formatTime(String dateString, String timeString) {
         String output;
-        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-        SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
+        SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy-HH:mm", Locale.US);
+      //  SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.US);
         try {
-            Date date = formatDate.parse(dateString);
-            Date time = formatTime.parse(timeString);
+            Date date = formatDate.parse(dateString + '-' + timeString);
+        //    Date time = formatTime.parse(timeString);
             Date dateCurrent = Calendar.getInstance().getTime();
             int day1 = (int) (date.getTime()/(1000*60*60*24L));
             int day2 = (int) (dateCurrent.getTime()/(1000*60*60*24L));
             int  daysApart = day1-day2;
             if (daysApart<7) {
                 if (daysApart<1){
-                    if (daysApart<0) output = "Done";                                                   // already been
-                    else output = (String) android.text.format.DateFormat.format("HH:mm", time);}   // the same day - show timee
+                    if (date.getTime()-dateCurrent.getTime()<0) output = "Done";                                                   // already been
+                    else output = (String) android.text.format.DateFormat.format("HH:mm", date);}   // the same day - show timee
                 else output = (String) android.text.format.DateFormat.format("E", date);}                   // within a week - show the day
             else output = (String) android.text.format.DateFormat.format("dd, MMM", date);                  // outside a week - show the date
         } catch (ParseException e) {

@@ -72,15 +72,15 @@ public class ProfileFragment extends Fragment {
 
     public void setupViewpagerChild(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new ProfileAgendaFragment(), "Agenda");
-  //      adapter.addFragment(new ProfilePhotosFragment(), "Photos");
+        adapter.addFragment(new ProfileAgendaFragment(), "Upcoming");
+        adapter.addFragment(new ProfileAgendaCompleteFragment(), "Previous");
         adapter.addFragment(new ProfileFriendsListFragment(), "Friends");
         viewPager.setAdapter(adapter);
     }
 
     private void setupTabTitles() {
-        tabLayout.getTabAt(0).setText(getString(R.string.profileAgenda_tabName));
-  //      tabLayout.getTabAt(1).setText(getString(R.string.profilePhotos_tabName));
-        tabLayout.getTabAt(1).setText(getString(R.string.profileFriends_tabName));
+        tabLayout.getTabAt(0).setText("Upcoming");
+        tabLayout.getTabAt(1).setText("Previous");
+        tabLayout.getTabAt(2).setText(getString(R.string.profileFriends_tabName));
     }
 }
