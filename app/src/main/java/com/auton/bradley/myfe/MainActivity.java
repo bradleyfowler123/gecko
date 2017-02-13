@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -27,6 +28,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -40,6 +42,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -456,7 +459,6 @@ public class MainActivity extends AppCompatActivity {
                         // for each agenda item
                         while (iterator.hasNext()) {
                             AgendaClass agendaItem = iterator.next();
-                            Log.d("ijk,mlk", dataSnapshot.toString());
                             TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
                             if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
                                 agendaItem.rank = timeNRank.rank;
@@ -552,44 +554,77 @@ public class MainActivity extends AppCompatActivity {
                     // get data
         activityDataRef.addChildEventListener(new ChildEventListener() {
             @Override           // for each activity agenda item, add it and repopulate home list
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
-                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                agendaItem.event = false;
-                agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
-                homeListItems.add(agendaItem);
-                homeListTitles.add(agendaItem.activity);
-                homeListRefs.add(agendaItem.ref);
-                if (homeFragment != null)
-                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
+                        agendaItem.event = false;
+                        agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                            if (homeFragment != null)
+                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
 
             @Override       // for each activity agenda item, update it and repopulate home list
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                homeListItems.remove(index);
-                homeListTitles.remove(index);
-                homeListRefs.remove(index);
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                };
-                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                agendaItem.event = false;
-                agendaItem.distAway = getDistanceAway(agendaItem.location);
-                homeListItems.add(agendaItem);
-                homeListTitles.add(agendaItem.activity);
-                homeListRefs.add(agendaItem.ref);
-                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
+                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                        };
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
+                        agendaItem.event = false;
+                        agendaItem.distAway = getDistanceAway(agendaItem.location);
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
 
             @Override       // for each activity agenda item, remove it and repopulate home list
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                homeListItems.remove(index);
-                homeListTitles.remove(index);
-                homeListRefs.remove(index);
-                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildRemoved(final DataSnapshot dataSnapshot) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
 
             @Override
@@ -597,6 +632,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+        ;
 
         // get and set all events
         DatabaseReference eventsDataRef = database.child("activitydata").child(location).child("events");
@@ -604,44 +640,78 @@ public class MainActivity extends AppCompatActivity {
         // get data
         ordered.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                };
-                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                agendaItem.event = true;
-                agendaItem.distAway = getDistanceAway(agendaItem.location);
-                homeListItems.add(agendaItem);
-                homeListTitles.add(agendaItem.activity);
-                homeListRefs.add(agendaItem.ref);
-                if (homeFragment != null)
-                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                        };
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
+                        agendaItem.event = true;
+                        agendaItem.distAway = getDistanceAway(agendaItem.location);
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                  //          System.out.println("Finished executing public " + homeListTitles.toString());
+                            if (homeFragment != null)
+                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
-                homeListItems.remove(index);
-                homeListTitles.remove(index);
-                homeListRefs.remove(index);
-                GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                };
-                AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                agendaItem.event = true;
-                agendaItem.distAway = getDistanceAway(agendaItem.location);
-                homeListItems.add(agendaItem);
-                homeListTitles.add(agendaItem.activity);
-                homeListRefs.add(agendaItem.ref);
-                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
+                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                        };
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
+                        agendaItem.event = true;
+                        agendaItem.distAway = getDistanceAway(agendaItem.location);
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
-                homeListItems.remove(index);
-                homeListTitles.remove(index);
-                homeListRefs.remove(index);
-                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+            public void onChildRemoved(final DataSnapshot dataSnapshot) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
+                        return true;
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
             }
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
