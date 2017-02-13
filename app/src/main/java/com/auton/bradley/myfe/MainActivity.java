@@ -22,13 +22,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.TaskExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -42,7 +40,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -89,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, Integer> activityFriendGoingNumbersTemp = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
 
@@ -156,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setCurrentItem(currentTab);
         }
         else {
-            Log.d("ihikjhik", "yfh");
+       //     Log.d("ihikjhik", "yfh");
             currentTab = savedInstanceState.getInt("currentTab");
             facebookConnected = savedInstanceState.getBoolean("fbCon");
             facebookData = savedInstanceState.getBundle("fbData");
@@ -177,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("onRestore?????????????/", ">DDDDDDDDDD");
+    //    Log.d("onRestore?????????????/", ">DDDDDDDDDD");
      /*   currentTab = savedInstanceState.getInt("currentTab");
         facebookConnected = savedInstanceState.getBoolean("fbCon");
         facebookData = savedInstanceState.getBundle("fbData");
@@ -439,42 +437,64 @@ public class MainActivity extends AppCompatActivity {
                 final DatabaseReference friend = database.child("users").child(friendUIDs.get(j)).child("Agenda");
                 friend.addValueEventListener(new ValueEventListener() {
                     @Override               // upon data return
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // isolate each agenda item along with which friend it is
-                        GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
-                        };
-                        HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                        Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                        String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
-                        // remove all list items of this friend
-                        int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
-                        String friendUrl = friendFBUrls.get(i);
-                        for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
-                            if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
-                                friendFeedListItemsData.remove(k);
-                                friendFeedListItems.remove(k);
-                                k = k - 1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        new AsyncTask<Object, Boolean, Boolean>() {
+                            @Override
+                            protected Boolean doInBackground(Object... params) {
+                                // isolate each agenda item along with which friend it is
+                                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
+                                };
+                                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                                Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                                String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
+                                // remove all list items of this friend
+                                int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
+                                String friendUrl = friendFBUrls.get(i);
+                                for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
+                                    if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
+                                        friendFeedListItemsData.remove(k);
+                                        friendFeedListItems.remove(k);
+                                        k = k - 1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                                    }
+                                }               // all all list items for this friend
+                                // for each agenda item
+                                while (iterator.hasNext()) {
+                                    AgendaClass agendaItem = iterator.next();
+                                    TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
+                                    if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
+                                        agendaItem.rank = timeNRank.rank;
+                                        agendaItem.activityDescription = agendaItem.activity + ", " + location;
+                                        agendaItem.timeAgo = timeNRank.timeDisp;
+                                        agendaItem.friendName = friendFBNames.get(i);
+                                        agendaItem.picUrl = friendFBUrls.get(i);
+                                        friendFeedListItems.add(agendaItem.ref);
+                                        friendFeedListItemsData.add(agendaItem);
+                                        friendFeedSortedList = friendFeedListItemsData;
+                                        Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
+                                                    // calculate friend going numbers (in background haha)
+                                        activityFriendGoingNumbersTemp.clear();
+                                        // get numbers
+                                        for (String value : homeListRefs) {
+                                            int freq = Collections.frequency(friendFeedListItems, value);
+                                            if (freq != 0) activityFriendGoingNumbersTemp.put(value, freq);                             // don't show 0 values
+                                        }              // update list
+                                    }
+                                }
+                                return true;
                             }
-                        }               // all all list items for this friend
-                        // for each agenda item
-                        while (iterator.hasNext()) {
-                            AgendaClass agendaItem = iterator.next();
-                            TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
-                            if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
-                                agendaItem.rank = timeNRank.rank;
-                                agendaItem.activityDescription = agendaItem.activity + ", " + location;
-                                agendaItem.timeAgo = timeNRank.timeDisp;
-                                agendaItem.friendName = friendFBNames.get(i);
-                                agendaItem.picUrl = friendFBUrls.get(i);
-                                friendFeedListItems.add(agendaItem.ref);
-                                friendFeedListItemsData.add(agendaItem);
-                                friendFeedSortedList = friendFeedListItemsData;
-                                Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
-                                if (friendFragment != null)
-                                    friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
+                            @Override
+                            protected void onPostExecute(Boolean result) {
+                                if(result){
+                                    if (friendFragment != null)
+                                        friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
+                                                           // now friend agenda data has been found, show friend going numbers on home feed
+                                    activityFriendGoingNumbers = activityFriendGoingNumbersTemp;
+                                    // update list
+                                    if (homeFragment != null)
+                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                }
                             }
-                        }
-                        findFriendsGoingToActivities();                                             // now friend agenda data has been found, show friend going numbers on home feed
+                        }.execute();
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -512,18 +532,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-                // now friend agenda data has been found, show friend going numbers on home feed
-    private void findFriendsGoingToActivities() {
-        activityFriendGoingNumbers.clear();
-                        // get numbers
-        for (String value : homeListRefs) {
-            int freq = Collections.frequency(friendFeedListItems, value);
-            if (freq != 0) activityFriendGoingNumbers.put(value, freq);                             // don't show 0 values
-        }              // update list
-        if (homeFragment != null)
-            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-    }
-
                     // get user data
     private void getNSetUserData() {
                         // set users interests stars on home screen
@@ -533,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
             @Override                           // get interests
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                interested.clear();
+                interested.clear(); // prevents using async for some reason
                 while (snapshotIterator.hasNext()) {
                     interested.add(snapshotIterator.next().getValue().toString());
                 }
