@@ -265,7 +265,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         Snackbar snackbar = Snackbar
-                                                .make(view, "Added to calendar", Snackbar.LENGTH_LONG);
+                                                .make(view, "Added to calendar", Snackbar.LENGTH_SHORT);
                                         snackbar.show();
                                         // upload selection to there agenda
                                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -327,7 +327,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     if (myInterests.contains(ref)) {
                         myInterests.remove(ref);
                         Snackbar snackbar = Snackbar
-                                .make(view, "Unmarked as interested", Snackbar.LENGTH_LONG);
+                                .make(view, "Unmarked as interested", Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         // analytics
                         Bundle params = new Bundle();
@@ -349,7 +349,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     else {
                         myInterests.add(ref);
                         Snackbar snackbar = Snackbar
-                                .make(view, "Marked as interested", Snackbar.LENGTH_LONG);
+                                .make(view, "Marked as interested", Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         // analytics
                         Bundle params = new Bundle();

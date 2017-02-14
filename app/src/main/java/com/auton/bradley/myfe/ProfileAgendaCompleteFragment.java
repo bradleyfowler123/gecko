@@ -117,7 +117,7 @@ public class ProfileAgendaCompleteFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Snackbar snackbar = Snackbar
-                                        .make(rootView, "Deleted from history", Snackbar.LENGTH_LONG);
+                                        .make(rootView, "Deleted from history", Snackbar.LENGTH_SHORT);
                                 snackbar.show();
                                 // upload selection to there agenda
                                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();

@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == 1) {
                 Snackbar snackbar = Snackbar
-                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_LONG);
+                        .make(viewPager, "Added to calendar", Snackbar.LENGTH_SHORT);
                 snackbar.show();
                 if (user != null) {       // upload selection to their agenda
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -828,11 +828,10 @@ public class MainActivity extends AppCompatActivity {
                     DecimalFormat newFormat = new DecimalFormat("#####.#");
                     return Double.valueOf(newFormat.format(valueResult));
                 }
-                else return 0;
+                else return -1;
             }
             catch (IOException e) {
-                e.printStackTrace();
-                return 0;
+                return -2;
             }
         }
         else return 0;
