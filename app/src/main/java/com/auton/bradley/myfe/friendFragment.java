@@ -342,10 +342,16 @@ class friendAdapter extends ArrayAdapter<String> {                              
         holder.time=(TextView) convertView.findViewById(R.id.ff_list_item_timeAgo);
         holder.img=(ImageView)  convertView.findViewById(R.id.ff_list_item_image);
         // populate the title and image with data for a list item
-        Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).into(holder.img);
-        holder.friends.setText(items.get(position).friendName);
-        holder.activity.setText(items.get(position).activityDescription);
-        holder.time.setText(items.get(position).timeAgo);
+        try {
+            Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).into(holder.img);
+            holder.friends.setText(items.get(position).friendName);
+            holder.activity.setText(items.get(position).activityDescription);
+            holder.time.setText(items.get(position).timeAgo);
+        }
+        catch (Exception e) {
+            Log.d("Exception Friend Frag", "1254");
+        }
+
         // return the updated view
         return convertView;
     }
