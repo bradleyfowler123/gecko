@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     public FirebaseAuth auth;
     public FirebaseUser user;
     int currentTab = 0;
-    String location = "cambridge"; Location currentLoc;
+    String location = "United Kingdom%%England%%Cambridgeshire%%Cambridge"; Location currentLoc;
 
 
     private FriendFragment friendFragment = new FriendFragment();
@@ -589,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
     private void getNSetHomeFeedData() {
         // get and set all activities
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference activityDataRef = database.child("activitydata").child(location).child("activities");
+        DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
                     // get data
         activityDataRef.addChildEventListener(new ChildEventListener() {
             @Override           // for each activity agenda item, add it and repopulate home list
@@ -680,7 +680,7 @@ public class MainActivity extends AppCompatActivity {
         ;
 
         // get and set all events
-        DatabaseReference eventsDataRef = database.child("activitydata").child(location).child("events");
+        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
         Query ordered = eventsDataRef.orderByChild("date");
         // get data
         ordered.addChildEventListener(new ChildEventListener() {

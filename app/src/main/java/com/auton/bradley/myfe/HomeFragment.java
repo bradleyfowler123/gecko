@@ -103,7 +103,6 @@ public class HomeFragment extends Fragment {
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
-    //    Log.d("!!!!!!!!!!!!!A", sortedList2.toString());
         if (home_list!=null && getActivity()!=null) {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list

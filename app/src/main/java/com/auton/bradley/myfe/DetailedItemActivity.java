@@ -63,7 +63,6 @@ import java.util.Locale;
 
 public class DetailedItemActivity extends AppCompatActivity implements OnMapReadyCallback {
     // global variable declarations
-    private MapView mapView; private MapFragment mapFragment;
     private AgendaClass activityData = new AgendaClass();
     private ArrayList<String> myInterests; private Menu menu;
     private RequestCreator topImage; private Address address;
@@ -72,12 +71,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_item);
-        // get view objects
-        mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
- //       mapView = (MapView) findViewById(R.id.mapView2);
- //       mapView.onCreate(savedInstanceState);                                                       // set map view to previous display if there is one
-        // get and display appropriate data and handle button presses
+         // get and display appropriate data and handle button presses
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");                                                // work out what started this activity - either home feed, friend feed, friend profile, users profile
         myInterests = intent.getStringArrayListExtra("interests");
@@ -191,48 +185,52 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
         final TextView tv_other = (TextView) findViewById(R.id.adi_other);
         final String[] refItems = ref.split("/");
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference agenda = database.child("activitydata").child(refItems[0]).child(refItems[1]).child(refItems[2]);
+        DatabaseReference agenda = database.child("activitydata/placeData").child(refItems[0]).child(refItems[1]).child(refItems[2]);
         agenda.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() == null) {
                     tv_title.setText("Item removed by the provider");
+                    tv_desc.setVisibility(View.GONE);
+                    tv_link.setVisibility(View.GONE);
+                    tv_title.setVisibility(View.GONE);
+                    iv_activityImage.setVisibility(View.GONE);
+                    findViewById(R.id.map).setVisibility(View.GONE);
                 }
                 else {
                     activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                     activityData.event = refItems[1].equals("events");  // set activity/event data
                     activityData.ref = ref;
-                    topImage = Picasso.with(getBaseContext()).load(activityData.image);
-                        Log.d("!!!!!!!!!!!", "AAAAAAAAAAAAAAAAA");
-                        tv_title.setText(activityData.activity);
-                        tv_desc.setText(activityData.activityDescription);
-                        tv_link.setText("Visit: " + activityData.url);
-                        if (activityData.event) {
-                            if (activityData.price != 0) {
-                                tv_other.setText("Prices from £" + activityData.price + "\n \nTimings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
-                            } else {
-                                tv_other.setText("Timings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
-                            }
+                    Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                    tv_title.setText(activityData.activity);
+                    tv_desc.setText(activityData.activityDescription);
+                    tv_link.setText("Visit: " + activityData.url);
+                    if (activityData.event) {
+                        if (activityData.price != 0) {
+                            tv_other.setText("Prices from £" + activityData.price + "\n \nTimings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
+                        } else {
+                            tv_other.setText("Timings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
                         }
-                        topImage.into(iv_activityImage);
-                        if (menu != null) {
-                            if (myInterests.contains(activityData.ref))
-                                menu.getItem(0).setIcon(android.R.drawable.star_on);
-                            else menu.getItem(0).setIcon(android.R.drawable.star_off);
-                        }
-                        if (activityData.familyfriendly != null && activityData.familyfriendly)
-                            findViewById(R.id.adi_iconList_family).setVisibility(View.VISIBLE);
-                        if (activityData.disabled != null && activityData.disabled)
-                            findViewById(R.id.adi_iconList_disabled).setVisibility(View.VISIBLE);
-                        if (activityData.indoor != null && activityData.indoor)
-                            findViewById(R.id.adi_iconList_indoor).setVisibility(View.VISIBLE);
-                        if (activityData.parking != null && activityData.parking)
-                            findViewById(R.id.adi_iconList_parking).setVisibility(View.VISIBLE);
-                        if (activityData.pet != null && activityData.pet)
-                            findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
-                        if (activityData.toilet != null && activityData.toilet)
-                            findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
-                        mapFragment.getMapAsync(DetailedItemActivity.this);
+                    }
+                    if (menu != null) {
+                        if (myInterests.contains(activityData.ref))
+                            menu.getItem(0).setIcon(android.R.drawable.star_on);
+                        else menu.getItem(0).setIcon(android.R.drawable.star_off);
+                    }
+                    if (activityData.familyfriendly != null && activityData.familyfriendly)
+                        findViewById(R.id.adi_iconList_family).setVisibility(View.VISIBLE);
+                    if (activityData.disabled != null && activityData.disabled)
+                        findViewById(R.id.adi_iconList_disabled).setVisibility(View.VISIBLE);
+                    if (activityData.indoor != null && activityData.indoor)
+                        findViewById(R.id.adi_iconList_indoor).setVisibility(View.VISIBLE);
+                    if (activityData.parking != null && activityData.parking)
+                        findViewById(R.id.adi_iconList_parking).setVisibility(View.VISIBLE);
+                    if (activityData.pet != null && activityData.pet)
+                        findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
+                    if (activityData.toilet != null && activityData.toilet)
+                        findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
+                    MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+                    mapFragment.getMapAsync(DetailedItemActivity.this);
                   //      setupMap(activityData.activity, activityData.location);
 
 
@@ -280,39 +278,8 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
         }
         return output;
     }
-                    // function to setup the google map
-    void setupMap(final String title, final String location) {
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {                                                        // Gets to GoogleMap from the MapView and does initialization stuff
-                Geocoder geocoder = new Geocoder(getBaseContext());                                 // geocoder process' locations
-                try {
-                    List<Address> addresses = geocoder.getFromLocationName(location, 1);            // get just one address for given location string
-                    if (addresses.size() != 0) {                                                    // if it finds one
-                        Address address = addresses.get(0);
-                        googleMap.addMarker(new MarkerOptions()                                     // add pin on google map
-                                .position(new LatLng(address.getLatitude(), address.getLongitude()))
-                                .title(title));
-                                                // move camera to that location
-                        CameraPosition camPos = new CameraPosition(new LatLng(address.getLatitude(), address.getLongitude()), 12, 0, 0); // zoom,,rotation
-                        CameraUpdate cu = CameraUpdateFactory.newCameraPosition(camPos);
-                        googleMap.moveCamera(cu);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                                // set blue dot where user is if they have allowed access to their location
-                if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    googleMap.setMyLocationEnabled(true);
-                }
-                UiSettings uiSettings = googleMap.getUiSettings();
-                uiSettings.setMyLocationButtonEnabled(true);
-                uiSettings.setAllGesturesEnabled(true);
-                uiSettings.setZoomControlsEnabled(true);
-                uiSettings.setMapToolbarEnabled(true);
-            }
-        });
-    }
+
+
                             // users agenda item reschedule time returned
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -457,38 +424,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-     //   mapView.onStart();
-    }
-    @Override
-    public void onPause() {
-        super.onPause();
-    //    mapView.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    //    mapView.onResume();
-    }
-    @Override
-    public void onStop() {
-        super.onStop();
-    //    mapView.onStop();
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    //    mapView.onDestroy();
-    }
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-    //    mapView.onLowMemory();
-    }
-
+    // function to setup the google map
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         new AsyncTask<Object, Boolean, Boolean>() {
@@ -505,7 +441,6 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                         return false;
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
                     return false;
                 }
             }
@@ -521,14 +456,13 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     googleMap.moveCamera(cu);
                 }
                 else {
-                    //
+                    View map = findViewById(R.id.map);
+                    map.setVisibility(View.INVISIBLE);
+
+
                 }
             }
         }.execute();
-
-
-
-
         // set blue dot where user is if they have allowed access to their location
         if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);

@@ -122,21 +122,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@id/adi_other"/>
 
-            <com.google.android.gms.maps.MapView
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
-                android:id="@+id/mapView2"
-                android:visibility="invisible"
-                android:layout_below="@+id/adi_decription"
-                android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@id/adi_other"/>
-
             <TextView
                 android:text="Visit: http://www.bodyworkcompany.co.uk/adult-dance-and-fitness-class/dance/"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:layout_below="@id/mapView2"
+                android:layout_below="@id/map"
                 android:id="@+id/adi_link"
                 android:maxLines="2"
                 android:padding="10dp"/>
