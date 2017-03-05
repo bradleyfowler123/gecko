@@ -77,7 +77,7 @@ public class ProfileAgendaFragment extends Fragment {
                  if (agendaData != null) {                                                          // if user or friend has agenda items
                      Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                      Iterator<String> keySet = agendaData.keySet().iterator();
-
+                     Log.d("asdfg3", dataSnapshot.toString());
                      listItems.clear();
                      ArrayList<String> titles = new ArrayList<>();
                      while (iterator.hasNext()) {
@@ -109,6 +109,7 @@ public class ProfileAgendaFragment extends Fragment {
                                 // load custom detailed view
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 AgendaClass listItem = sortedList.get(i);
+                Log.d("asdfg2", sortedList.get(i).toString());
                 if(getActivity().toString().contains("FriendActivity")) {
                     intent.putExtra("from", "friendPage");                                          // custom detailed friend
                     intent.putExtra("friendDate",listItem.date);

@@ -33,10 +33,12 @@ public class ProfileFragment extends Fragment {
                                     // get user info
         MainActivity activity = (MainActivity) getActivity();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        Bundle fbData = activity.facebookData;
-        Boolean fbCon = activity.facebookConnected;
+
+
                                 // if user logged in
         if(user != null) {
+            Bundle fbData = activity.facebookData;
+            Boolean fbCon = activity.facebookConnected;
                                 // do not show sign up view
             loggedInView.setVisibility(View.VISIBLE);
             signUpView.setVisibility(View.GONE);

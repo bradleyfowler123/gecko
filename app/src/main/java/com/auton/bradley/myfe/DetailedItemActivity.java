@@ -125,6 +125,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                 ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
                 final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
                 // get data
+                Log.d("asdfg1", intent.toString());
                 final String ref = intent.getStringExtra("ref");
                 final String userRef = intent.getStringExtra("userRef");
                 String date = intent.getStringExtra("date");
@@ -212,6 +213,14 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                             tv_other.setText("Timings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
                         }
                     }
+                    else {
+                        if (activityData.price != 0) {
+                            tv_other.setText("Prices from £" + activityData.price + "\n \nLocation:\n" + activityData.location);
+                        }
+                        else {
+                            tv_other.setText("Location:\n" + activityData.location);
+                        }
+                    }
                     if (menu != null) {
                         if (myInterests.contains(activityData.ref))
                             menu.getItem(0).setIcon(android.R.drawable.star_on);
@@ -231,7 +240,6 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                         findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
                     MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
                     mapFragment.getMapAsync(DetailedItemActivity.this);
-                  //      setupMap(activityData.activity, activityData.location);
 
 
                 }
@@ -457,7 +465,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                 }
                 else {
                     View map = findViewById(R.id.map);
-                    map.setVisibility(View.INVISIBLE);
+                    map.setVisibility(View.GONE);
 
 
                 }

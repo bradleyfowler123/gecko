@@ -107,6 +107,7 @@ public class HomeFragment extends Fragment {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list
                 home_list.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             } else {
                 adapter.notifyDataSetChanged();}                                                    // repopulate existing list
         }
@@ -202,7 +203,12 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                 // populate the texts and images with data for a list item
         AgendaClass listItem = listData.get(position);
         holder.activityTitle.setText(listItem.activity);
-        holder.activityLocation.setText(String.format("%s km away", Double.toString(listItem.distAway)));
+        if (listItem.distAway == -1)
+            holder.activityLocation.setVisibility(View.GONE);
+        else {
+            holder.activityLocation.setVisibility(View.VISIBLE);
+            holder.activityLocation.setText(String.format("%s km away", Double.toString(listItem.distAway)));
+        }
         RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image);
         activityImg.centerCrop().resize(1000,600).into(holder.img);
         if (listItem.event) {

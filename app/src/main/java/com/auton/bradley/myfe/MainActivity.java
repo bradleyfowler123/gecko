@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Integer> activityFriendGoingNumbersTemp = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
+    private Boolean backContinue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
             getNSetUserData();      // get user's data from firebase
             // check to see if we have their other data
             if (getIntent().hasExtra("fbConnected")) {  // if so login started this activity or preferences set
-                Toast.makeText(getBaseContext(), "FIRST OPEN BUT ALREADY SIGNED IN", Toast.LENGTH_LONG).show();
                 Log.d("!!!!!!!!!BBBBBBBBB", "FIRST OPEN");
                 // get user's social data from intent
                 Intent intent = getIntent();
@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                     getNSetFriendData();    // get friends info and show it on home feed
                 }
             } else {                    // if we have lost all the data just log tem out
-                Toast.makeText(getBaseContext(), "REOPENED", Toast.LENGTH_LONG).show();
                 Log.d("!!!!!!!!!BBBBBBBBB", "REOPENED");
                 // need to get saved instance state data
                 // check for facebook connection
@@ -171,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         } else {  // user is not signed in
-            Toast.makeText(getBaseContext(), "NOT SIGNED IN", Toast.LENGTH_LONG).show();
             Log.wtf("!!!!!!!AAAAAAAAA", "NOT SIGNED IN");
             // do nothing
             LoginManager.getInstance().logOut();
@@ -393,7 +391,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
                     // show login or logout button
-        if (user != null) {
+        FirebaseUser user1 = FirebaseAuth.getInstance().getCurrentUser();
+        if (user1 != null) {
             menu.getItem(0).setVisible(false);
             menu.getItem(1).setVisible(true);
             menu.getItem(2).setVisible(true);   // settings
@@ -470,63 +469,67 @@ public class MainActivity extends AppCompatActivity {
                 friend.addValueEventListener(new ValueEventListener() {
                     @Override               // upon data return
                     public void onDataChange(final DataSnapshot dataSnapshot) {
-                        new AsyncTask<Object, Boolean, Boolean>() {
-                            @Override
-                            protected Boolean doInBackground(Object... params) {
-                                // isolate each agenda item along with which friend it is
-                                GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
-                                };
-                                HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
-                                Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
-                                String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
-                                // remove all list items of this friend
-                                int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
-                                String friendUrl = friendFBUrls.get(i);
-                                for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
-                                    if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
-                                        friendFeedListItemsData.remove(k);
-                                        friendFeedListItems.remove(k);
-                                        k = k - 1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                        if (dataSnapshot.getValue()!=null) {
+                            new AsyncTask<Object, Boolean, Boolean>() {
+                                @Override
+                                protected Boolean doInBackground(Object... params) {
+                                    // isolate each agenda item along with which friend it is
+                                    GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
+                                    };
+                                    HashMap<String, AgendaClass> agendaData = dataSnapshot.getValue(t);              // get agenda data
+                                    Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
+                                    String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
+                                    // remove all list items of this friend
+                                    int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
+                                    String friendUrl = friendFBUrls.get(i);
+                                    for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
+                                        if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
+                                            friendFeedListItemsData.remove(k);
+                                            friendFeedListItems.remove(k);
+                                            k = k - 1;                                                            // as all items left unchecked have moved pointers by -1, reflect this in where we are up to counting
+                                        }
+                                    }               // all all list items for this friend
+                                    // for each agenda item
+                                    while (iterator.hasNext()) {
+                                        AgendaClass agendaItem = iterator.next();
+                                        TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
+                                        if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
+                                            agendaItem.rank = timeNRank.rank;
+                                            agendaItem.activityDescription = agendaItem.activity + ", " + location;
+                                            agendaItem.timeAgo = timeNRank.timeDisp;
+                                            agendaItem.friendName = friendFBNames.get(i);
+                                            agendaItem.picUrl = friendFBUrls.get(i);
+                                            friendFeedListItems.add(agendaItem.ref);
+                                            friendFeedListItemsData.add(agendaItem);
+                                            friendFeedSortedList = friendFeedListItemsData;
+                                            Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
+                                            // calculate friend going numbers (in background haha)
+                                            activityFriendGoingNumbersTemp.clear();
+                                            // get numbers
+                                            for (String value : homeListRefs) {
+                                                int freq = Collections.frequency(friendFeedListItems, value);
+                                                if (freq != 0)
+                                                    activityFriendGoingNumbersTemp.put(value, freq);                             // don't show 0 values
+                                            }              // update list
+                                        }
                                     }
-                                }               // all all list items for this friend
-                                // for each agenda item
-                                while (iterator.hasNext()) {
-                                    AgendaClass agendaItem = iterator.next();
-                                    TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
-                                    if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
-                                        agendaItem.rank = timeNRank.rank;
-                                        agendaItem.activityDescription = agendaItem.activity + ", " + location;
-                                        agendaItem.timeAgo = timeNRank.timeDisp;
-                                        agendaItem.friendName = friendFBNames.get(i);
-                                        agendaItem.picUrl = friendFBUrls.get(i);
-                                        friendFeedListItems.add(agendaItem.ref);
-                                        friendFeedListItemsData.add(agendaItem);
-                                        friendFeedSortedList = friendFeedListItemsData;
-                                        Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
-                                                    // calculate friend going numbers (in background haha)
-                                        activityFriendGoingNumbersTemp.clear();
-                                        // get numbers
-                                        for (String value : homeListRefs) {
-                                            int freq = Collections.frequency(friendFeedListItems, value);
-                                            if (freq != 0) activityFriendGoingNumbersTemp.put(value, freq);                             // don't show 0 values
-                                        }              // update list
+                                    return true;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Boolean result) {
+                                    if (result) {
+                                        if (friendFragment != null)
+                                            friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
+                                        // now friend agenda data has been found, show friend going numbers on home feed
+                                        activityFriendGoingNumbers = activityFriendGoingNumbersTemp;
+                                        // update list
+                                        if (homeFragment != null)
+                                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                                     }
                                 }
-                                return true;
-                            }
-                            @Override
-                            protected void onPostExecute(Boolean result) {
-                                if(result){
-                                    if (friendFragment != null)
-                                        friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
-                                                           // now friend agenda data has been found, show friend going numbers on home feed
-                                    activityFriendGoingNumbers = activityFriendGoingNumbersTemp;
-                                    // update list
-                                    if (homeFragment != null)
-                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                                }
-                            }
-                        }.execute();
+                            }.execute();
+                        }
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -590,6 +593,7 @@ public class MainActivity extends AppCompatActivity {
         // get and set all activities
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
+        Query orderedActivities = activityDataRef.limitToFirst(10);
                     // get data
         activityDataRef.addChildEventListener(new ChildEventListener() {
             @Override           // for each activity agenda item, add it and repopulate home list
@@ -681,34 +685,38 @@ public class MainActivity extends AppCompatActivity {
 
         // get and set all events
         DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
-        Query ordered = eventsDataRef.orderByChild("date");
+        Query orderedEvents = eventsDataRef.orderByChild("date").limitToFirst(10);
         // get data
-        ordered.addChildEventListener(new ChildEventListener() {
+        orderedEvents.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
+               //         backContinue = false;
+                    //    System.out.println("qwertyuiop1");
+
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                         };
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                         agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
                         agendaItem.event = true;
                         agendaItem.distAway = getDistanceAway(agendaItem.location);
-                        homeListItemsTemp.add(agendaItem);
-                        homeListTitlesTemp.add(agendaItem.activity);
-                        homeListRefsTemp.add(agendaItem.ref);
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
+                  //      System.out.println("qwertyuiop2");
+                 //       backContinue = true;
                         return true;
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                  //          System.out.println("Finished executing public " + homeListTitles.toString());
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
+                      //      System.out.println("qwertyuiop3");
                             if (homeFragment != null)
                                 homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
+                        //System.out.println("qwertyuiop4");
                     }
                 }.execute();
             }
@@ -831,7 +839,7 @@ public class MainActivity extends AppCompatActivity {
                 else return -1;
             }
             catch (IOException e) {
-                return -2;
+                return -1;
             }
         }
         else return 0;

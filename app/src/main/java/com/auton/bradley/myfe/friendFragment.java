@@ -68,10 +68,11 @@ public class FriendFragment extends Fragment {
         ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);
                                 // get user info
         final MainActivity activity = (MainActivity) getActivity();
-        final FirebaseUser user = activity.user;
-        Boolean fbCon = activity.facebookConnected;
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
                             // if user signed in
         if(user != null) {
+            Boolean fbCon = activity.facebookConnected;
                             // if fb connected - show fb screen
             if (fbCon) {
                                 // show correct views
