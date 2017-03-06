@@ -83,13 +83,12 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<AgendaClass> friendFeedSortedList = new ArrayList<>();
     private ArrayList<String> friendFeedListItems = new ArrayList<>(); // some necessary crap
     private ArrayList<AgendaClass> homeListItems = new ArrayList<>();                                // contains all of the data for all of the activities in cambridge
-    private ArrayList<AgendaClass> homeListItemsTemp = new ArrayList<>();
     private ArrayList<AgendaClass> filteredHomeListItems = new ArrayList<>();
     private ArrayList<String> filteredHomeListTitles = new ArrayList<>();
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
-    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
     private int activityCount, eventCount;
 
@@ -508,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
                                                     activityFriendGoingNumbers.put(ref, temp);
                                                 }
                                             } else {
-                                                ArrayList<String> temp = new ArrayList<String>();
+                                                ArrayList<String> temp = new ArrayList<>();
                                                 temp.add(friendFBNames.get(i));
                                                 activityFriendGoingNumbers.put(ref, temp);
                                             }
@@ -543,18 +542,33 @@ public class MainActivity extends AppCompatActivity {
                 friendInt.addChildEventListener(new ChildEventListener() {
                     @Override               // get a single interest
                     public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                        String friendUid = dataSnapshot.getRef().getParent().getParent().getKey();                  // get this friend's UID
+                        int i = friendUIDs.indexOf(friendUid);
                         String ref = dataSnapshot.getValue().toString();
                         if (activityFriendInterestedNumbers.containsKey(ref)) {
-                            activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref) + 1);
-                        } else activityFriendInterestedNumbers.put(ref, 1);
+                            if (!activityFriendInterestedNumbers.get(ref).contains(friendFBNames.get(i))){
+                                ArrayList<String> temp = activityFriendInterestedNumbers.get(ref);
+                                temp.add(friendFBNames.get(i));
+                                activityFriendInterestedNumbers.put(ref, temp);
+                            }
+                        } else {
+                            ArrayList<String> temp = new ArrayList<>();
+                            temp.add(friendFBNames.get(i));
+                            activityFriendInterestedNumbers.put(ref, temp);
+                        }
+
                         if (homeFragment != null)   // update data
                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                     }
 
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) { // remove 1 from overall count and update home list
+                        String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
+                        int i = friendUIDs.indexOf(friendUid);
                         String ref = dataSnapshot.getValue().toString();
-                        activityFriendInterestedNumbers.put(ref, activityFriendInterestedNumbers.get(ref) - 1);
+                        ArrayList<String> temp = activityFriendInterestedNumbers.get(ref);
+                        temp.remove(friendFBNames.get(i));
+                        activityFriendInterestedNumbers.put(ref, temp);
                         homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                     }
                                 // not possible

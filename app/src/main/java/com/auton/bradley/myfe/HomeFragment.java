@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<AgendaClass> listItems;
     private ArrayList<String> listTitles;
     private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
-    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
     private Boolean flag_loading = true;
@@ -121,7 +121,7 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
                         // function to update the list items shown in the home list
-    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, ArrayList<String>> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, ArrayList<String>> actFriGoNums, Map<String, ArrayList<String>> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriGoNums;
@@ -180,10 +180,10 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private ArrayList<String> arraySearchList;                                                      // backup data and array search list contain all of the unfiltered data
     private ArrayList<AgendaClass> backupData;
     private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
-    private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     private FirebaseAnalytics mFirebaseAnalytics;
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, ArrayList<String>> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, ArrayList<String>> actFriGoNo, Map<String, ArrayList<String>> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -256,7 +256,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
 
         if (!activityFriendInterestedNumbers.isEmpty()) {
             if (activityFriendInterestedNumbers.get(listItem.ref)!=null) {
-                holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(listItem.ref)));
+                holder.noFriInt.setText(String.valueOf(activityFriendInterestedNumbers.get(listItem.ref).size()));
             }
             else {
                 holder.noFriInt.setText(" ");
@@ -310,7 +310,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                         params.putDouble("distance_away", listItem.distAway);
                                         int interested; int going;
                                         if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
-                                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                                        else interested = activityFriendInterestedNumbers.get(listItem.ref).size();
                                         params.putInt("friends_interested", interested);
                                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
                                         else going = activityFriendGoingNumbers.get(listItem.ref).size();
@@ -363,7 +363,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         params.putInt("position_in_list", this.position);
                         int interested; int going;
                         if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
-                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                        else interested = activityFriendInterestedNumbers.get(listItem.ref).size();
                         params.putInt("friends_interested", interested);
                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
                         else going = activityFriendGoingNumbers.get(listItem.ref).size();
@@ -385,7 +385,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         params.putInt("position_in_list", this.position);
                         int interested; int going;
                         if (activityFriendInterestedNumbers.get(listItem.ref)==null)  interested=0;
-                        else interested = activityFriendInterestedNumbers.get(listItem.ref);
+                        else interested = activityFriendInterestedNumbers.get(listItem.ref).size();
                         params.putInt("friends_interested", interested);
                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
                         else going = activityFriendGoingNumbers.get(listItem.ref).size();
@@ -407,12 +407,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.interested.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
-                CharSequence number = holder.noFriInt.getText(); String activity = listData.get(position).activity;
-                String message;
-                if (number == " ") message = "None of your friends have said they are interested in going to " + activity + " yet";
-                else if (number == "1") message = "1 friend is interested in going to " + activity;
-                else message = number + " friends are interested in going to " + activity;
-                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), activityFriendInterestedNumbers.get(listData.get(this.position).ref).toString(), Toast.LENGTH_LONG).show();
                 return true;
             }
         });
