@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference android:title="We don't waste data syncing in the background.">
+    <Preference android:title="We don't sync data in the background.">
 
     </Preference>
 

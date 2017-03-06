@@ -31,6 +31,6 @@
         android:defaultValue="true"
         android:key="fbCon_switch"
         android:title="Link with Facebook"
-        android:summary="Bradley Fowler signed in" />
+        android:summary="Signed in" />
 
 </PreferenceScreen>

@@ -47,7 +47,7 @@ public class ProfileFragment extends Fragment {
                                 // get user data
                 tvName.setText(user.getDisplayName());
                 ImageView imageView = (ImageView) rootView.findViewById(R.id.img_profile_pic);
-                RequestCreator picURL = Picasso.with(getContext()).load(fbData.getString("profile_pic"));
+                RequestCreator picURL = Picasso.with(getContext()).load(fbData.getString("profile_pic")).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic);
                 picURL.transform(new CircleTransform()).into(imageView);
                                 // load tab bar and tab data into friend layout
                 viewPager = (ViewPager) rootView.findViewById(R.id.viewpager_profile);

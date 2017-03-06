@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
+    private Boolean flag_loading = true;
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -93,6 +95,25 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        home_list.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
+                if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount>9)
+                {
+                    if(!flag_loading)
+                    {
+                        flag_loading = true;
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        mainActivity.getNSetHomeFeedData();
+                    }
+                }
+            }
+        });
+
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
@@ -103,6 +124,7 @@ public class HomeFragment extends Fragment {
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
+        if (listTitles.size()%10 == 0) flag_loading = false;
         if (home_list!=null && getActivity()!=null) {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list
@@ -209,7 +231,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
             holder.activityLocation.setVisibility(View.VISIBLE);
             holder.activityLocation.setText(String.format("%s km away", Double.toString(listItem.distAway)));
         }
-        RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image);
+        RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
         activityImg.centerCrop().resize(1000,600).into(holder.img);
         if (listItem.event) {
             holder.totalGoing.setVisibility(View.VISIBLE);

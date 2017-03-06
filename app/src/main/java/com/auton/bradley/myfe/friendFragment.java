@@ -166,6 +166,7 @@ public class FriendFragment extends Fragment {
             if (adapter==null){     // create new adapter to generate list
                 adapter = new friendAdapter(getActivity(), sortedList, listItems);
                 ff_list.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
             } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
 
         }
@@ -344,7 +345,7 @@ class friendAdapter extends ArrayAdapter<String> {                              
         holder.img=(ImageView)  convertView.findViewById(R.id.ff_list_item_image);
         // populate the title and image with data for a list item
         try {
-            Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).into(holder.img);
+            Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(holder.img);
             holder.friends.setText(items.get(position).friendName);
             holder.activity.setText(items.get(position).activityDescription);
             holder.time.setText(items.get(position).timeAgo);

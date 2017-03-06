@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Integer> activityFriendGoingNumbersTemp = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
-    private Boolean backContinue;
+    private int activityCount, eventCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,17 +138,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = getIntent();
                 currentTab = intent.getIntExtra("tab", 0);
                 facebookConnected = intent.getBooleanExtra("fbConnected", false);   // if they have connected facebook
+
+                setupViewPager(viewPager);
+                tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+                tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+                setupTabIcons();
+                getNSetHomeFeedData();          // get home feed data
                 if (facebookConnected) {
                     facebookData = intent.getBundleExtra("fbData");
-
-                    setupViewPager(viewPager);
-                    tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-                    tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-                    setupTabIcons();
-                    getNSetHomeFeedData();          // get home feed data
-
-
-
                     getNSetFriendData();    // get friends info and show it on home feed
                 }
             } else {                    // if we have lost all the data just log tem out
@@ -589,33 +586,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
                                     // get and set activities for around 'cambridge'
-    private void getNSetHomeFeedData() {
+    public void getNSetHomeFeedData() {
         // get and set all activities
+        int ItemCount = homeListItems.size();
+        String eventStart, activityStart;
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
-        Query orderedActivities = activityDataRef.limitToFirst(10);
-                    // get data
-        activityDataRef.addChildEventListener(new ChildEventListener() {
+        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
+        Query orderedActivities, orderedEvents;
+
+        if (ItemCount == 0) {
+            orderedActivities = activityDataRef.orderByKey().limitToFirst(5);
+            orderedEvents = eventsDataRef.orderByKey().limitToFirst(5);
+        }
+        else {
+            if (homeListItems.get(ItemCount -6).event) {
+                eventStart = homeListItems.get(ItemCount -6).ref.split("/")[2];
+                activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
+            } else {
+                eventStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
+                activityStart = homeListItems.get(ItemCount -6).ref.split("/")[2];
+            }
+            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6);
+            orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6);
+        }
+
+
+                      // get data
+        orderedActivities.addChildEventListener(new ChildEventListener() {
             @Override           // for each activity agenda item, add it and repopulate home list
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                         agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                        agendaItem.event = false;
-                        agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
-                        homeListItemsTemp.add(agendaItem);
-                        homeListTitlesTemp.add(agendaItem.activity);
-                        homeListRefsTemp.add(agendaItem.ref);
-                        return true;
+                        if (homeListRefs.contains(agendaItem.ref)) return false;
+                        else {
+                            agendaItem.event = false;
+                            agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
+                            homeListItems.add(agendaItem);
+                            homeListTitles.add(agendaItem.activity);
+                            homeListRefs.add(agendaItem.ref);
+                            return true;
+                        }
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
                             if (homeFragment != null)
                                 homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
@@ -628,26 +647,24 @@ public class MainActivity extends AppCompatActivity {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
-                        int index = homeListRefsTemp.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                        homeListItemsTemp.remove(index);
-                        homeListTitlesTemp.remove(index);
-                        homeListRefsTemp.remove(index);
+                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                         };
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                         agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
                         agendaItem.event = false;
                         agendaItem.distAway = getDistanceAway(agendaItem.location);
-                        homeListItemsTemp.add(agendaItem);
-                        homeListTitlesTemp.add(agendaItem.activity);
-                        homeListRefsTemp.add(agendaItem.ref);
+                        homeListItems.add(agendaItem);
+                        homeListTitles.add(agendaItem.activity);
+                        homeListRefs.add(agendaItem.ref);
                         return true;
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
                     }
@@ -659,17 +676,15 @@ public class MainActivity extends AppCompatActivity {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
-                        int index = homeListRefsTemp.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                        homeListItemsTemp.remove(index);
-                        homeListTitlesTemp.remove(index);
-                        homeListRefsTemp.remove(index);
+                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
                         return true;
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
                     }
@@ -682,10 +697,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         });
         ;
-
         // get and set all events
-        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
-        Query orderedEvents = eventsDataRef.orderByChild("date").limitToFirst(10);
         // get data
         orderedEvents.addChildEventListener(new ChildEventListener() {
             @Override
@@ -693,9 +705,38 @@ public class MainActivity extends AppCompatActivity {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-               //         backContinue = false;
-                    //    System.out.println("qwertyuiop1");
-
+                           GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                        };
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
+                        if (homeListRefs.contains(agendaItem.ref)) return false;
+                        else {
+                            agendaItem.event = true;
+                            agendaItem.distAway = getDistanceAway(agendaItem.location);
+                            homeListItems.add(agendaItem);
+                            homeListTitles.add(agendaItem.activity);
+                            homeListRefs.add(agendaItem.ref);
+                            return true;
+                        }
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if(result){
+                             if (homeFragment != null)
+                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        }
+                    }
+                }.execute();
+            }
+            @Override
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
+                         int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                         };
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
@@ -705,46 +746,11 @@ public class MainActivity extends AppCompatActivity {
                         homeListItems.add(agendaItem);
                         homeListTitles.add(agendaItem.activity);
                         homeListRefs.add(agendaItem.ref);
-                  //      System.out.println("qwertyuiop2");
-                 //       backContinue = true;
                         return true;
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                      //      System.out.println("qwertyuiop3");
-                            if (homeFragment != null)
-                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                        //System.out.println("qwertyuiop4");
-                    }
-                }.execute();
-            }
-            @Override
-            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
-                new AsyncTask<Object, Boolean, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
-                        int index = homeListRefsTemp.indexOf(location + "/events/" + dataSnapshot.getKey());
-                        homeListItemsTemp.remove(index);
-                        homeListTitlesTemp.remove(index);
-                        homeListRefsTemp.remove(index);
-                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                        };
-                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                        agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                        agendaItem.event = true;
-                        agendaItem.distAway = getDistanceAway(agendaItem.location);
-                        homeListItemsTemp.add(agendaItem);
-                        homeListTitlesTemp.add(agendaItem.activity);
-                        homeListRefsTemp.add(agendaItem.ref);
-                        return true;
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        if(result){
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
                     }
@@ -756,18 +762,16 @@ public class MainActivity extends AppCompatActivity {
                 new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        homeListItemsTemp = homeListItems; homeListTitlesTemp = homeListTitles; homeListRefsTemp = homeListRefs;
-                        int index = homeListRefsTemp.indexOf(location + "/events/" + dataSnapshot.getKey());
-                        homeListItemsTemp.remove(index);
-                        homeListTitlesTemp.remove(index);
-                        homeListRefsTemp.remove(index);
+                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
+                        homeListItems.remove(index);
+                        homeListTitles.remove(index);
+                        homeListRefs.remove(index);
                         return true;
                     }
                     @Override
                     protected void onPostExecute(Boolean result) {
                         if(result){
-                            homeListItems = homeListItemsTemp; homeListTitles = homeListTitlesTemp; homeListRefs = homeListRefsTemp;
-                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                         }
                     }
                 }.execute();
@@ -780,6 +784,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
                                 // function that returns formatted date or time, if it has been rank=0 and if not a number used to rank the item
     private TimeDispNRank formatTime(String dateString, String timeString) {
         String output;

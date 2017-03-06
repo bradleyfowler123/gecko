@@ -126,7 +126,7 @@ class friendsListAdapter extends ArrayAdapter<String> {                         
         holder.profilePic = (ImageView) convertView.findViewById(R.id.profile_friend_list_item_profilePic);
         // populate the title and image with data for a list item
         holder.name.setText(names.get(position));
-        Picasso.with(getContext()).load(profilePics.get(position)).centerCrop().resize(100,100).into(holder.profilePic);
+        Picasso.with(getContext()).load(profilePics.get(position)).centerCrop().resize(100,100).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(holder.profilePic);
         // return the updated view
         return convertView;
     }

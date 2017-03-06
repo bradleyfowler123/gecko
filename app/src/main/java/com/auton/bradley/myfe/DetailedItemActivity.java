@@ -103,7 +103,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                 // set banner data
                 tv_friendName.setText(friendName);
                 tv_friendText.setText("is going at " + formatTime(friendTime) + " on " + formatDate(friendDate));
-                Picasso.with(getBaseContext()).load(friendImage).into(iv_friendImage);
+                Picasso.with(getBaseContext()).load(friendImage).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(iv_friendImage);
                 // handle banner add to cal click
                 iv_addToCal.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -202,7 +202,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                     activityData.event = refItems[1].equals("events");  // set activity/event data
                     activityData.ref = ref;
-                    Picasso.with(getBaseContext()).load(activityData.image).into(iv_activityImage);
+                    Picasso.with(getBaseContext()).load(activityData.image).placeholder(R.drawable.detailedviewrectangle).error(R.drawable.detailedviewrectangle).into(iv_activityImage);
                     tv_title.setText(activityData.activity);
                     tv_desc.setText(activityData.activityDescription);
                     tv_link.setText("Visit: " + activityData.url);
