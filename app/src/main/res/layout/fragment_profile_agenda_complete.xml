@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context="com.auton.bradley.myfe.ProfileAgendaCompleteFragment"
-android:orientation="vertical"
-android:id="@+id/profile_agenda_complete_list"
-android:nestedScrollingEnabled="true">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.auton.bradley.myfe.ProfileAgendaCompleteFragment"
+    android:orientation="vertical" >
 
-</ListView>
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/profile_agenda_complete_list"
+        android:nestedScrollingEnabled="true">
+    </ListView>
+    <TextView
+        android:id="@+id/comp_agenda_empty_list_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:visibility="gone"
+        android:textSize="20sp"
+        android:text="History is empty!" >
+    </TextView>
+
+</LinearLayout>

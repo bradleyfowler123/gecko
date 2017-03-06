@@ -194,7 +194,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     tv_title.setText("Item removed by the provider");
                     tv_desc.setVisibility(View.GONE);
                     tv_link.setVisibility(View.GONE);
-                    tv_title.setVisibility(View.GONE);
+                    tv_other.setVisibility(View.GONE);
                     iv_activityImage.setVisibility(View.GONE);
                     findViewById(R.id.map).setVisibility(View.GONE);
                 }

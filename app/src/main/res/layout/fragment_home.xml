@@ -11,5 +11,28 @@
         android:nestedScrollingEnabled="true"
         android:divider="@null">
     </ListView>
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:id="@+id/home_empty_list_item"
+        android:orientation="vertical"
+        android:layout_height="150dp"
+        android:layout_margin="10dp"
+        android:visibility="gone">
+        <View
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:background="@drawable/homerectangle"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/white"
+            android:text="Loading.."
+            android:maxLines="2"
+            android:maxWidth="200dp"
+            android:textSize="20sp"
+            android:gravity="center_horizontal|center_vertical"
+            android:textStyle="normal|bold" />
+    </FrameLayout>
 
 </RelativeLayout>

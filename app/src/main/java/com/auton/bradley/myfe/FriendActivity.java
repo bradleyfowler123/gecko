@@ -47,7 +47,7 @@ public class FriendActivity extends AppCompatActivity {
         TextView naneTv = (TextView) findViewById(R.id.af_tv_profile_name);
         naneTv.setText(names.get(index));
         ImageView imageView = (ImageView) findViewById(R.id.af_img_profile_pic);
-        RequestCreator picURL = Picasso.with(getBaseContext()).load(Urls.get(index));
+        RequestCreator picURL = Picasso.with(getBaseContext()).load(Urls.get(index)).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic);
         picURL.transform(new CircleTransform()).into(imageView);
                         // load tab bar and tab data
         viewPager = (ViewPager) findViewById(R.id.af_viewpager_profile);                                       // find view underneith tabs

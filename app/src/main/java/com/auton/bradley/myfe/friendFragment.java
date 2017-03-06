@@ -79,6 +79,7 @@ public class FriendFragment extends Fragment {
                 signUp.setVisibility(View.GONE);
                 fbLinkButton.setVisibility(View.GONE);
                 ff_list.setVisibility(View.VISIBLE);
+                ff_list.setEmptyView(rootView.findViewById(R.id.friend_empty_list_item));
                                 // populate list
                 friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
                 ff_list.setAdapter(adapter);
@@ -166,7 +167,6 @@ public class FriendFragment extends Fragment {
             if (adapter==null){     // create new adapter to generate list
                 adapter = new friendAdapter(getActivity(), sortedList, listItems);
                 ff_list.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
             } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
 
         }
@@ -347,7 +347,7 @@ class friendAdapter extends ArrayAdapter<String> {                              
         try {
             Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(holder.img);
             holder.friends.setText(items.get(position).friendName);
-            holder.activity.setText(items.get(position).activityDescription);
+            holder.activity.setText(items.get(position).activity);
             holder.time.setText(items.get(position).timeAgo);
         }
         catch (Exception e) {

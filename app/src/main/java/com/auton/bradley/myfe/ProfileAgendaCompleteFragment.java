@@ -53,6 +53,7 @@ public class ProfileAgendaCompleteFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda_complete, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_complete_list);             // locate the list object in the home tab
+        pa_list.setEmptyView(rootView.findViewById(R.id.comp_agenda_empty_list_item));
         final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
         // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {

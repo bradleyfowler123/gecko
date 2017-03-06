@@ -70,10 +70,12 @@ public class HomeFragment extends Fragment {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
+        home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
         if (listTitles!=null) {
             adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
+
         // show detailed activity view when list item clicked upon
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
@@ -129,7 +131,6 @@ public class HomeFragment extends Fragment {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list
                 home_list.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
             } else {
                 adapter.notifyDataSetChanged();}                                                    // repopulate existing list
         }
@@ -233,13 +234,13 @@ class homeAdapter extends ArrayAdapter<String> {                                
         }
         RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
         activityImg.centerCrop().resize(1000,600).into(holder.img);
-        if (listItem.event) {
+     /*   if (listItem.event) {
             holder.totalGoing.setVisibility(View.VISIBLE);
             holder.noTotGoing.setText(String.format("%s", Integer.toString(listItem.totalgoing)));
         }
         else {
-            holder.totalGoing.setVisibility(View.GONE);
-        }
+     */       holder.totalGoing.setVisibility(View.GONE);
+      //  }
                     // display numbers and stars on bottom banners
         if (myInterests.contains(listItem.ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
