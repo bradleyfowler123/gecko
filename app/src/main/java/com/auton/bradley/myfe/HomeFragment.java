@@ -37,6 +37,7 @@ import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
                             // fragment that handles the home tab
@@ -46,7 +47,7 @@ public class HomeFragment extends Fragment {
     private homeAdapter adapter;
     private ArrayList<AgendaClass> listItems;
     private ArrayList<String> listTitles;
-    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -120,7 +121,7 @@ public class HomeFragment extends Fragment {
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
                         // function to update the list items shown in the home list
-    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, Integer> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, ArrayList<String>> actFriGoNums, Map<String, Integer> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriGoNums;
@@ -178,11 +179,11 @@ class homeAdapter extends ArrayAdapter<String> {                                
     private Context c;
     private ArrayList<String> arraySearchList;                                                      // backup data and array search list contain all of the unfiltered data
     private ArrayList<AgendaClass> backupData;
-    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     private FirebaseAnalytics mFirebaseAnalytics;
                                 // define a function that can be used to declare this custom adapter class
-    homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, Integer> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
+    homeAdapter(Context context, ArrayList<AgendaClass> listData, ArrayList<String> activityTitles, Map<String, ArrayList<String>> actFriGoNo, Map<String, Integer> actFriIntNums, ArrayList<String> interests) {     // arguments set the context, texts and images for this adapter class
         super(context, R.layout.home_list_item, activityTitles);
         this.c = context;
         this.listData = listData;                                                                   // all of the data to be shown
@@ -246,7 +247,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         else holder.interestedIV.setImageResource(android.R.drawable.star_off);
         if (!activityFriendGoingNumbers.isEmpty()) {
             if (activityFriendGoingNumbers.get(listItem.ref)!=null) {
-                holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(listItem.ref)));
+                holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(listItem.ref).size()));
             }
             else {
                 holder.noFriGoing.setText(" ");
@@ -265,12 +266,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {     // inform user of how many friends are going
-                CharSequence number = holder.noFriGoing.getText(); String activity = listData.get(this.position).activity;
-                String message;
-                if (number == " ") message = "None of your friends have added  " + activity + " to their agenda yet";
-                else if (number == "1") message = "1 friend is going to " + activity;
-                else message = number + " friends are going " + activity;
-                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), activityFriendGoingNumbers.get(listData.get(this.position).ref).toString(), Toast.LENGTH_LONG).show();
                 return true;
             }
         });                                 // add item to your calendar
@@ -317,7 +313,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                         else interested = activityFriendInterestedNumbers.get(listItem.ref);
                                         params.putInt("friends_interested", interested);
                                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
-                                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                                        else going = activityFriendGoingNumbers.get(listItem.ref).size();
                                         params.putInt("friends_going", going);
                                         mFirebaseAnalytics.logEvent("item_added_to_agenda", params);
                                     }
@@ -370,7 +366,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         else interested = activityFriendInterestedNumbers.get(listItem.ref);
                         params.putInt("friends_interested", interested);
                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
-                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                        else going = activityFriendGoingNumbers.get(listItem.ref).size();
                         params.putInt("friends_going", going);
                         mFirebaseAnalytics.logEvent("item_unmarked_as_interested", params);
                     }
@@ -392,7 +388,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                         else interested = activityFriendInterestedNumbers.get(listItem.ref);
                         params.putInt("friends_interested", interested);
                         if (activityFriendGoingNumbers.get(listItem.ref)==null) going = 0;
-                        else going = activityFriendGoingNumbers.get(listItem.ref);
+                        else going = activityFriendGoingNumbers.get(listItem.ref).size();
                         params.putInt("friends_going", going);
                         mFirebaseAnalytics.logEvent("item_marked_as_interested", params);
                     }

@@ -45,6 +45,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -86,11 +87,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<AgendaClass> filteredHomeListItems = new ArrayList<>();
     private ArrayList<String> filteredHomeListTitles = new ArrayList<>();
     private ArrayList<String> homeListRefs = new ArrayList<>();
-    private ArrayList<String> homeListRefsTemp = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
-    private ArrayList<String> homeListTitlesTemp = new ArrayList<>();
-    private Map<String, Integer> activityFriendGoingNumbers = new HashMap<>();
-    private Map<String, Integer> activityFriendGoingNumbersTemp = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, Integer> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
     private int activityCount, eventCount;
@@ -491,24 +489,32 @@ public class MainActivity extends AppCompatActivity {
                                         AgendaClass agendaItem = iterator.next();
                                         TimeDispNRank timeNRank = formatTime(agendaItem.date, agendaItem.time); // returns formatted datetime string and a number to rank it based on its date and time
                                         if (!timeNRank.timeDisp.equals("0")) {      // item not already been and no error
+                                            String ref = agendaItem.ref;
                                             agendaItem.rank = timeNRank.rank;
                                             agendaItem.activityDescription = agendaItem.activity + ", " + location;
                                             agendaItem.timeAgo = timeNRank.timeDisp;
                                             agendaItem.friendName = friendFBNames.get(i);
                                             agendaItem.picUrl = friendFBUrls.get(i);
-                                            friendFeedListItems.add(agendaItem.ref);
+                                            friendFeedListItems.add(ref);
                                             friendFeedListItemsData.add(agendaItem);
                                             friendFeedSortedList = friendFeedListItemsData;
                                             Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
                                             // calculate friend going numbers (in background haha)
-                                            activityFriendGoingNumbersTemp.clear();
-                                            // get numbers
-                                            for (String value : homeListRefs) {
-                                                int freq = Collections.frequency(friendFeedListItems, value);
-                                                if (freq != 0)
-                                                    activityFriendGoingNumbersTemp.put(value, freq);                             // don't show 0 values
-                                            }              // update list
+
+                                            if (activityFriendGoingNumbers.containsKey(ref)) {
+                                                if (!activityFriendGoingNumbers.get(ref).contains(friendFBNames.get(i))){
+                                                    ArrayList<String> temp = activityFriendGoingNumbers.get(ref);
+                                                    temp.add(friendFBNames.get(i));
+                                                    activityFriendGoingNumbers.put(ref, temp);
+                                                }
+                                            } else {
+                                                ArrayList<String> temp = new ArrayList<String>();
+                                                temp.add(friendFBNames.get(i));
+                                                activityFriendGoingNumbers.put(ref, temp);
+                                            }
+                                            // update list
                                         }
+
                                     }
                                     return true;
                                 }
@@ -519,7 +525,6 @@ public class MainActivity extends AppCompatActivity {
                                         if (friendFragment != null)
                                             friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
                                         // now friend agenda data has been found, show friend going numbers on home feed
-                                        activityFriendGoingNumbers = activityFriendGoingNumbersTemp;
                                         // update list
                                         if (homeFragment != null)
                                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
