@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
     private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
-    private int activityCount, eventCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {                    // if we have lost all the data just log tem out
                 Log.d("!!!!!!!!!BBBBBBBBB", "REOPENED");
+        //        Toast.makeText(getBaseContext(),Boolean.toString(savedInstanceState.getBoolean("fbCon")),Toast.LENGTH_LONG).show();
                 // need to get saved instance state data
                 // check for facebook connection
                 // get and set friend data
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         setupTabIcons();
         viewPager.setCurrentItem(currentTab);
     }
-
+*/
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d("onSave","!!!!!!!!!!!!!");
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-*/
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
+      /*  switch (requestCode) {
             case 13: {          // if any permissions not granted, request them again
                 for (int i = 0; i < permissions.length; i++) {
                     if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-    }
+    */}
 
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
@@ -867,6 +867,6 @@ public class MainActivity extends AppCompatActivity {
                 return -1;
             }
         }
-        else return 0;
+        else return -1;
     }
 }

@@ -52,6 +52,10 @@ public class ProfileAgendaFragment extends Fragment {
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
         pa_list.setEmptyView(rootView.findViewById(R.id.agenda_empty_list_item));
         final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
+
+
+
+
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
@@ -78,7 +82,6 @@ public class ProfileAgendaFragment extends Fragment {
                  if (agendaData != null) {                                                          // if user or friend has agenda items
                      Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                      Iterator<String> keySet = agendaData.keySet().iterator();
-                     Log.d("asdfg3", dataSnapshot.toString());
                      listItems.clear();
                      ArrayList<String> titles = new ArrayList<>();
                      while (iterator.hasNext()) {

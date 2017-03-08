@@ -19,7 +19,6 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/altontowers"
                 android:id="@+id/adi_image"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
@@ -82,7 +81,6 @@
             </LinearLayout>
 
             <TextView
-                android:text="Indoor Climbing"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="3"
@@ -94,7 +92,6 @@
                 android:paddingEnd="10dp"/>
 
             <TextView
-                android:text="For adults (18+) who are interested in taking well-being, dance and fitness classes. Find information on all our classes including: Yoga, Pilates, Massage Therapies, Ballet, Jazz, Tap, Contemporary, Street Dance, Commercial, Zumba, Weekend Workout and Barre."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -104,7 +101,6 @@
                 android:padding="10dp"/>
 
             <TextView
-                android:text="Prices from £20"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -120,7 +116,6 @@
                 android:layout_below="@id/adi_other" />
 
             <TextView
-                android:text="Visit: http://www.bodyworkcompany.co.uk/adult-dance-and-fitness-class/dance/"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -179,8 +174,7 @@
                 android:layout_height="0dp"
                 android:id="@+id/adi_fd_name"
                 android:gravity="center_vertical|start"
-                android:text="Darren Norton"
-                android:textColor="@android:color/white"
+               android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:layout_weight="1"
                 android:textStyle="normal|bold" />
@@ -190,7 +184,6 @@
                 android:layout_height="0dp"
                 android:id="@+id/adi_fd_text"
                 android:gravity="center_vertical|top"
-                android:text="is going at 12:00 on 15, Jun"
                 android:textColor="@android:color/white"
                 android:layout_weight="1" />
 

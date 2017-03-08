@@ -1,6 +1,7 @@
 package com.auton.bradley.myfe;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -33,9 +34,12 @@ public class AboutHelpActivity extends AppCompatActivity {
                 "Attributions"
         };
 
-        final String aboutUs = "Here is something about us aren't we cool \n no no";
-        final ArrayList<String> faqQuestions = new ArrayList<>(Arrays.asList("Question 1?","Question 2?"));
-        final ArrayList<String> faqAnswers = new ArrayList<>(Arrays.asList("Answer 1","Answer 2"));
+        final String aboutUs = "Our mission is to sustainably enhance the quality of life of individuals by providing" +
+                " meaningful opportunities to stimulate and develop people outside of work." +
+                "\n\nCreated by Brad Fowler from Cambridge University.";
+        final ArrayList<String> faqQuestions = new ArrayList<>(Arrays.asList("Why can't I see some of my friends activity when I know they have scheduled things?","Question 2?"));
+        final ArrayList<String> faqAnswers = new ArrayList<>(Arrays.asList("Firstly check that you are friends with them on Facebook. If so then kindly ask them to log out of GoPort and back in again on their phone to fix the problem.","Answer 2"));
+        final String attrib = "Thank you:\n";
 
         // Define a new Adapter
         // First parameter - Context
@@ -71,13 +75,17 @@ public class AboutHelpActivity extends AppCompatActivity {
                         startActivity(intent2);
                         break;
                     case 2:
-                        // Begin the transaction
-                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-// Replace the contents of the container with the new fragment
-                        ft.replace(R.id.container111, new FooFragment());
-// or ft.add(R.id.your_placeholder, new FooFragment());
-// Complete the changes added above
-                        ft.commit();
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                "mailto","bradley.fowler123@gmail.com", null));
+                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "GoPort Query");
+                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Dear GoPort, \n \n");
+                        startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        break;
+                    case 3:
+                        Intent intent4 = new Intent(AboutHelpActivity.this, AboutHelpActivityItem.class);
+                        intent4.putExtra("from", "attrib");
+                        intent4.putExtra("data", attrib);
+                        startActivity(intent4);
                         break;
                 }
             }
@@ -86,22 +94,5 @@ public class AboutHelpActivity extends AppCompatActivity {
     }
 
 
-    public static class FooFragment extends Fragment {
-        // The onCreateView method is called when Fragment should create its View object hierarchy,
-        // either dynamically or via XML layout inflation.
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-            // Defines the xml file for the fragment
-            return inflater.inflate(R.layout.abouthelp_faq, parent, false);
-        }
-
-        // This event is triggered soon after onCreateView().
-        // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            // Setup any handles to view objects here
-            // EditText etFoo = (EditText) view.findViewById(R.id.etFoo);
-        }
-    }
 
 }
