@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
-                getNSetHomeFeedData();          // get home feed data
+            //    getNSetHomeFeedData();          // get home feed data
                 if (facebookConnected) {
                     facebookData = intent.getBundleExtra("fbData");
                     getNSetFriendData();    // get friends info and show it on home feed
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
-                getNSetHomeFeedData();          // get home feed data
+           //     getNSetHomeFeedData();          // get home feed data
 
 
             }
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
             tabLayout.setupWithViewPager(viewPager);                                                    // setup view
             setupTabIcons();
-            getNSetHomeFeedData();          // get home feed data
+     //       getNSetHomeFeedData();          // get home feed data
 
 
         }

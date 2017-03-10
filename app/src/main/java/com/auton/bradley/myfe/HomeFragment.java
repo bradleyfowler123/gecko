@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -71,11 +72,30 @@ public class HomeFragment extends Fragment {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
-        home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
-        if (listTitles!=null) {
-            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
-            home_list.setAdapter(adapter);
-        }
+       // home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
+       // if (listTitles!=null) {
+        //    adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
+        //    home_list.setAdapter(adapter);
+     //   }
+
+        DatabaseReference eventsDataRef = FirebaseDatabase.getInstance().getReference().child("activitydata/placeData").child("United Kingdom%%England%%Cambridgeshire%%Cambridge").child("events");
+        FirebaseListAdapter<AgendaClass> firebaseListAdapter = new FirebaseListAdapter<AgendaClass>(getActivity(),AgendaClass.class, android.R.layout.two_line_list_item ,eventsDataRef) {
+            @Override
+            protected void populateView(View v, AgendaClass model, int position) {
+                TextView activityTitle = (TextView) v.findViewById(android.R.id.text1);
+                TextView activityLocation = (TextView) v.findViewById(android.R.id.text2);
+                // ImageView img = (ImageView) v.findViewById(R.id.sr_list_item_image);
+
+                activityTitle.setText(model.activity);
+                activityLocation.setText(model.location);
+                // RequestCreator activityImg = Picasso.with(getContext()).load(model.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
+                // activityImg.centerCrop().resize(1000,600).into(img);
+
+            }
+        };
+
+        home_list.setAdapter(firebaseListAdapter);
+
 
         // show detailed activity view when list item clicked upon
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -11,15 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,10 +55,26 @@ public class ProfileAgendaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_list);             // locate the list object in the home tab
-        pa_list.setEmptyView(rootView.findViewById(R.id.agenda_empty_list_item));
+    //    pa_list.setEmptyView(rootView.findViewById(R.id.agenda_empty_list_item));
         final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
 
+        DatabaseReference eventsDataRef = FirebaseDatabase.getInstance().getReference().child("activitydata/placeData").child("United Kingdom%%England%%Cambridgeshire%%Cambridge").child("events");
+        FirebaseListAdapter<AgendaClass> firebaseListAdapter = new FirebaseListAdapter<AgendaClass>(getActivity(),AgendaClass.class, android.R.layout.two_line_list_item ,eventsDataRef) {
+            @Override
+            protected void populateView(View v, AgendaClass model, int position) {
+                TextView activityTitle = (TextView) v.findViewById(android.R.id.text1);
+                TextView activityLocation = (TextView) v.findViewById(android.R.id.text2);
+               // ImageView img = (ImageView) v.findViewById(R.id.sr_list_item_image);
 
+                activityTitle.setText(model.activity);
+                activityLocation.setText(model.location);
+               // RequestCreator activityImg = Picasso.with(getContext()).load(model.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
+               // activityImg.centerCrop().resize(1000,600).into(img);
+
+            }
+        };
+
+        pa_list.setAdapter(firebaseListAdapter);
 
 
                                 // handle whether fragment was called by profile tab or friend activity
@@ -70,7 +91,7 @@ public class ProfileAgendaFragment extends Fragment {
             friendName = null; friendUrl = null;
             myInterests = activity.interested;
         }
-                                        // get data to be displayed
+/*                                        // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
@@ -106,7 +127,7 @@ public class ProfileAgendaFragment extends Fragment {
                  Log.d("Datebase Error2", databaseError.toString());
              }
         });
-                                // if agenda item clicked
+    */                            // if agenda item clicked
         pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
