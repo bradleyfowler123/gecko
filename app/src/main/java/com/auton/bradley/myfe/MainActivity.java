@@ -145,8 +145,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {                    // if we have lost all the data just log tem out
                 Log.d("!!!!!!!!!BBBBBBBBB", "REOPENED");
-        //        Toast.makeText(getBaseContext(),Boolean.toString(savedInstanceState.getBoolean("fbCon")),Toast.LENGTH_LONG).show();
-                // need to get saved instance state data
+       /*         if (savedInstanceState!=null) {
+                    Log.d("!!!!!!!!!BBBBBBBBB1", "true");
+                }
+                else {
+                    Log.d("!!!!!!!!!BBBBBBBBB2", "false");
+                }
+       */       // need to get saved instance state data
                 // check for facebook connection
                 // get and set friend data
                 // not sure how to get saved instance state after activity destroy
@@ -173,14 +178,20 @@ public class MainActivity extends AppCompatActivity {
             facebookConnected = false;
             auth.signOut();
 
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("tab", 0);
-            startActivity(intent);
+            if (getIntent().hasExtra("tab")) {
+                setupViewPager(viewPager);
+                tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+                tabLayout.setupWithViewPager(viewPager);                                                    // setup view
+                setupTabIcons();
+                getNSetHomeFeedData();
+            }
+            else {
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("tab", 0);
+                startActivity(intent);
+            }
 
-/*            tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-            tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-            setupTabIcons();
-            getNSetHomeFeedData();          // get home feed data
+/*                     // get home feed data
 */
 
         }
