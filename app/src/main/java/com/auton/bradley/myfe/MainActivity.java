@@ -22,10 +22,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,7 +43,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -88,16 +85,18 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> homeListRefs = new ArrayList<>();
     private ArrayList<String> homeListTitles = new ArrayList<>();                                         // stores all of the titles, used to filter results with search
     private Map<String, ArrayList<String>> activityFriendGoingNumbers = new HashMap<>();
+    private Map<String, ArrayList<String>> activityFriendGoingNumbersHolder = new HashMap<>();
     private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
-
+    private AgendaClass[] unseenHomeUpdates = new AgendaClass[2];
+    private int eventCount = 0; private int activityCount = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         callbackManager = CallbackManager.Factory.create();
-        FacebookSdk.sdkInitialize(getApplicationContext());
+    //    FacebookSdk.sdkInitialize(getApplicationContext());
         // check permissions granted - if one is not add it to a list to request from user
         ArrayList<String> permissions = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
-            //    getNSetHomeFeedData();          // get home feed data
+                getNSetHomeFeedData();          // get home feed data
                 if (facebookConnected) {
                     facebookData = intent.getBundleExtra("fbData");
                     getNSetFriendData();    // get friends info and show it on home feed
@@ -155,12 +154,16 @@ public class MainActivity extends AppCompatActivity {
                 facebookConnected = false;
                 auth.signOut();
 
-                setupViewPager(viewPager);
+
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("tab", 0);
+                startActivity(intent);
+        /*        setupViewPager(viewPager);
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
-           //     getNSetHomeFeedData();          // get home feed data
-
+                getNSetHomeFeedData();          // get home feed data
+*/
 
             }
         } else {  // user is not signed in
@@ -170,24 +173,26 @@ public class MainActivity extends AppCompatActivity {
             facebookConnected = false;
             auth.signOut();
 
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra("tab", 0);
+            startActivity(intent);
 
-            setupViewPager(viewPager);
-            tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
+/*            tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
             tabLayout.setupWithViewPager(viewPager);                                                    // setup view
             setupTabIcons();
-     //       getNSetHomeFeedData();          // get home feed data
-
+            getNSetHomeFeedData();          // get home feed data
+*/
 
         }
         viewPager.setCurrentItem(currentTab);
     }
 
 
-   /* @Override
+    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d("onRestore","!!!!!!!!!!!!!");
-        Toast.makeText(getBaseContext(), "SAVED INSTANCE STATE EXISTS", Toast.LENGTH_LONG).show();
+    /*    Toast.makeText(getBaseContext(), "SAVED INSTANCE STATE EXISTS", Toast.LENGTH_LONG).show();
 
         Boolean signedIn = savedInstanceState.getBoolean("signedIn");
         if (signedIn) {
@@ -208,13 +213,13 @@ public class MainActivity extends AppCompatActivity {
         filteredHomeListItems = savedInstanceState.getParcelableArrayList("fhld");
         filteredHomeListTitles = savedInstanceState.getStringArrayList("fhlt");
         homeListRefs = savedInstanceState.getStringArrayList("hflr");
-
+*/
         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
         if (homeFragment!=null) homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
-
+/*
         // load action bars
         toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);
@@ -224,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);                                                    // setup view
         setupTabIcons();
         viewPager.setCurrentItem(currentTab);
-    }
-*/
+ */   }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d("onSave","!!!!!!!!!!!!!");
@@ -334,9 +339,54 @@ public class MainActivity extends AppCompatActivity {
                 }
                 // other- family friendly
                 ArrayList<String> other = data.getStringArrayListExtra("other");
-                if (other.contains("Family Friendly Only")) {               // remove items not family friendly if ffo set
+                if (other.contains("Family Friendly")) {               // remove items not family friendly if ffo set
                     for (int i = 0; i < filteredHomeListItems.size(); i++) {
                         if (!filteredHomeListItems.get(i).familyfriendly) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
+                    }
+                }
+                if (other.contains("Indoor")) {               // remove items not family friendly if ffo set
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).indoor) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
+                    }
+                }
+                if (other.contains("Disabled Access")) {               // remove items not family friendly if ffo set
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).disabled) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
+                    }
+                }
+                if (other.contains("Parking")) {               // remove items not family friendly if ffo set
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).parking) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
+                    }
+                }
+                if (other.contains("Pet Friendly")) {               // remove items not family friendly if ffo set
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).pet) {
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
+                    }
+                }
+                if (other.contains("Toilets")) {               // remove items not family friendly if ffo set
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (!filteredHomeListItems.get(i).toilet) {
                             filteredHomeListItems.remove(i);
                             filteredHomeListTitles.remove(i);
                             i = i - 1;
@@ -467,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
                             new AsyncTask<Object, Boolean, Boolean>() {
                                 @Override
                                 protected Boolean doInBackground(Object... params) {
+                                    activityFriendGoingNumbersHolder = activityFriendGoingNumbers;
                                     // isolate each agenda item along with which friend it is
                                     GenericTypeIndicator<HashMap<String, AgendaClass>> t = new GenericTypeIndicator<HashMap<String, AgendaClass>>() {
                                     };
@@ -498,20 +549,23 @@ public class MainActivity extends AppCompatActivity {
                                             friendFeedListItemsData.add(agendaItem);
                                             friendFeedSortedList = friendFeedListItemsData;
                                             Collections.sort(friendFeedSortedList, new AgendaComparator());     // sort upcoming items
-                                            // calculate friend going numbers (in background haha)
 
-                                            if (activityFriendGoingNumbers.containsKey(ref)) {
-                                                if (!activityFriendGoingNumbers.get(ref).contains(friendFBNames.get(i))){
-                                                    ArrayList<String> temp = activityFriendGoingNumbers.get(ref);
+
+                                            if (activityFriendGoingNumbersHolder.containsKey(ref)) {          // if a friend is already going to this event
+                                                if (!activityFriendGoingNumbersHolder.get(ref).contains(friendFBNames.get(i))){   // if this specific friend not already recorded as going to this event
+                                                            // append them to the list of friends which are going
+                                                    ArrayList<String> temp = activityFriendGoingNumbersHolder.get(ref);
                                                     temp.add(friendFBNames.get(i));
-                                                    activityFriendGoingNumbers.put(ref, temp);
+                                                    activityFriendGoingNumbersHolder.put(ref, temp);
                                                 }
+                                                            // otherwise do noting as they are already going
                                             } else {
+                                                        // if no friends are going to this event
                                                 ArrayList<String> temp = new ArrayList<>();
+                                                                // create a new list and add this friend
                                                 temp.add(friendFBNames.get(i));
-                                                activityFriendGoingNumbers.put(ref, temp);
+                                                activityFriendGoingNumbersHolder.put(ref, temp);
                                             }
-                                            // update list
                                         }
 
                                     }
@@ -525,8 +579,10 @@ public class MainActivity extends AppCompatActivity {
                                             friendFragment.storeData(friendFeedSortedList, friendFeedListItems);    // populate friend feed list
                                         // now friend agenda data has been found, show friend going numbers on home feed
                                         // update list
-                                        if (homeFragment != null)
+                                        if (homeFragment != null) {
+                                            activityFriendGoingNumbers = activityFriendGoingNumbersHolder;
                                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                        }
                                     }
                                 }
                             }.execute();
@@ -609,61 +665,79 @@ public class MainActivity extends AppCompatActivity {
         // get and set all activities
         int ItemCount = homeListItems.size();
         String eventStart, activityStart;
+        Boolean getActivities = true;
+        Boolean getEvents = true;
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
         DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
         Query orderedActivities, orderedEvents;
 
-        if (ItemCount == 0) {
+        if (ItemCount < 2) {   // for first iteration just get first 5 from each starting from zero
             orderedActivities = activityDataRef.orderByKey().limitToFirst(5);
             orderedEvents = eventsDataRef.orderByKey().limitToFirst(5);
-        }
-        else {
-            if (homeListItems.get(ItemCount -6).event) {
-                eventStart = homeListItems.get(ItemCount -6).ref.split("/")[2];
-                activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-            } else {
+        } else {                // otherwise determine where to start from
+            int activityRemainder = 5 - (activityCount % 5);
+            int eventRemainder = 5 - (eventCount % 5);
+            Log.d("!!!!!!!!!", Integer.toString(activityRemainder));
+            Boolean lastItemWasEvent = homeListItems.get(ItemCount - 1).event;
+
+            if (lastItemWasEvent) {
+                activityStart = homeListItems.get(ItemCount - eventRemainder - 1).ref.split("/")[2];
                 eventStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-                activityStart = homeListItems.get(ItemCount -6).ref.split("/")[2];
+            } else {
+                activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
+                eventStart = homeListItems.get(ItemCount - activityRemainder - 1).ref.split("/")[2];
             }
+
+            if (eventRemainder != 5) getEvents = false;
+            if (activityRemainder != 5) getActivities = false;
+
             orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6);
             orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6);
         }
 
 
-                      // get data
-        orderedActivities.addChildEventListener(new ChildEventListener() {
-            @Override           // for each activity agenda item, add it and repopulate home list
-            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                new AsyncTask<Object, Boolean, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Object... params) {
-                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {};
-                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                        agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                        if (homeListRefs.contains(agendaItem.ref)) return false;
-                        else {
-                            agendaItem.event = false;
-                            agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
-                            homeListItems.add(agendaItem);
-                            homeListTitles.add(agendaItem.activity);
-                            homeListRefs.add(agendaItem.ref);
-                            return true;
+        // get data
+        if (getActivities) {
+            orderedActivities.addChildEventListener(new ChildEventListener() {
+                @Override
+                // for each activity agenda item, add it and repopulate home list
+                public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                    new AsyncTask<Object, Boolean, Boolean>() {
+                        @Override
+                        protected Boolean doInBackground(Object... params) {
+                            //         homeListItemsHolder = homeListItems; homeListTitlesHolder = homeListTitles;  homeListRefsHolder = homeListRefs;
+                            GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                            };
+                            AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                            agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
+                            if (homeListRefs.contains(agendaItem.ref)) return false;
+                            else {
+                                agendaItem.event = false;
+                                agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
+                                unseenHomeUpdates[0] = agendaItem;
+                                activityCount = activityCount + 1;
+                                return true;
+                            }
                         }
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        if(result){
-                            if (homeFragment != null)
-                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                    }
-                }.execute();
-            }
 
-            @Override       // for each activity agenda item, update it and repopulate home list
-            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
-                new AsyncTask<Object, Boolean, Boolean>() {
+                        @Override
+                        protected void onPostExecute(Boolean result) {
+                            if (result) {
+                                if (homeFragment != null) {
+                                    homeListItems.add(unseenHomeUpdates[0]);
+                                    homeListTitles.add(unseenHomeUpdates[0].activity);
+                                    homeListRefs.add(unseenHomeUpdates[0].ref);
+                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                }
+                            }
+                        }
+                    }.execute();
+                }
+
+                @Override       // for each activity agenda item, update it and repopulate home list
+                public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+           /*     new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
                         int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
@@ -688,11 +762,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
-            }
+         */
+                }
 
-            @Override       // for each activity agenda item, remove it and repopulate home list
-            public void onChildRemoved(final DataSnapshot dataSnapshot) {
-                new AsyncTask<Object, Boolean, Boolean>() {
+                @Override       // for each activity agenda item, remove it and repopulate home list
+                public void onChildRemoved(final DataSnapshot dataSnapshot) {
+           /*     new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
                         int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
@@ -708,51 +783,61 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
-            }
+       */
+                }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-        ;
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
         // get and set all events
         // get data
-        orderedEvents.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                new AsyncTask<Object, Boolean, Boolean>() {
+        if (getEvents) {
+            orderedEvents.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                    new AsyncTask<Object, Boolean, Boolean>() {
+                        @Override
+                        protected Boolean doInBackground(Object... params) {
+                            GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                            };
+                            AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                            agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
+                            if (homeListRefs.contains(agendaItem.ref)) return false;
+                            else {
+                                agendaItem.event = true;
+                                agendaItem.distAway = getDistanceAway(agendaItem.location);
+                                unseenHomeUpdates[1] = agendaItem;
+                                eventCount = eventCount + 1;
+                                return true;
+                            }
+                        }
+
+                        @Override
+                        protected void onPostExecute(Boolean result) {
+                            if (result) {
+                                if (homeFragment != null) {
+                                    homeListItems.add(unseenHomeUpdates[1]);
+                                    homeListTitles.add(unseenHomeUpdates[1].activity);
+                                    homeListRefs.add(unseenHomeUpdates[1].ref);
+                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                }
+                            }
+                        }
+                    }.execute();
+                }
+
+                @Override
+                public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+              /*  new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                           GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                        };
-                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                        agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                        if (homeListRefs.contains(agendaItem.ref)) return false;
-                        else {
-                            agendaItem.event = true;
-                            agendaItem.distAway = getDistanceAway(agendaItem.location);
-                            homeListItems.add(agendaItem);
-                            homeListTitles.add(agendaItem.activity);
-                            homeListRefs.add(agendaItem.ref);
-                            return true;
-                        }
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        if(result){
-                             if (homeFragment != null)
-                                homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                    }
-                }.execute();
-            }
-            @Override
-            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
-                new AsyncTask<Object, Boolean, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Object... params) {
-                         int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
+                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
                         homeListItems.remove(index);
                         homeListTitles.remove(index);
                         homeListRefs.remove(index);
@@ -774,11 +859,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
-            }
+         */
+                }
 
-            @Override
-            public void onChildRemoved(final DataSnapshot dataSnapshot) {
-                new AsyncTask<Object, Boolean, Boolean>() {
+                @Override
+                public void onChildRemoved(final DataSnapshot dataSnapshot) {
+       /*         new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
                         int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
@@ -794,14 +880,18 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
-            }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+     */
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
     }
 
 

@@ -123,7 +123,7 @@ public class SearchPrefActivity extends AppCompatActivity {
                 else         cost = Integer.valueOf(costItem.Selected.substring(7));
                 double dist; Item distItem = item.get(3);
                 if (distItem.Selected.equals(distItem.elements.get(distItem.elements.size()-1)))    dist = Double.valueOf(distItem.CustomValue.toString());
-                else dist = Double.valueOf(distItem.Selected.substring(2,distItem.Selected.length()-6));
+                else dist = Double.valueOf(distItem.Selected.substring(2,distItem.Selected.length()-3));
                 intent.putExtra("cost", cost);
                 intent.putExtra("type", item.get(1).mSelected);
                 intent.putExtra("location", item.get(2).Selected);
@@ -168,6 +168,10 @@ public class SearchPrefActivity extends AppCompatActivity {
         Item i6=new Item(other[0], temp,true);
         i6.elements.add(other[1]);
         i6.elements.add(other[2]);
+        i6.elements.add(other[3]);
+        i6.elements.add(other[4]);
+        i6.elements.add(other[5]);
+        i6.elements.add(other[6]);
 
         ArrayList<Item> allItems=new ArrayList<>();                                                 // append all Item objects into an ArrayList
         allItems.add(i1);

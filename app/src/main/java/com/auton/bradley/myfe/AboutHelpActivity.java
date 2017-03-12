@@ -37,9 +37,9 @@ public class AboutHelpActivity extends AppCompatActivity {
         final String aboutUs = "Our mission is to sustainably enhance the quality of life of individuals by providing" +
                 " meaningful opportunities to stimulate and develop people outside of work." +
                 "\n\nCreated by Brad Fowler from Cambridge University.";
-        final ArrayList<String> faqQuestions = new ArrayList<>(Arrays.asList("Why can't I see some of my friends activity when I know they have scheduled things?","Question 2?"));
-        final ArrayList<String> faqAnswers = new ArrayList<>(Arrays.asList("Firstly check that you are friends with them on Facebook. If so then kindly ask them to log out of GoPort and back in again on their phone to fix the problem.","Answer 2"));
-        final String attrib = "Thank you:\n";
+        final ArrayList<String> faqQuestions = new ArrayList<>(Arrays.asList("Why can't I see some of my friends activity when I know they have scheduled things?","Why has my display name not updated after I've changed it?"));
+        final ArrayList<String> faqAnswers = new ArrayList<>(Arrays.asList("Firstly check that you are friends with them on Facebook. If so then kindly ask them to log out of Gecko and back in again on their phone to fix the problem.","Try logging out and back in again."));
+        final String attrib = "Icons made by Madebyoliver from www.flaticon.com is licensed by CC 3.0 BY";
 
         // Define a new Adapter
         // First parameter - Context
@@ -77,8 +77,8 @@ public class AboutHelpActivity extends AppCompatActivity {
                     case 2:
                         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                                 "mailto","bradley.fowler123@gmail.com", null));
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "GoPort Query");
-                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Dear GoPort, \n \n");
+                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Gecko Query");
+                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Dear Gecko, \n \n");
                         startActivity(Intent.createChooser(emailIntent, "Send email..."));
                         break;
                     case 3:

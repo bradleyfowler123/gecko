@@ -25,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -37,6 +36,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -72,30 +72,11 @@ public class HomeFragment extends Fragment {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
-       // home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
-       // if (listTitles!=null) {
-        //    adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
-        //    home_list.setAdapter(adapter);
-     //   }
-
-        DatabaseReference eventsDataRef = FirebaseDatabase.getInstance().getReference().child("activitydata/placeData").child("United Kingdom%%England%%Cambridgeshire%%Cambridge").child("events");
-        FirebaseListAdapter<AgendaClass> firebaseListAdapter = new FirebaseListAdapter<AgendaClass>(getActivity(),AgendaClass.class, android.R.layout.two_line_list_item ,eventsDataRef) {
-            @Override
-            protected void populateView(View v, AgendaClass model, int position) {
-                TextView activityTitle = (TextView) v.findViewById(android.R.id.text1);
-                TextView activityLocation = (TextView) v.findViewById(android.R.id.text2);
-                // ImageView img = (ImageView) v.findViewById(R.id.sr_list_item_image);
-
-                activityTitle.setText(model.activity);
-                activityLocation.setText(model.location);
-                // RequestCreator activityImg = Picasso.with(getContext()).load(model.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
-                // activityImg.centerCrop().resize(1000,600).into(img);
-
-            }
-        };
-
-        home_list.setAdapter(firebaseListAdapter);
-
+        home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
+        if (listTitles!=null) {
+            adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
+            home_list.setAdapter(adapter);
+        }
 
         // show detailed activity view when list item clicked upon
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -125,7 +106,7 @@ public class HomeFragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
 
-                if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount>9)
+                if(firstVisibleItem+visibleItemCount == totalItemCount)
                 {
                     if(!flag_loading)
                     {
@@ -286,7 +267,21 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {     // inform user of how many friends are going
-                Toast.makeText(getContext(), activityFriendGoingNumbers.get(listData.get(this.position).ref).toString(), Toast.LENGTH_LONG).show();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    ArrayList<String> friendsGoing = activityFriendGoingNumbers.get(listData.get(this.position).ref);
+                    if (friendsGoing != null) {
+                        CharSequence[] cs = friendsGoing.toArray(new CharSequence[friendsGoing.size()]);
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("Friends Going")
+                                .setPositiveButton("okay", null)
+                                .setItems(cs, null)
+                                .create()
+                                .show();
+                    }
+                    else {
+                        Toast.makeText(getContext(),"None of your friends are going to " + listData.get(this.position).activity,Toast.LENGTH_LONG).show();
+                    }
+                }
                 return true;
             }
         });                                 // add item to your calendar
@@ -427,7 +422,21 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.interested.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
-                Toast.makeText(getContext(), activityFriendInterestedNumbers.get(listData.get(this.position).ref).toString(), Toast.LENGTH_LONG).show();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    ArrayList<String> friendsGoing = activityFriendInterestedNumbers.get(listData.get(this.position).ref);
+                    if (friendsGoing != null) {
+                        CharSequence[] cs = friendsGoing.toArray(new CharSequence[friendsGoing.size()]);
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("Friends Interested")
+                                .setPositiveButton("okay", null)
+                                .setItems(cs, null)
+                                .create()
+                                .show();
+                    }
+                    else {
+                        Toast.makeText(getContext(),"None of your friends are interested in " + listData.get(this.position).activity,Toast.LENGTH_LONG).show();
+                    }
+                }
                 return true;
             }
         });

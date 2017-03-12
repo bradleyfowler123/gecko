@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoPort</string>
+    <string name="app_name">Gecko</string>
     <string name="action_settings">Settings</string>
     <string name="action_login">Login</string>
     <string name="action_logout">Logout</string>

@@ -94,15 +94,19 @@
     </array>
     <array name="elvDistanceItems">
         <item>Distance</item>
-        <item>&lt; 2 miles</item>
-        <item>&lt; 10 miles</item>
-        <item>&lt; 30 miles</item>
+        <item>&lt; 2 km</item>
+        <item>&lt; 10 km</item>
+        <item>&lt; 30 km</item>
         <item>Custom</item>
     </array>
     <array name="elvOtherItems">
         <item>Other</item>
-        <item>Family Friendly Only</item>
+        <item>Family Friendly</item>
         <item>Indoor</item>
+        <item>Disabled Access</item>
+        <item>Parking</item>
+        <item>Pet Friendly</item>
+        <item>Toilets</item>
     </array>
 
 </resources>
