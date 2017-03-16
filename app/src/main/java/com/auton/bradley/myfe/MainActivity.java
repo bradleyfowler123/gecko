@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<String> interested = new ArrayList<>();
     private AgendaClass[] unseenHomeUpdates = new AgendaClass[2];
     private int eventCount = 0; private int activityCount = 0;
+    private int eventCountDatabase = 0; private int activityCountDatabase = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -536,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                                     Iterator<AgendaClass> iterator = agendaData.values().iterator();                // parse out a list of friendClass'
                                     String friendUid = dataSnapshot.getRef().getParent().getKey();                  // get this friend's UID
                                     // remove all list items of this friend
-                                    int i = friendUIDs.indexOf(friendUid);                                          // locate the index of where they are in FacebookData
+                                    int i = friendUIDs.indexOf(friendUid);
                                     String friendUrl = friendFBUrls.get(i);
                                     for (int k = 0; k < friendFeedListItemsData.size(); k++) {                            // not the size gets calculated upon every iteration
                                         if (friendFeedListItemsData.get(k).picUrl.equals(friendUrl)) {                    // ideally use fb uid but as this is not available using urls as they are unique
@@ -675,33 +676,59 @@ public class MainActivity extends AppCompatActivity {
     public void getNSetHomeFeedData() {
         // get and set all activities
         int ItemCount = homeListItems.size();
-        String eventStart, activityStart;
+        String eventStart = "", activityStart = "";
         Boolean getActivities = true;
         Boolean getEvents = true;
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
         DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
-        Query orderedActivities, orderedEvents;
 
+                // get the number of activities and events in the database
+        database.child("activitydata/placeData").child(location).child("activityCount").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                activityCountDatabase = ((Long) dataSnapshot.getValue()).intValue();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+        database.child("activitydata/placeData").child(location).child("eventCount").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                eventCountDatabase = ((Long) dataSnapshot.getValue()).intValue();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        Query orderedActivities, orderedEvents;
         if (ItemCount < 2) {   // for first iteration just get first 5 from each starting from zero
             orderedActivities = activityDataRef.orderByKey().limitToFirst(5);
             orderedEvents = eventsDataRef.orderByKey().limitToFirst(5);
-        } else {                // otherwise determine where to start from
+        }
+        else {                // otherwise determine where to start from
+
             int activityRemainder = 5 - (activityCount % 5);
             int eventRemainder = 5 - (eventCount % 5);
-            Log.d("!!!!!!!!!", Integer.toString(activityRemainder));
             Boolean lastItemWasEvent = homeListItems.get(ItemCount - 1).event;
-
-            if (lastItemWasEvent) {
-                activityStart = homeListItems.get(ItemCount - eventRemainder - 1).ref.split("/")[2];
-                eventStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-            } else {
-                activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-                eventStart = homeListItems.get(ItemCount - activityRemainder - 1).ref.split("/")[2];
+            try {
+                if (lastItemWasEvent) {
+                    activityStart = homeListItems.get(ItemCount - eventRemainder - 1).ref.split("/")[2];
+                    eventStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
+                } else {
+                    activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
+                    eventStart = homeListItems.get(ItemCount - activityRemainder - 1).ref.split("/")[2];
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                Log.d("!!!!!!!!!!a", e.toString());
+                getEvents = false;
+                getActivities = false;
             }
 
-            if (eventRemainder != 5) getEvents = false;
-            if (activityRemainder != 5) getActivities = false;
+
+            if (eventCount >= eventCountDatabase) getEvents = false;
+            if (activityCount >= activityCountDatabase) getActivities = false;
 
             orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6);
             orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6);

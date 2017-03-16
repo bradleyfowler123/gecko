@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -52,7 +53,7 @@ public class HomeFragment extends Fragment {
     private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     private ArrayList<String> myInterests = new ArrayList<>();
     private FirebaseAnalytics mFirebaseAnalytics;
-    private Boolean flag_loading = true;
+    private Boolean flag_loading = true; private int loaded_count = 0;
 
     public HomeFragment() {        // Required empty public constructor
         setHasOptionsMenu(true);
@@ -106,11 +107,12 @@ public class HomeFragment extends Fragment {
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
 
-                if(firstVisibleItem+visibleItemCount == totalItemCount)
+                // offset by 1 list item so start loading on second to last item
+                if(firstVisibleItem+visibleItemCount >= totalItemCount - 1)
                 {
                     if(!flag_loading)
                     {
-                        flag_loading = true;
+                        flag_loading = true; loaded_count = 0;
                         MainActivity mainActivity = (MainActivity) getActivity();
                         mainActivity.getNSetHomeFeedData();
                     }
@@ -128,7 +130,8 @@ public class HomeFragment extends Fragment {
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
-        if (listTitles.size()%10 == 0) flag_loading = false;
+        loaded_count = loaded_count +1;
+        if (loaded_count > 4) flag_loading = false;
         if (home_list!=null && getActivity()!=null) {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list
