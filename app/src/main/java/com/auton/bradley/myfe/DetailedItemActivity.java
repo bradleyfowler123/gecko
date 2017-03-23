@@ -6,13 +6,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,7 +25,6 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -42,10 +39,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -62,16 +57,20 @@ import java.util.Locale;
  */
 
 public class DetailedItemActivity extends AppCompatActivity implements OnMapReadyCallback {
-    // global variable declarations
+                    // global variable declarations
     private AgendaClass activityData = new AgendaClass();
-    private ArrayList<String> myInterests; private Menu menu;
-    private RequestCreator topImage; private Address address;
+    private ArrayList<String> myInterests; private Menu menu;       // used for toggled the interested star in the menu
+    private Address address;                                        // used to store the google maps address of the location of the item
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+                // set up the page  we trying to view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_item);
-         // get and display appropriate data and handle button presses
+
+        // get and display appropriate data and handle button presses
         final Intent intent = getIntent();
         String from = intent.getStringExtra("from");                                                // work out what started this activity - either home feed, friend feed, friend profile, users profile
         myInterests = intent.getStringArrayListExtra("interests");
@@ -125,7 +124,6 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                 ImageView edit_schedule = (ImageView) findViewById(R.id.adi_scheduled_edit);
                 final TextView scheduled_text = (TextView) findViewById(R.id.adi_scheduled_text);
                 // get data
-                Log.d("asdfg1", intent.toString());
                 final String ref = intent.getStringExtra("ref");
                 final String userRef = intent.getStringExtra("userRef");
                 String date = intent.getStringExtra("date");
@@ -157,7 +155,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                                        DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(userRef);
+                                        DatabaseReference userItem = database.child("users").child(user.getUid()).child("Agenda").child(userRef);
                                         userItem.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -178,34 +176,47 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
 
     }
 
+        // function to get the items data from firebase and populate the relevant views with it
     private void getNSetData(final String ref) {
+
+        // get the views
         final ImageView iv_activityImage = (ImageView) findViewById(R.id.adi_image);
         final TextView tv_title = (TextView) findViewById(R.id.adi_title);
         final TextView tv_desc = (TextView) findViewById(R.id.adi_decription);
         final TextView tv_link = (TextView) findViewById(R.id.adi_link);
         final TextView tv_other = (TextView) findViewById(R.id.adi_other);
+
+        // connect to firebase
         final String[] refItems = ref.split("/");
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference agenda = database.child("activitydata/placeData").child(refItems[0]).child(refItems[1]).child(refItems[2]);
         agenda.addValueEventListener(new ValueEventListener() {
-            @Override
+            @Override   // when data is returned
             public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                    // if no data exists at that location
                 if (dataSnapshot.getValue() == null) {
-                    tv_title.setText("Item removed by the provider");
+                        // inform user that item has been removed
+                    tv_title.setText(R.string.detailedItemActivity_removed);
                     tv_desc.setVisibility(View.GONE);
                     tv_link.setVisibility(View.GONE);
                     tv_other.setVisibility(View.GONE);
                     iv_activityImage.setVisibility(View.GONE);
                     findViewById(R.id.map).setVisibility(View.GONE);
                 }
+                        // if data exists, display it
                 else {
                     activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                     activityData.event = refItems[1].equals("events");  // set activity/event data
                     activityData.ref = ref;
+
+                    //  set title, description, url, image
                     Picasso.with(getBaseContext()).load(activityData.image).placeholder(R.drawable.detailedviewrectangle).error(R.drawable.detailedviewrectangle).into(iv_activityImage);
                     tv_title.setText(activityData.activity);
                     tv_desc.setText(activityData.activityDescription);
-                    tv_link.setText("Visit: " + activityData.url);
+                    tv_link.setText(("Visit: " + activityData.url));
+
+                    // set other data that depends on if it was an activity or event, date, time, price (in display)
                     if (activityData.event) {
                         if (activityData.price != 0) {
                             tv_other.setText("Prices from £" + activityData.price + "\n \nTimings:\n" + formatTime(activityData.time) + " on " + formatDate(activityData.date) + "\n \nLocation:\n" + activityData.location);
@@ -218,14 +229,18 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                             tv_other.setText("Prices from £" + activityData.price + "\n \nLocation:\n" + activityData.location);
                         }
                         else {
-                            tv_other.setText("Location:\n" + activityData.location);
+                            tv_other.setText(("Location:\n" + activityData.location));
                         }
                     }
+
+                        // set interested star
                     if (menu != null) {
                         if (myInterests.contains(activityData.ref))
                             menu.getItem(0).setIcon(android.R.drawable.star_on);
                         else menu.getItem(0).setIcon(android.R.drawable.star_off);
                     }
+
+                        // show icons if activity or event has them
                     if (activityData.familyfriendly != null && activityData.familyfriendly)
                         findViewById(R.id.adi_iconList_family).setVisibility(View.VISIBLE);
                     if (activityData.disabled != null && activityData.disabled)
@@ -238,10 +253,10 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                         findViewById(R.id.adi_iconList_pet).setVisibility(View.VISIBLE);
                     if (activityData.toilet != null && activityData.toilet)
                         findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
+
+                        // load the map
                     MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
                     if (mapFragment!= null) mapFragment.getMapAsync(DetailedItemActivity.this);
-
-
                 }
             }
             @Override
@@ -250,6 +265,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
             }
         });
 
+        // if link is pressed load it in the web browser
         tv_link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -288,17 +304,18 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
     }
 
 
-                            // users agenda item reschedule time returned
+                            // users agenda item reschedule time returned or add to calendar button pressed
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // add to calendar button returns data
         if (resultCode == 1) {
+
+                    // reschedule button returned value
             if (requestCode==1){
                                     // get data return
                     String date = data.getStringExtra("date"); String time = data.getStringExtra("time");
                     DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                    DatabaseReference userItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").child(data.getStringExtra("userRef"));
+                    DatabaseReference userItem = database.child("users").child(user.getUid()).child("Agenda").child(data.getStringExtra("userRef"));
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("date",date);
                     map.put("time",time);
@@ -309,18 +326,22 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                             Toast.makeText(getBaseContext(),"Error Update Failed",Toast.LENGTH_SHORT).show();
                         }
                     });
+                                    // inform user of update
                     Snackbar snackbar = Snackbar
                             .make(findViewById(R.id.activity_detailed_item), "Updated", Snackbar.LENGTH_SHORT);
                     snackbar.show();
                     TextView textView = (TextView) findViewById(R.id.adi_scheduled_text);
                     textView.setText("You are going at " + formatTime(time) + " on " + formatDate(date));
             }
+
+                    // add to calendar button returns data
             else if (requestCode==32) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            // inform user that we are adding it
                     Snackbar snackbar = Snackbar
                             .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_SHORT);
                     snackbar.show();
-                    if (user != null) {       // upload selection to their agenda
+                            // upload selection to their agenda
+                    if (user != null) {
                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
                         DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
                         HashMap<String, String> pushData = new HashMap<>();
@@ -353,16 +374,20 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+
+                    // add item button is pressed
             case R.id.action_addActivity:
 
                 // if user not logged in
-                if (FirebaseAuth.getInstance().getCurrentUser() == null) {                            // tell them to log in
+                if (user == null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(DetailedItemActivity.this);
                     builder.setMessage("Sign in to add items to your agenda")
                             .setPositiveButton("okay", null)
                             .create()
                             .show();
-                } else {              // if user logged in
+                }
+                // if user logged in
+                else {
                     final AgendaClass listItem = activityData;
                     if (listItem.event) {           // if event add it straight away
                         Snackbar snackbar = Snackbar
@@ -370,7 +395,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                         snackbar.show();
                         // upload selection to there agenda
                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                        DatabaseReference agendaItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").push();
+                        DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
                         HashMap<String, String> pushData = new HashMap<>();
                         pushData.put("activity", listItem.activity);
                         pushData.put("location", listItem.location);
@@ -384,17 +409,15 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                         intent.putExtra("title", listItem.activity);                           // data need to add item to calendar
                         intent.putExtra("location", listItem.location);
                         intent.putExtra("reference", listItem.ref);
-                        Log.d("CCCCCCCC", "d");
                         startActivityForResult(intent, 32);
-                         // result is handled by main activity
+                         // result is handled above
                     }
                 }
-
-
                 return true;
+
+                    // interested button is pressed
             case R.id.action_interestedActivity:
                 // if user not logged in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user== null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(DetailedItemActivity.this);
                     builder.setMessage("Sign in to mark items as interested")
@@ -435,9 +458,12 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
     // function to setup the google map
     @Override
     public void onMapReady(final GoogleMap googleMap) {
+
+        // perform setup mostly in the background
         new AsyncTask<Object, Boolean, Boolean>() {
             @Override
             protected Boolean doInBackground(Object... params) {
+                    // lookup the location on google maps
                 Geocoder geocoder = new Geocoder(getBaseContext());                                 // geocoder process' locations
                 try {
                     List<Address> addresses = geocoder.getFromLocationName(activityData.location, 1);
@@ -454,7 +480,9 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
             }
             @Override
             protected void onPostExecute(Boolean result) {
+                    // if location is found
                 if(result){
+                    // set marker on map
                     googleMap.addMarker(new MarkerOptions()                                     // add pin on google map
                             .position(new LatLng(address.getLatitude(), address.getLongitude()))
                             .title(activityData.activity));
@@ -463,18 +491,20 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     CameraUpdate cu = CameraUpdateFactory.newCameraPosition(camPos);
                     googleMap.moveCamera(cu);
                 }
+                    // otherwise hide map
                 else {
                     View map = findViewById(R.id.map);
                     map.setVisibility(View.GONE);
-
-
                 }
             }
         }.execute();
+
         // set blue dot where user is if they have allowed access to their location
         if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
+
+        // set up map options
         UiSettings uiSettings = googleMap.getUiSettings();
         uiSettings.setMyLocationButtonEnabled(true);
         uiSettings.setAllGesturesEnabled(true);

@@ -16,7 +16,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
-// fragment that handles the planner tab
+/*
+    fragment used to display the users profile
+ */
+
 public class ProfileFragment extends Fragment {
     ViewPager viewPager;
     ViewPager viewPagerNFb;
@@ -60,7 +63,7 @@ public class ProfileFragment extends Fragment {
                 loggedInView.showNext();            // show view for user with no facebook connected
                 viewPagerNFb = (ViewPager) rootView.findViewById(R.id.viewpager_profile_noFB);
                 ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-                adapter.addFragment(new ProfileAgendaFragment(), "Agenda");
+                adapter.addFragment(new ProfileAgendaFragment());
                 viewPagerNFb.setAdapter(adapter);
             }
         }
@@ -74,12 +77,13 @@ public class ProfileFragment extends Fragment {
 
     public void setupViewpagerChild(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new ProfileAgendaFragment(), "Upcoming");
-        adapter.addFragment(new ProfileAgendaCompleteFragment(), "Previous");
-        adapter.addFragment(new ProfileFriendsListFragment(), "Friends");
+        adapter.addFragment(new ProfileAgendaFragment());
+        adapter.addFragment(new ProfileAgendaCompleteFragment());
+        adapter.addFragment(new ProfileFriendsListFragment());
         viewPager.setAdapter(adapter);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setupTabTitles() {
         tabLayout.getTabAt(0).setText("Upcoming");
         tabLayout.getTabAt(1).setText("Previous");

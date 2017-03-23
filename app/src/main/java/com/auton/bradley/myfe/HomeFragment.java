@@ -25,7 +25,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -37,12 +36,14 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-                            // fragment that handles the home tab
+
+/*
+     fragment that handles the home tab
+*/
+
 public class HomeFragment extends Fragment {
                                 // global variable declarations
     private ListView home_list;
@@ -69,17 +70,20 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
-                                   // variable declarations
+
+                                   // get view elements and setup environment
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         View rootView = inflater.inflate(R.layout.fragment_home,container,false);                   // enables easy access to the root search xml
         home_list = (ListView) rootView.findViewById(R.id.home_list);                               // locate the list object in the home tab
         home_list.setEmptyView(rootView.findViewById(R.id.home_empty_list_item));
+
+                                    // if we have data generate a list
         if (listTitles!=null) {
             adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
             home_list.setAdapter(adapter);
         }
 
-        // show detailed activity view when list item clicked upon
+                                    // show detailed activity view when list item clicked upon
         home_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override                   // show detailed view of activity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -100,18 +104,20 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+                        // when user scrolls and near the bottom load more data
         home_list.setOnScrollListener(new AbsListView.OnScrollListener() {
 
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-            }
+            public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
 
                 // offset by 1 list item so start loading on second to last item
                 if(firstVisibleItem+visibleItemCount >= totalItemCount - 1)
-                {
+                {       // provided we are not already loading data
                     if(!flag_loading)
-                    {
+                    {       // load some more items
                         flag_loading = true; loaded_count = 0;
                         MainActivity mainActivity = (MainActivity) getActivity();
                         mainActivity.getNSetHomeFeedData();
@@ -120,18 +126,24 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
+
                         // function to update the list items shown in the home list
     public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings, Map<String, ArrayList<String>> actFriGoNums, Map<String, ArrayList<String>> actFriIntNums,  ArrayList<String> interests, Boolean forceRemake){
+
+        // get data
         listItems = sortedList2;
         listTitles = strings; // some necessary crap
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
+
+        // reset loading flag when 5 items have loaded
         loaded_count = loaded_count +1;
         if (loaded_count > 4) flag_loading = false;
+
+        // update list view with new data
         if (home_list!=null && getActivity()!=null) {
             if (adapter==null || forceRemake){                  // force remake runs whenever user filters with preferences
                 adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);  // populate new list
@@ -146,6 +158,7 @@ public class HomeFragment extends Fragment {
         menu.clear();                                                                               // remove current menu
         final Boolean[] yes = {true};                                                               // we need to remake the list just before it tries to filter so the the data it is filtering from is up to date
         inflater.inflate(R.menu.menu_home,menu);                                                    // add home one
+
                                 // display either login or logout
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             menu.getItem(2).setVisible(false);
@@ -155,7 +168,9 @@ public class HomeFragment extends Fragment {
             menu.getItem(2).setVisible(true);
             menu.getItem(3).setVisible(false);
             menu.getItem(4).setVisible(false);   // settings
-        }        // set up search button
+        }
+
+                            // set up search button
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -216,6 +231,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
             convertView = inflater.inflate(R.layout.home_list_item, nullParent);
         }
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+
                         // find the views within the list
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
@@ -228,6 +244,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         holder.addToCal = convertView.findViewById(R.id.sr_add_to_calander);
         holder.interested = convertView.findViewById(R.id.home_interested);
         holder.totalGoing = convertView.findViewById(R.id.home_total_going);
+
                                 // populate the texts and images with data for a list item
         AgendaClass listItem = listData.get(position);
         holder.activityTitle.setText(listItem.activity);
@@ -266,6 +283,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 holder.noFriInt.setText(" ");
             }
         }
+
                              // add an on long click listener for the add to calendar button in each list item
         holder.addToCal.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
@@ -287,12 +305,15 @@ class homeAdapter extends ArrayAdapter<String> {                                
                 }
                 return true;
             }
-        });                                 // add item to your calendar
+        });
+
+                            // add item to your calendar
         holder.addToCal.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(final View view) {
                 // if user not logged in
-                if (FirebaseAuth.getInstance().getCurrentUser() == null) {                            // tell them to log in
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) {                            // tell them to log in
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setMessage("Sign in to add items to your agenda")
                             .setPositiveButton("okay", null)
@@ -311,7 +332,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                         snackbar.show();
                                         // upload selection to there agenda
                                         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-                                        DatabaseReference agendaItem = database.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Agenda").push();
+                                        DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
                                         HashMap<String, String> pushData = new HashMap<>();
                                         pushData.put("activity", listItem.activity);
                                         pushData.put("location", listItem.location);
@@ -350,7 +371,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
                     }
                 }
             }
-        });                 // toggle interested on list item
+        });
+
+                        // toggle interested on list item
         holder.interested.setOnClickListener(new onClickListenerPosition(position) {
             @Override
             public void onClick(View view) {
@@ -421,7 +444,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
 
                 }
             }
-        });                         // flash how many friends are interested going
+        });
+
+                    // flash how many friends are interested going
         holder.interested.setOnLongClickListener(new onLongClickListenerPosition(position) {
             @Override
             public boolean onLongClick(View view) {
@@ -445,6 +470,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         });
         return convertView;                                                                         // return the updated view
     }
+
     @Override
     public int getCount() {
         return listData.size();
@@ -452,7 +478,9 @@ class homeAdapter extends ArrayAdapter<String> {                                
     @Override
     public long getItemId(int position) {
         return position;
-    }                               // function to remove list items not containing searched titles
+    }
+
+                    // function to remove list items not containing searched titles
     void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());                                       // get the searched string
         listData.clear();                                                                           // remove all items from list

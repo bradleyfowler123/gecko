@@ -1,4 +1,6 @@
 <resources>
+
+    <!-- Strings related to overall Gecko app -->
     <string name="app_name">Gecko</string>
     <string name="action_settings">Settings</string>
     <string name="action_login">Login</string>
@@ -8,6 +10,7 @@
     <string name="facebook_app_id">171902163272566</string>
     <string name="fb_login_protocol_scheme">fb171902163272566</string>
 
+    <!-- Strings related to register page -->
     <string name="register_title">Create An Account</string>
     <string name="register_name">Screen Name</string>
     <string name="register_email">Email</string>
@@ -17,6 +20,7 @@
     <string name="register_failed">Register Failed! Email already registered</string>
     <string name="register_ok_button">OK</string>
 
+    <!-- Strings related to login page -->
     <string name="login_button">Login</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
@@ -24,12 +28,15 @@
     <string name="login_failed">Login Failed - Email or Password Incorrect</string>
     <string name="login_retry_button">Retry</string>
 
+    <!-- Strings related to popups -->
     <string name="input_prompt_labelFor">Enter some text</string>
 
+    <!-- Strings related to home page -->
     <string name="home_top_message">Recommended For You</string>
     <string name="home_list_image_desc">Picture of a recommendation</string>
     <string name="home_toast_list_click">Navigating to the website</string>
 
+    <!-- Strings related to search preferences page -->
     <string name="search_top_message">Set Your Preferences</string>
     <string name="search_button">Search</string>
     <string name="search_dialog_enter">Enter</string>
@@ -38,90 +45,27 @@
     <string name="search_previewDistanceBefore">&lt; </string>
     <string name="search_previewDistanceAfter"> miles</string>
 
+    <!-- Strings related to profile page -->
     <string name="profile_signIp">Sign up to save items to your Agenda! </string>
     <string name="profile_contentDescription">Your Profile Picture</string>
     <string name="profileAgenda_tabName">Agenda</string>
     <string name="profilePhotos_tabName">Photos</string>
     <string name="profileFriends_tabName">Friends</string>
 
+    <!-- Strings related to friend feed page -->
     <string name="friendFeed_tabName">Feed</string>
-    <string name="friend_signUp">Sign up to see the Social Tab!</string>
+    <string name="friendFeed_signUp">Sign up to see the Social Tab!</string>
     <string name="friendFeed_imageDescription">A friend\'s profile picture</string>
-    <string name="friendMap_tabName">Map</string>
+    <string name="friendFeed_linkFb">Link Facebook to see your friends!</string>
 
-    <string name="test">Here is some test data</string>
-    <string name="title_activity_search_pref">Activity Preferences</string>
+    <!-- Strings related to friend detailed item view page -->
+    <string name="detailedItemActivity_removed">Item removed by the provider</string>
 
     <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
     <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_title_display_name">Display name</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_search_pref">Activity Preferences</string>
 </resources>

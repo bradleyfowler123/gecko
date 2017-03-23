@@ -2,13 +2,9 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,21 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
-import com.squareup.picasso.Transformation;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
+
+/*
+    fragment used to display a list of the users friends
+ */
 
 public class ProfileFriendsListFragment extends Fragment {
 
@@ -46,15 +35,18 @@ public class ProfileFriendsListFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+            // setup the view and get view items from the layout
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_profile_friends, container, false);        // enables easy access to the root search xml
         ListView pa_list = (ListView) rootView.findViewById(R.id.profile_friend_list);             // locate the list object in the home tab
+
                                 // variable declarations
-        final Bundle fbData;
         final ArrayList<String> friendNames;
         final ArrayList<String> friendUids;
         final ArrayList<String> profilePicUrls;
         final ArrayList<String> interested;
+
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {                           // if friend activity
             final FriendActivity activity = (FriendActivity) getActivity();                         // get users friend list
@@ -65,7 +57,6 @@ public class ProfileFriendsListFragment extends Fragment {
         }
         else {                                                                                      // if main activity
             final MainActivity activity = (MainActivity) getActivity();                             // get users friend list
-            fbData = activity.facebookData;
             friendNames = activity.facebookData.getStringArrayList("friendNames");
             friendUids = activity.facebookData.getStringArrayList("friendUids");
             profilePicUrls = activity.facebookData.getStringArrayList("friendUrls");
@@ -74,6 +65,7 @@ public class ProfileFriendsListFragment extends Fragment {
                                 // populate friends list
         friendsListAdapter adapter = new friendsListAdapter(getActivity(),friendNames,profilePicUrls);
         pa_list.setAdapter(adapter);
+
                                 // when friend is clicked up
         pa_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

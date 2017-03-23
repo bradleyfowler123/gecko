@@ -46,8 +46,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/*
+    fragment that handles the friend feed tab
+ */
 
-// fragment that handles the friends tab
 public class FriendFragment extends Fragment {
                     // global variable declarations
     View rootView;
@@ -61,11 +63,13 @@ public class FriendFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-                                // get friend tab layout
+
+                                // get friend tab layout views
         rootView = inflater.inflate(R.layout.fragment_friend, container, false);
         TextView signUp = (TextView) rootView.findViewById(R.id.friend_signUp_text);
         fbLinkButton = (LoginButton) rootView.findViewById(R.id.connect_with_fb_button);
         ff_list = (ListView) rootView.findViewById(R.id.friend_feed_list);
+
                                 // get user info
         final MainActivity activity = (MainActivity) getActivity();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -82,7 +86,6 @@ public class FriendFragment extends Fragment {
                 ff_list.setEmptyView(rootView.findViewById(R.id.friend_empty_list_item));
                                 // populate list
                 friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
-                if (sortedList.size()>0) Log.d("HHHHHHHH1", sortedList.get(0).friendName);
                 ff_list.setAdapter(adapter);
                                 // on list item click show detailed activity view
                 ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,7 +108,7 @@ public class FriendFragment extends Fragment {
             }
             else {         // else show connect fb screen
                 signUp.setVisibility(View.VISIBLE);
-                signUp.setText("Link Facebook to see your friends!");
+                signUp.setText(R.string.friendFeed_linkFb);
                 fbLinkButton.setVisibility(View.VISIBLE);
                 ff_list.setVisibility(View.GONE);
 
@@ -123,6 +126,7 @@ public class FriendFragment extends Fragment {
                             public void onCompleted(JSONObject object, GraphResponse response2) {
                                 FacebookFriendData friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
                                 FacebookData = getFacebookData(object, friends);                            // format the data into a nice bundle
+                                //noinspection ConstantConditions
                                 if(FacebookData.getString("email").equals(user.getEmail())) {
                                     user.linkWithCredential(credential);
                                     Toast.makeText(getContext(),"FB Linked",Toast.LENGTH_SHORT).show();
@@ -160,6 +164,7 @@ public class FriendFragment extends Fragment {
                                 // return the view
         return rootView;
     }
+
                                 // function to update the list items shown in the friend feed
     public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings){
         sortedList = sortedList2;
@@ -167,12 +172,14 @@ public class FriendFragment extends Fragment {
         if (ff_list!=null) {
             if (adapter==null){     // create new adapter to generate list
                 adapter = new friendAdapter(getActivity(), sortedList, listItems);
-                Log.d("HHHHHHHH2", sortedList.get(0).friendName);
                 ff_list.setAdapter(adapter);
             } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
 
         }
     }
+
+
+    // below all needed for when user first links accounts so very similar to login code below
                             // function to get users friends info
     public FacebookFriendData getFacebookFriends(AccessToken accessToken) {
         final FacebookFriendData friendData = new FacebookFriendData();
@@ -210,11 +217,12 @@ public class FriendFragment extends Fragment {
         // store users uid and fb id in database lookup table - need not run every time
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
+        @SuppressWarnings("ConstantConditions") DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
+        assert user != null;
         myFacebookIDRef.setValue(user.getUid());
-        // if you have no friends run main activity
+
+                // if you have no friends run main activity
         final ArrayList<String> facebookFriendIDs = FacebookData.getStringArrayList("friendIds");
-        //      Log.d("yughj", friendFirebaseIDs.toString());
         if (facebookFriendIDs == null || facebookFriendIDs.isEmpty()) {
             DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
             friends.removeValue();
@@ -227,13 +235,16 @@ public class FriendFragment extends Fragment {
             activity.finish();
             startActivity(intent);
         }
-        else {          // else store friends UIDs in the users friend list on firebase
+
+                // else store friends UIDs in the users friend list on firebase
+        else {
             // initialise variables
             friendFirebaseIDs = new ArrayList<>();                          // will hold the list of friend UIDs
             for (int i = 0; i < facebookFriendIDs.size(); i++) {
                 friendFirebaseIDs.add(i, "");
             }
             friendCount = facebookFriendIDs.size();
+
             // for every facebook friend, get their uid
             for (int i = 0; i < facebookFriendIDs.size(); i++) {
                 DatabaseReference firebaseIDRef = database.child("facebookIDs").child(facebookFriendIDs.get(i));
@@ -249,7 +260,7 @@ public class FriendFragment extends Fragment {
                             DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
                             friends.setValue(friendFirebaseIDs);
                             FacebookData.putStringArrayList("friendUids", friendFirebaseIDs);
-                            //        Log.d("uuhjv", FacebookData.getStringArrayList("friendUids").toString());
+
                             // restart main activity to display new user state
                             MainActivity activity = (MainActivity) getActivity();
                             Intent intent = new Intent(getActivity(), MainActivity.class);
@@ -349,7 +360,6 @@ class friendAdapter extends ArrayAdapter<String> {                              
         try {
             Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(holder.img);
             holder.friends.setText(items.get(position).friendName);
-            Log.d("FFFFFF", items.get(position).friendName);
             holder.activity.setText(items.get(position).activity);
             holder.time.setText(items.get(position).timeAgo);
         }

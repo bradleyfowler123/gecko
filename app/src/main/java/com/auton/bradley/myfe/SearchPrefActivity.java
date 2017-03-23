@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,19 +21,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+/*
+    activity used to set the preferences which determine which items will be shown on the home page
+ */
+
 public class SearchPrefActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_pref);
+
         // variable declarations
         final ExpandableListView elv=(ExpandableListView) findViewById(R.id.search_list);  // locate the elv in this view
         final ArrayList<Item> item=getData();                                                       // generate data which will be used to populate the el
-        //  elv.setVerticalFadingEdgeEnabled(true);
+
         // generate the elv
         final searchPrefAdapter adapter = new searchPrefAdapter(this,item);                              // define the adapter to be used to generate elv
         elv.setAdapter(adapter);                                                                    // assign this adapter to the elv
+
         // handle clicks on the elv
         elv.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {                 // setup function to listen for a click on the child elements
             @Override
@@ -59,12 +64,12 @@ public class SearchPrefActivity extends AppCompatActivity {
                             dialogMessage = dialogMessages[0];
                             before = getString(R.string.search_previewCost); after = "";
                         }
-                        else if (groupPos==2) {     // location
+                        /*else if (groupPos==2) {     // location
                             inputType = 1;
                             dialogMessage = dialogMessages[2];
                             before = ""; after = "";
                         }
-                        else {                      // distance
+                        */else {                      // distance
                             inputType = 2;
                             dialogMessage = dialogMessages[3];
                             before = getString(R.string.search_previewDistanceBefore); after = getString(R.string.search_previewDistanceAfter);
@@ -109,13 +114,14 @@ public class SearchPrefActivity extends AppCompatActivity {
                 return false;
             }
         });
-        // search button at bottom of tab
+
+        // search button at bottom of tab pressed
         Button button = (Button) findViewById(R.id.search_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(),MainActivity.class);
-                Bundle searchPref = new Bundle();
+
+                // get the data from the elv
                 int cost; Item costItem = item.get(0);
                 if (costItem.Selected.equals(costItem.elements.get(costItem.elements.size()-1)))      cost = Integer.valueOf(costItem.CustomValue.toString());
                 else if (costItem.Selected.equals("Any")) cost = 999999999;
@@ -124,6 +130,9 @@ public class SearchPrefActivity extends AppCompatActivity {
                 double dist; Item distItem = item.get(3);
                 if (distItem.Selected.equals(distItem.elements.get(distItem.elements.size()-1)))    dist = Double.valueOf(distItem.CustomValue.toString());
                 else dist = Double.valueOf(distItem.Selected.substring(2,distItem.Selected.length()-3));
+
+                    // pass it back to the main activity
+                Intent intent = new Intent(getBaseContext(),MainActivity.class);
                 intent.putExtra("cost", cost);
                 intent.putExtra("type", item.get(1).mSelected);
                 intent.putExtra("location", item.get(2).Selected);
@@ -132,12 +141,13 @@ public class SearchPrefActivity extends AppCompatActivity {
                 setResult(1,intent);
                 finish();
             }
-        });
-                                                                        // return the search view (and everything below) to the main activity so it can be shown
+        });                                                               // return the search view (and everything below) to the main activity so it can be shown
 }
 
     // function that generates the elv data
     private ArrayList<Item> getData() {                                                             // generates an array containing 3 Item class objects
+
+        // cost
         String[] cost = getResources().getStringArray(R.array.elvCostItems);
         Item i1=new Item(cost[0], new ArrayList<>(Collections.singletonList(cost[5])),false);          // Define an Item object call i1
         i1.elements.add(cost[1]);                                                                    // child elements below
@@ -147,15 +157,18 @@ public class SearchPrefActivity extends AppCompatActivity {
         i1.elements.add(cost[5]);
         i1.elements.add(cost[6]);
 
+        // activity or event
         String[] category = getResources().getStringArray(R.array.elvCategoryItems);
         Item i2=new Item(category[0], new ArrayList<>(Arrays.asList(category[1],category[2])),true);      // Item.Option is set by the arg1 and default selection is set by arg 2
         i2.elements.add(category[1]);
         i2.elements.add(category[2]);
 
+        // city
         String[] location = getResources().getStringArray(R.array.elvLocationItems);
         Item i4=new Item(location[0],new ArrayList<>(Collections.singletonList(location[1])),false);
         i4.elements.add(location[1]);
 
+        // distance away
         String[] distance = getResources().getStringArray(R.array.elvDistanceItems);
         Item i5=new Item(distance[0],new ArrayList<>(Collections.singletonList(distance[2])),false);
         i5.elements.add(distance[1]);
@@ -163,6 +176,7 @@ public class SearchPrefActivity extends AppCompatActivity {
         i5.elements.add(distance[3]);
         i5.elements.add(distance[4]);
 
+        // other - disabled access, indoors, etc
         String[] other = getResources().getStringArray(R.array.elvOtherItems);
         ArrayList<String> temp = new ArrayList<>();
         Item i6=new Item(other[0], temp,true);
@@ -173,6 +187,7 @@ public class SearchPrefActivity extends AppCompatActivity {
         i6.elements.add(other[5]);
         i6.elements.add(other[6]);
 
+        // add items to the elv
         ArrayList<Item> allItems=new ArrayList<>();                                                 // append all Item objects into an ArrayList
         allItems.add(i1);
         allItems.add(i2);

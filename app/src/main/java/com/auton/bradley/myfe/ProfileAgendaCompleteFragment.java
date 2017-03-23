@@ -2,7 +2,6 @@ package com.auton.bradley.myfe;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -16,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,8 +32,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
+/*
+    fragment used to display a list of items that the user has completed
+ */
+
 public class ProfileAgendaCompleteFragment extends Fragment {
 
+        // global variable declarations
     ArrayList<AgendaClass> listItems = new ArrayList<>();
     ArrayList<AgendaClass> sortedList = new ArrayList<>();
 
@@ -46,30 +49,31 @@ public class ProfileAgendaCompleteFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    // function that generates the view
+            // function that generates the view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+                // setup view and get view items to be populated
         super.onCreate(savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_profile_agenda_complete, container, false);        // enables easy access to the root search xml
         final ListView pa_list = (ListView) rootView.findViewById(R.id.profile_agenda_complete_list);             // locate the list object in the home tab
         pa_list.setEmptyView(rootView.findViewById(R.id.comp_agenda_empty_list_item));
-        final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
+
+                    // get the user uid of the user that the data is from
+        final String Uid;
         // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
             Uid = activity.UIDs.get(activity.index);
-            friendName = activity.names.get(activity.index);
-            friendUrl = activity.Urls.get(activity.index);
-            myInterests = activity.Interested;
         }
         else {
             final MainActivity activity = (MainActivity) getActivity();
+            //noinspection ConstantConditions
             Uid = activity.auth.getCurrentUser().getUid();
-            friendName = null; friendUrl = null;
-            myInterests = activity.interested;
         }
-        // get data to be displayed
+
+                    // get data to be displayed
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference agenda = database.child("users").child(Uid).child("Agenda");
         agenda.addValueEventListener(new ValueEventListener() {
@@ -106,7 +110,8 @@ public class ProfileAgendaCompleteFragment extends Fragment {
                 Log.d("Datebase Error2", databaseError.toString());
             }
         });
-        // if agenda item clicked
+
+        // if agenda item is long clicked, show option to delete it
         pa_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -133,10 +138,10 @@ public class ProfileAgendaCompleteFragment extends Fragment {
                 return false;
             }
         });
-
         return rootView;
     }
 
+    // function used to calculate the order of where an item should appear in the list
     private int calcRank(String dateString, String timeString) {
         int rank;
         SimpleDateFormat formatDT = new SimpleDateFormat("MM/dd/yyyy-HH:mm", Locale.US);
@@ -158,7 +163,7 @@ public class ProfileAgendaCompleteFragment extends Fragment {
 }
 
 
-// adapter used for to show your activities as a list view in profile agenda sub tab
+// adapter used to show your activities as a list view in profile agenda sub tab
 class ProfileAgendaCompleteAdapter extends ArrayAdapter<String> {                                                    // Define the custom adapter class for our list view
     // declare variables of this class
     private ArrayList<AgendaClass> items;
@@ -188,19 +193,23 @@ class ProfileAgendaCompleteAdapter extends ArrayAdapter<String> {               
             final ViewGroup nullParent = null;
             convertView = inflater.inflate(R.layout.profile_agenda_list_item, nullParent);
         }
+
         // find the views within the list
         final ViewHolder holder = new ViewHolder();
         holder.activity = (TextView) convertView.findViewById(R.id.tv_profile_agenda_activities);
         holder.date = (TextView) convertView.findViewById(R.id.tv_profile_agenda_date);
         holder.locations = (TextView) convertView.findViewById(R.id.tv_profile_agenda_location);
+
         // populate the title and image with data for a list item
         holder.activity.setText(items.get(position).activity);
         holder.date.setText(formatTime(items.get(position).date));
         holder.locations.setText(items.get(position).location);
+
         // return the updated view
         return convertView;
     }
 
+    // function used to format the time so that it is displayed nicely in the list
     private String formatTime(String dateString) {
         String output;
         SimpleDateFormat formatDate = new SimpleDateFormat("MM/dd/yyyy", Locale.US);

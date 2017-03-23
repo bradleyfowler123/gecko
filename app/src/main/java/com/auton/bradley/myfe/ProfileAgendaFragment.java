@@ -31,8 +31,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
+/*
+    fragment used to display a list of items that the user has upcoming in their agenda
+ */
+
 public class ProfileAgendaFragment extends Fragment {
 
+            // global variable declarations
     ArrayList<AgendaClass> listItems = new ArrayList<>();
     ArrayList<AgendaClass> sortedList = new ArrayList<>();
 
@@ -54,8 +59,6 @@ public class ProfileAgendaFragment extends Fragment {
         final String Uid; final String friendName; final String friendUrl; final ArrayList<String> myInterests;
 
 
-
-
                                 // handle whether fragment was called by profile tab or friend activity
         if (getActivity().getLocalClassName().equals("FriendActivity")) {
             final FriendActivity activity = (FriendActivity) getActivity();
@@ -66,6 +69,7 @@ public class ProfileAgendaFragment extends Fragment {
         }
         else {
             final MainActivity activity = (MainActivity) getActivity();
+            //noinspection ConstantConditions
             Uid = activity.auth.getCurrentUser().getUid();
             friendName = null; friendUrl = null;
             myInterests = activity.interested;
@@ -113,7 +117,6 @@ public class ProfileAgendaFragment extends Fragment {
                                 // load custom detailed view
                 Intent intent = new Intent(getActivity(),DetailedItemActivity.class);
                 AgendaClass listItem = sortedList.get(i);
-                Log.d("asdfg2", sortedList.get(i).toString());
                 if(getActivity().toString().contains("FriendActivity")) {
                     intent.putExtra("from", "friendPage");                                          // custom detailed friend
                     intent.putExtra("friendDate",listItem.date);

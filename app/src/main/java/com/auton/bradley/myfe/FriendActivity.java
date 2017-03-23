@@ -3,9 +3,6 @@ package com.auton.bradley.myfe;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
@@ -15,7 +12,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Activity that displays a friends profile
@@ -59,50 +55,17 @@ public class FriendActivity extends AppCompatActivity {
                         // add the tabs
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
-        adapter.addFragment(new ProfileAgendaFragment(), "Upcoming");
-        adapter.addFragment(new ProfileAgendaCompleteFragment(), "Previous");
-        adapter.addFragment(new ProfileFriendsListFragment(), "Friends");
+        adapter.addFragment(new ProfileAgendaFragment());
+        adapter.addFragment(new ProfileAgendaCompleteFragment());
+        adapter.addFragment(new ProfileFriendsListFragment());
         viewPager.setAdapter(adapter);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setupTabTitles() {
         tabLayout.getTabAt(0).setText("Upcoming");
         tabLayout.getTabAt(1).setText("Previous");
         tabLayout.getTabAt(2).setText("Your Friends");
     }
 }
-
-/**
- * Custom adapter used for defining adding fragment tabs to a viewpager
- */
-
-class ViewPagerAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
-    private final List<String> mFragmentTitleList = new ArrayList<>();
-
-    ViewPagerAdapter(FragmentManager manager) {
-        super(manager);
-    }
-
-    @Override
-    public Fragment getItem(int position) {
-        return mFragmentList.get(position);
-    }
-
-    @Override
-    public int getCount() {
-        return mFragmentList.size();
-    }
-
-    void addFragment(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return null; //mFragmentTitleList.get(position);
-    }
-}
-
 

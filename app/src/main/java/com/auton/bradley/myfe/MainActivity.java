@@ -13,13 +13,15 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -38,7 +40,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     int currentTab = 0;
     String location = "United Kingdom%%England%%Cambridgeshire%%Cambridge"; Location currentLoc;
 
-
     private FriendFragment friendFragment = new FriendFragment();
     private ProfileFragment profileFragment = new ProfileFragment();
     private HomeFragment homeFragment = new HomeFragment();
@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     private AgendaClass[] unseenHomeUpdates = new AgendaClass[2];
     private int eventCount = 0; private int activityCount = 0;
     private int eventCountDatabase = 0; private int activityCountDatabase = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         callbackManager = CallbackManager.Factory.create();
 
-    //    FacebookSdk.sdkInitialize(getApplicationContext());
         // check permissions granted - if one is not add it to a list to request from user
         ArrayList<String> permissions = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (ContextCompat.checkSelfPermission(getBaseContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.INTERNET);
-        }               // request permissions (until all are granted, see on result below)
+        }               // request permissions
         if (permissions.size() != 0) {
             String[] Sarray = permissions.toArray(new String[permissions.size()]);
             ActivityCompat.requestPermissions(this, Sarray, 13);
@@ -118,24 +119,25 @@ public class MainActivity extends AppCompatActivity {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             currentLoc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);}
-                                                             // you can edit action bar style in activity_main.xml
+
         // load main activity layout
         setContentView(R.layout.activity_main);                                                     // load the main activity view// add icons to ta
         toolbar = (Toolbar) findViewById(R.id.toolbar);   // load action bars                                          // enable the action bar (above tabbed menus)
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.container);
 
+
         // check if firebase is signed in
         if (user != null) {     // if user signed into firebase
             getNSetUserData();      // get user's data from firebase
             // check to see if we have their other data
             if (getIntent().hasExtra("fbConnected")) {  // if so login started this activity or preferences set
-                Log.d("!!!!!!!!!BBBBBBBBB", "FIRST OPEN");
                 // get user's social data from intent
                 Intent intent = getIntent();
                 currentTab = intent.getIntExtra("tab", 0);
                 facebookConnected = intent.getBooleanExtra("fbConnected", false);   // if they have connected facebook
 
+                // set home feed data and then friend data
                 setupViewPager(viewPager);
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
@@ -145,41 +147,27 @@ public class MainActivity extends AppCompatActivity {
                     facebookData = intent.getBundleExtra("fbData");
                     getNSetFriendData();    // get friends info and show it on home feed
                 }
-            } else {                    // if we have lost all the data just log tem out
-                Log.d("!!!!!!!!!BBBBBBBBB", "REOPENED");
-       /*         if (savedInstanceState!=null) {
-                    Log.d("!!!!!!!!!BBBBBBBBB1", "true");
-                }
-                else {
-                    Log.d("!!!!!!!!!BBBBBBBBB2", "false");
-                }
-       */       // need to get saved instance state data
-                // check for facebook connection
-                // get and set friend data
-                // not sure how to get saved instance state after activity destroy
+            }
+
+            else {                    // if we have lost all the data just log tem out
+
                 LoginManager.getInstance().logOut();
                 facebookConnected = false;
                 auth.signOut();
 
-
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.putExtra("tab", 0);
                 startActivity(intent);
-        /*        setupViewPager(viewPager);
-                tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-                tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-                setupTabIcons();
-                getNSetHomeFeedData();          // get home feed data
-*/
-
             }
-        } else {  // user is not signed in
-            Log.wtf("!!!!!!!AAAAAAAAA", "NOT SIGNED IN");
-            // do nothing
+        }
+
+        else {                  // user is not signed in
+            // ensure they are fully logged out
             LoginManager.getInstance().logOut();
             facebookConnected = false;
             auth.signOut();
 
+                                // if they were already on the app (returning from e.g. settings page), return them to the correct tab
             if (getIntent().hasExtra("tab")) {
                 setupViewPager(viewPager);
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
@@ -187,100 +175,45 @@ public class MainActivity extends AppCompatActivity {
                 setupTabIcons();
                 getNSetHomeFeedData();
             }
+
+                                // otherwise they are logged out and just opened app, so show them login screen
             else {
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.putExtra("tab", 0);
                 startActivity(intent);
             }
-
-/*                     // get home feed data
-*/
-
         }
         viewPager.setCurrentItem(currentTab);
     }
 
-
+/*
+    functions to handle screen rotations etc. Although not allowed
+ */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("onRestore","!!!!!!!!!!!!!");
-    /*    Toast.makeText(getBaseContext(), "SAVED INSTANCE STATE EXISTS", Toast.LENGTH_LONG).show();
-
-        Boolean signedIn = savedInstanceState.getBoolean("signedIn");
-        if (signedIn) {
-            interested = savedInstanceState.getStringArrayList("interested");
-            facebookConnected = savedInstanceState.getBoolean("fbCon");
-            if (facebookConnected) {
-                facebookData = savedInstanceState.getBundle("fbData");
-                friendFeedListItemsData = savedInstanceState.getParcelableArrayList("ffld");
-                friendFeedSortedList = savedInstanceState.getParcelableArrayList("ffsl");
-                friendFeedListItems = savedInstanceState.getStringArrayList("ffli");
-                activityFriendGoingNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfgn");
-                activityFriendInterestedNumbers = (Map<String, Integer>) savedInstanceState.getSerializable("hfin");
-            }
-        }
-        currentTab = savedInstanceState.getInt("currentTab");
-        homeListItems = savedInstanceState.getParcelableArrayList("hfld");
-        homeListTitles = savedInstanceState.getStringArrayList("hflt");
-        filteredHomeListItems = savedInstanceState.getParcelableArrayList("fhld");
-        filteredHomeListTitles = savedInstanceState.getStringArrayList("fhlt");
-        homeListRefs = savedInstanceState.getStringArrayList("hflr");
-*/
         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
         if (homeFragment!=null) homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
         if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
-/*
-        // load action bars
-        toolbar = (Toolbar) findViewById(R.id.toolbar);                                             // enable the action bar (above tabbed menus)
-        setSupportActionBar(toolbar);
-        viewPager = (ViewPager) findViewById(R.id.container);
-        setupViewPager(viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
-        tabLayout.setupWithViewPager(viewPager);                                                    // setup view
-        setupTabIcons();
-        viewPager.setCurrentItem(currentTab);
- */   }
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.d("onSave","!!!!!!!!!!!!!");
         if (friendFragment != null && friendFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "friendFragment", friendFragment);
         if (homeFragment != null && homeFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
         if (profileFragment != null && profileFragment.isAdded())
             getSupportFragmentManager().putFragment(outState, "profileFragment", profileFragment);
-        // begin transaction
-        if (user!=null) {
-            outState.putBoolean("signedIn", true);
-            outState.putStringArrayList("interested", interested);
-            outState.putBoolean("fbCon", facebookConnected);
-            if (facebookConnected) {
-                outState.putBundle("fbData", facebookData);
-                outState.putParcelableArrayList("ffld", friendFeedListItemsData);
-                outState.putParcelableArrayList("ffsl", friendFeedSortedList);
-                outState.putStringArrayList("ffli", friendFeedListItems);
-                outState.putSerializable("hfgn", (Serializable) activityFriendGoingNumbers);
-                outState.putSerializable("hfin", (Serializable) activityFriendInterestedNumbers);
-            }
-        }
-        else {
-            outState.putBoolean("signedIn", false);
-        }
-        outState.putInt("currentTab", currentTab);
-        outState.putParcelableArrayList("hfld", homeListItems);
-        outState.putStringArrayList("hflt", homeListTitles);
-        outState.putParcelableArrayList("fhld", filteredHomeListItems);
-        outState.putStringArrayList("fhlt", filteredHomeListTitles);
-        outState.putStringArrayList("hflr", homeListRefs);
-
         super.onSaveInstanceState(outState);
     }
 
-
+ /*
+    function that runs when add to calendar button clicked and data returned
+    plus when home feed preferences are set
+ */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -415,6 +348,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    /*
+    function that runs whenever the permissions are granted or denied
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
       /*  switch (requestCode) {
@@ -428,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
         }
     */}
 
+    @SuppressWarnings("ConstantConditions")
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
@@ -436,9 +374,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());               // generating adapter
-        adapter.addFragment(homeFragment, "Home");
-        adapter.addFragment(friendFragment, "Friend");
-        adapter.addFragment(profileFragment, "Profile");
+        adapter.addFragment(homeFragment);
+        adapter.addFragment(friendFragment);
+        adapter.addFragment(profileFragment);
         viewPager.setAdapter(adapter);// set the adapter to the container
     }
 
@@ -488,9 +426,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent5);
                 return true;
             case R.id.action_logout:
-                //     if (facebookConnected) {
                 LoginManager.getInstance().logOut();
-                //     }
                 auth.signOut();
                 facebookConnected = false;
                 currentTab = viewPager.getCurrentItem();
@@ -509,6 +445,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*
+    All functions regarding getting and setting data from firebase and facebook
+     */
+
     // get friend data
     void getNSetFriendData() {
         // get users friends
@@ -519,6 +459,8 @@ public class MainActivity extends AppCompatActivity {
             // get friend data
             final ArrayList<String> friendFBUrls = facebookData.getStringArrayList("friendUrls");
             final ArrayList<String> friendUIDs = facebookData.getStringArrayList("friendUids");
+            assert friendUIDs != null;
+            assert friendFBUrls != null;
             // for each friend
             for (int j = 0; j < friendUIDs.size(); j++) {
                 // get and set the friends' agenda data
@@ -673,9 +615,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-                                    // get and set activities for around 'cambridge'
+                                    // get and set activities and events for around 'cambridge'
     public void getNSetHomeFeedData() {
-        // get and set all activities
+                // variable declarations
         int ItemCount = homeListItems.size(); int offset = 0;
         String eventStart = "", activityStart = "";
         Boolean getActivities = true;
@@ -702,6 +644,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         });
 
+            // work out which items in the event and activity list on firebase we need to get
         Query orderedActivities, orderedEvents;
         if (ItemCount < 2) {   // for first iteration just get first 5 from each starting from zero
             orderedActivities = activityDataRef.orderByKey().limitToFirst(5);
@@ -709,7 +652,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else {                // otherwise determine where to start from
 
-            int activityRemainder = 5 - (activityCount % 5);
+            int activityRemainder = 5 - (activityCount % 5);    // get the number of activities that we have at the end. For e.g. 12 it returns 2
             int eventRemainder = 5 - (eventCount % 5);
             Boolean lastItemWasEvent = homeListItems.get(ItemCount - 1).event;
             try {
@@ -722,21 +665,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             catch (ArrayIndexOutOfBoundsException e) {
-                Log.d("!!!!!!!!!!a", e.toString());
                 getEvents = false;
                 getActivities = false;
             }
 
-
+            // if we have gotten the the end of a list, don't get anymore of them and set an offset so that we continue to get 10 new items each time
             if (eventCount >= eventCountDatabase) {getEvents = false; offset = 5;}
             if (activityCount >= activityCountDatabase) {getActivities = false; offset = 5;}
 
+            // form the references
             orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
             orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6 + offset);
         }
 
 
-        // get data
+        // get the activity data
         if (getActivities) {
             orderedActivities.addChildEventListener(new ChildEventListener() {
                 @Override
@@ -834,8 +777,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-        // get and set all events
-        // get data
+
+        // get events data
         if (getEvents) {
             orderedEvents.addChildEventListener(new ChildEventListener() {
                 @Override
@@ -966,6 +909,7 @@ public class MainActivity extends AppCompatActivity {
         return new TimeDispNRank(output, rank);
     }
 
+    // function that calculate the distance an item is away from current location
     double getDistanceAway(String loc) {
         Geocoder geocoder = new Geocoder(getBaseContext());
         if (currentLoc != null) {
@@ -999,3 +943,37 @@ public class MainActivity extends AppCompatActivity {
         else return -1;
     }
 }
+
+
+/**
+ * Custom adapter used for defining adding fragment tabs to a viewpager
+ */
+
+class ViewPagerAdapter extends FragmentPagerAdapter {
+    private final List<Fragment> mFragmentList = new ArrayList<>();
+
+    ViewPagerAdapter(FragmentManager manager) {
+        super(manager);
+    }
+
+    @Override
+    public Fragment getItem(int position) {
+        return mFragmentList.get(position);
+    }
+
+    @Override
+    public int getCount() {
+        return mFragmentList.size();
+    }
+
+    void addFragment(Fragment fragment) {
+        mFragmentList.add(fragment);
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return null; //mFragmentTitleList.get(position);
+    }
+}
+
+

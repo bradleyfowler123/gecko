@@ -1,66 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listArray">
-        <item>Headings</item>
-        <item>Headings and Details</item>
-        <item>All Data</item>
-    </string-array>
 
-    <string-array name="listValues">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-    <array name="recommendationsArray">
-        <item>Alton Towers</item>
-        <item>Cambridge Climbing</item>
-        <item>Local Gym</item>
-        <item>Alton Towers</item>
-        <item>Alton Towers</item>
-        <item>Cambridge Climbing</item>
-        <item>Local Gym</item>
-        <item>Alton Towers</item>
-    </array>
-    <array name="locationsArray">
-        <item>15 miles away</item>
-        <item>2 miles away</item>
-        <item>400m away</item>
-        <item>25 miles away</item>
-        <item>15 miles away</item>
-        <item>2 miles away</item>
-        <item>400m away</item>
-        <item>25 miles away</item>
-    </array>
-    <array name="pricesArray">
-        <item>$$$</item>
-        <item>$$</item>
-        <item>$</item>
-        <item>$$$</item>
-        <item>$$$</item>
-        <item>$$</item>
-        <item>$</item>
-        <item>$$$</item>
-    </array>
-
-    <array name="friendNames">
-        <item>Bradley Fowler</item>
-        <item>Darren Norton</item>
-        <item>Dawn Welburn</item>
-        <item>Andrew Phillips</item>
-    </array>
-    <array name="activityDescriptions">
-        <item>Posted a picture at ALTON TOWERS</item>
-        <item>Is going to SWAINS GO KARTING at 1:00pm</item>
-        <item>Has visited FLY MANCHESTER</item>
-        <item>Is going to ANN\'S POTTERY CLASS at 11:30am</item>
-    </array>
-    <array name="timeAgo">
-        <item>2 mins ago</item>
-        <item>10 mins ago</item>
-        <item>1 hour ago</item>
-        <item>2 days ago</item>
-    </array>
-
+    <!-- Arrays related to the preferences activity for the home feed -->
     <array name="elvCustomDialogMessages">
         <item>Enter your maximum price of items</item>
         <item>Enter the day(s) for which you would like to find items</item>
@@ -89,8 +30,8 @@
     </array>
     <array name="elvLocationItems">
         <item>City</item>
-        <item>cambridge</item>
-        <item>enter city</item>
+        <item>Cambridge</item>
+        <item>Enter City</item>
     </array>
     <array name="elvDistanceItems">
         <item>Distance</item>

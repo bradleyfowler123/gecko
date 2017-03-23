@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.View;
@@ -93,21 +92,20 @@ class AgendaClass implements Parcelable {
                     // used when dealing with users or friends stored agenda
     public String date;
     public String time;
-    public String ref; public String key;
-    public int rank;
-                            // subsection - used when trying to display the agenda data in friend feed only
-    public String timeAgo;
-    public String friendName;
-    public String picUrl;
+    String ref; String key;
+    int rank;
+                    // subsection - used when trying to display the agenda data in friend feed only
+    String timeAgo;
+    String friendName;
+    String picUrl;
                     // used when dealing with the activity item in database
-    public String location; public Double distAway;
-    public String activityDescription;
-    public String url;
-    public Integer price;
-    public Boolean familyfriendly; public Boolean disabled; public Boolean indoor; public Boolean parking; public Boolean pet; public Boolean toilet;
+    public String location; Double distAway;
+    String activityDescription;
+    String url;
+    Integer price, totalgoing;
+    Boolean familyfriendly; Boolean disabled; Boolean indoor; Boolean parking; Boolean pet; Boolean toilet;
     public Boolean event;
     public String image;
-    public Integer totalgoing;
 
     AgendaClass(){
     }

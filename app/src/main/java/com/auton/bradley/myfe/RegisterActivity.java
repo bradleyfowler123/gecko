@@ -80,7 +80,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Log.d("DisplayNameAdded", "User profile updated.");
                                                         // start Main activity
                                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                         intent.putExtra("verificationPass",true);
@@ -126,6 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     } else {
                                         progressBar.setVisibility(View.INVISIBLE);
                                         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                                        //noinspection ThrowableResultOfMethodCallIgnored,ConstantConditions
                                         builder.setMessage("Register Failed - " + task.getException().getMessage())
                                                 .setNegativeButton(getString(R.string.login_retry_button), null)
                                                 .create()

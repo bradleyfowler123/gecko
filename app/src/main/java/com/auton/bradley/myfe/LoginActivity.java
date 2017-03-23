@@ -23,7 +23,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
@@ -99,9 +98,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-    //    mFirebaseAnalytics.setUserProperty("test", "some string");
         mAuth = FirebaseAuth.getInstance();
-        FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().logOut();
         setContentView(R.layout.activity_login);                                                    // set the xml file to be viewed
@@ -120,12 +117,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {                                                                 // if user logged into firebase
-                    Log.d("TAG1", "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d("TAG1", "onAuthStateChanged:signed_in");
                         if (user.getProviders() != null && user.getProviders().contains("facebook.com")) { // check to see if facebook is linked to their account
                             if (FacebookData != null) {                                                 // if it is see if the facebook data has been gotten yet
                                         // store friends in firebase
                                             // store users uid and fb id in database lookup table - need not run every time
                                 final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                                //noinspection ConstantConditions
                                 DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
                                 myFacebookIDRef.setValue(user.getUid());
                                             // if you have no friends run main activity
@@ -219,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                     mAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                                 // when data is returned
+                                @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {                                           // if success
@@ -228,7 +227,8 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                     } else {                                                              // if fail
                                         progressBar.setVisibility(View.INVISIBLE);                          // hide progress bar
-                                                                            // if fails due to not a network error
+                                                                           // if fails due to not a network error
+                                        //noinspection ConstantConditions
                                         if (task.getException().getMessage().contains("The password is invalid")){
                                                                                     // allow them to reset password
                                             final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -274,7 +274,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 progressBar.setVisibility(View.VISIBLE);
                 final AccessToken accessToken = loginResult.getAccessToken();                       // get the access token
-                Log.i("fbAccessToken", accessToken.getToken());
                 final AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());  // generate firebase credential
                                         // make request for facebook user information
                 GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -283,6 +282,7 @@ public class LoginActivity extends AppCompatActivity {
                         FacebookFriendData friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
                         FacebookData = getFacebookData(object, friends);                            // format the data into a nice bundle
                                         // find out what providers, if any, email is used for
+                        //noinspection ConstantConditions
                         final Task<ProviderQueryResult> providers = mAuth.fetchProvidersForEmail(FacebookData.getString("email")); // check to see what providers the user uses
                         providers.addOnSuccessListener(new OnSuccessListener<ProviderQueryResult>() {
                             @Override   // when the data is returned
@@ -313,6 +313,7 @@ public class LoginActivity extends AppCompatActivity {
                                                             String pass = userInput.getText().toString();
                                                                             // sign in with given password
                                                             Pass = true;                // prevent main activity starting from the following login
+                                                            //noinspection ConstantConditions
                                                             mAuth.signInWithEmailAndPassword(FacebookData.getString("email"),pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                                 @Override
                                                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -339,8 +340,6 @@ public class LoginActivity extends AppCompatActivity {
                                             .create()
                                             .show();
                                 }
-                                Log.d("fdjkv fd", providerQueryResult.getProviders().toString());
-
                             }
                         });
                     }
@@ -407,7 +406,6 @@ public class LoginActivity extends AppCompatActivity {
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         JSONObject object = response.getJSONObject();
-                        String friendsNo = "";
                         try {
                             JSONArray jsonArray = object.getJSONArray("data");
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -416,12 +414,10 @@ public class LoginActivity extends AppCompatActivity {
                                 friendData.ids.add(i,aFriend.getString("id"));
                                 friendData.picUrls.add(i,"https://graph.facebook.com/" + aFriend.getString("id") + "/picture?width=200&height=150");
                             }
-                            friendsNo = object.getJSONObject("summary").getString("total_count");
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        Log.d("You have friends", friendsNo);
                     }
                 }
         ).executeAsync();

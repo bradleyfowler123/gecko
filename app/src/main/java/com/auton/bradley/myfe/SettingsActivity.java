@@ -1,16 +1,10 @@
 package com.auton.bradley.myfe;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -18,17 +12,11 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.SwitchPreference;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -37,7 +25,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
@@ -61,8 +48,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -70,8 +55,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
+  the settings activity
  */
+@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class SettingsActivity extends PreferenceActivity {
+
+                    // global variables
     private static boolean[] start = new boolean[3];
     private static boolean fbCon; private static Bundle FacebookData; private static ArrayList<String> friendFirebaseIDs; private static int friendCount;
     private static CallbackManager callbackManager;
@@ -98,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
                                 ? listPreference.getEntries()[index]
                                 : null);
             }                           // ringtone preference
-            else if (preference instanceof RingtonePreference) {
+            /*else if (preference instanceof RingtonePreference) {
                 if (TextUtils.isEmpty(stringValue)) {                                                // Empty values correspond to 'silent' (no ringtone).
                     preference.setSummary(R.string.pref_ringtone_silent);
 
@@ -113,43 +102,49 @@ public class SettingsActivity extends PreferenceActivity {
                     }
                 }
 
-            } else {                    // For all other preferences
+            } */else {                    // For all other preferences
                 preference.setSummary(stringValue);                                                 // set the summary to the value's simple string representation
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                assert user != null;
+
+                        // if it is the email
                 if (preference.getKey().equals("email_text")){
+                                // for first time it has not been changed, so just display it
                     if (start[0] || stringValue.isEmpty()) {
                         preference.setSummary(user.getEmail());
                         preference.setDefaultValue(user.getEmail());
                         start[0] = false;
                     }
                     else {
-                        // update email address
+                                // else update email address
                         final CharSequence backup = preference.getSummary();
                         preference.setSummary(stringValue);
                         preference.setDefaultValue(stringValue);
                         user.updateEmail(stringValue).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
                                 if (task.isSuccessful()) {
                                     Toast.makeText(preference.getContext(),"Email address updated",Toast.LENGTH_SHORT).show();
                                 }
                                 else {
                                     preference.setSummary(backup);
                                     preference.setDefaultValue(backup);
+                                    //noinspection ConstantConditions
                                     Toast.makeText(preference.getContext(),task.getException().getMessage(),Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
                     }
                 }
+                            // if it is the password
                 else if (preference.getKey().equals("password_text")){
                     preference.setDefaultValue("*********");
                     preference.setSummary("*********");
+                            // check for the first time again
                     if (start[1] || stringValue.isEmpty()) {
                         start[1] = false;
                     }
-                    else {
+                    else {      // if not
                         //update password
                         user.updatePassword(stringValue)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -159,45 +154,45 @@ public class SettingsActivity extends PreferenceActivity {
                                             Toast.makeText(preference.getContext(),"Password Updated",Toast.LENGTH_SHORT).show();
                                         }
                                         else {
+                                            //noinspection ConstantConditions
                                             Toast.makeText(preference.getContext(),task.getException().getMessage(),Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
                     }
-
                 }
+                            // if it is the name
                 else if (preference.getKey().equals("name_text")){
                     if (start[2] || stringValue.isEmpty()) {
+                                // display the name
                         preference.setSummary(user.getDisplayName());
                         preference.setDefaultValue(user.getDisplayName());
                         start[2] = false;
                     }
-                    else {
+                    else { // and not the first time then update the name
                         final CharSequence backup = preference.getSummary();
                         preference.setSummary(stringValue);
                         preference.setDefaultValue(stringValue);
                         //update name
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                 .setDisplayName(stringValue)
-                                //        .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
                                 .build();
                         user.updateProfile(profileUpdates)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        String name = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
                                         if (task.isSuccessful()) {
                                             Toast.makeText(preference.getContext(),"User profile updated.",Toast.LENGTH_SHORT).show();
                                         }
                                         else {
                                             preference.setSummary(backup);
                                             preference.setDefaultValue(backup);
+                                            //noinspection ConstantConditions
                                             Toast.makeText(preference.getContext(),task.getException().getMessage(),Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
                     }
-
                 }
             }
             return true;
@@ -229,7 +224,6 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         callbackManager = CallbackManager.Factory.create();
-        FacebookSdk.sdkInitialize(getApplicationContext());
         LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
         Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
 
@@ -237,7 +231,6 @@ public class SettingsActivity extends PreferenceActivity {
             fbCon = getIntent().getBooleanExtra("fbCon",false);
             currentTab = getIntent().getIntExtra("tab", 0);
         }
-        Log.d("reikd", Boolean.toString(fbCon));
         root.addView(bar, 0); // insert at top
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,56 +256,61 @@ public class SettingsActivity extends PreferenceActivity {
 
     // This fragment shows general preferences
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @SuppressLint("NewApi")
     public static class GeneralPreferenceFragment extends PreferenceFragment {
-
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
 
+            // set summary values to show what the preference is
             start[0] = true; start[1] = true; start[2] = true;
             bindPreferenceSummaryToValue(findPreference("email_text"));
             bindPreferenceSummaryToValue(findPreference("password_text"));
             bindPreferenceSummaryToValue(findPreference("name_text"));
             final SwitchPreference fbConnected = (SwitchPreference) findPreference("fbCon_switch");
-            Log.d("ewdks,m", Boolean.toString(fbCon));
-            fbConnected.setChecked(fbCon);
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            fbConnected.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object o) {
-                    Log.d("!!!!!!!!11", "dddddddd");
-                    if (fbCon) {            // unlink facebook
-                        if (user.getProviders().contains("password")) {
-                            FirebaseAuth.getInstance().getCurrentUser().unlink("facebook.com")
-                                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<AuthResult> task) {
-                                            if (task.isSuccessful()) {
-                                                LoginManager.getInstance().logOut();
-                                                Toast.makeText(getContext(), "Facebook succesfully unlinked.", Toast.LENGTH_SHORT).show();
-                                                Intent intent = new Intent(getContext(), MainActivity.class);         // start main activity and pass relevant data
-                                                intent.putExtra("tab", currentTab);
-                                                intent.putExtra("fbConnected", false);
-                                                startActivity(intent);
-                                            } else {
-                                                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+
+            // handle when facebook link toggle is pressed
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                fbConnected.setChecked(fbCon);
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                assert user != null;
+                fbConnected.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object o) {
+                        if (fbCon) {            // unlink facebook
+                            //noinspection ConstantConditions
+                            if (user.getProviders().contains("password")) {
+                                user.unlink("facebook.com")
+                                        .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    LoginManager.getInstance().logOut();
+                                                    Toast.makeText(getContext(), "Facebook succesfully unlinked.", Toast.LENGTH_SHORT).show();
+
+                                                    Intent intent = new Intent(getContext(), MainActivity.class);         // start main activity and pass relevant data
+                                                    intent.putExtra("tab", currentTab);
+                                                    intent.putExtra("fbConnected", false);
+                                                    startActivity(intent);
+                                                } else {
+                                                    //noinspection ConstantConditions
+                                                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                            } else {              // do nothing
+                                fbConnected.setChecked(fbCon);
+                                Toast.makeText(getContext(), "Not possible as facebook is your only sign in method", Toast.LENGTH_LONG).show();
+                            }
+                        } else {                 // link facebook
+                            linkFacebook(user);
                         }
-                        else {              // do nothing
-                            fbConnected.setChecked(fbCon);
-                            Toast.makeText(getContext(), "Not possible as facebook is your only sign in method", Toast.LENGTH_LONG).show();
-                        }
+                        return true;
                     }
-                    else {                 // link facebook
-                        linkFacebook(user);
-                    }
-                    return true;
-                }
-            });
+                });
+            }
         }
 
         void linkFacebook(final FirebaseUser user) {
@@ -330,6 +328,7 @@ public class SettingsActivity extends PreferenceActivity {
                             FacebookFriendData friends = getFacebookFriends(accessToken);                        // make separate request for friend list of friends using myfe
                             FacebookData = getFacebookData(object, friends);                            // format the data into a nice bundle
                             Log.d("gujkjk", friends.names.toString());
+                            //noinspection ConstantConditions
                             if(FacebookData.getString("email").equals(user.getEmail())) {
                                 user.linkWithCredential(credential);
                                 Toast.makeText(getContext(),"FB Linked",Toast.LENGTH_SHORT).show();
@@ -431,10 +430,12 @@ public class SettingsActivity extends PreferenceActivity {
             }
         }
 
+        @SuppressWarnings("ConstantConditions")
         public void storeFbFriendsInFirebase() {
             // store friends in firebase
             // store users uid and fb id in database lookup table - need not run every time
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            assert user != null;
             final DatabaseReference database = FirebaseDatabase.getInstance().getReference();
             DatabaseReference myFacebookIDRef = database.child("facebookIDs").child(FacebookData.getString("id"));
             myFacebookIDRef.setValue(user.getUid());

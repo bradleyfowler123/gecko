@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,13 +28,17 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+                        // set up the page we are trying to view
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend_agenda);
+
                         // get view elements
         Button button = (Button) findViewById(R.id.fty_button);
         final CheckBox checkBox = (CheckBox) findViewById(R.id.fty_checkBox);
         TextView activityTv = (TextView) findViewById(R.id.fty_activity_text);
         TextView dateTv = (TextView) findViewById(R.id.fty_date_text);
+
                         // get data
         Intent intent = getIntent();
         final String title = intent.getStringExtra("activity");
@@ -43,16 +46,19 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
         final String date = intent.getStringExtra("date");
         final String time = intent.getStringExtra("time");
         final String ref = intent.getStringExtra("reference");
+
                         // set view data
         activityTv.setText(title);
         dateTv.setText(formatData(date) + " at " + formatTime(time));
-                        // add button clicked
+
+                        // when the add button is clicked
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                             // upload activity to users agenda on firebase
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                assert user != null;
                 DatabaseReference agendaItem = database.child("users").child(user.getUid()).child("Agenda").push();
                 HashMap<String, String> pushData = new HashMap<>();
                 pushData.put("activity",title);
