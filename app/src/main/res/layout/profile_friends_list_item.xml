@@ -15,14 +15,13 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:contentDescription="@string/friendFeed_imageDescription"
-        app:srcCompat="@drawable/com_facebook_button_icon_blue" />
+        app:srcCompat="@drawable/ic_profilepic" />
 
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="Bradley Fowler"
         android:textSize="25sp"
         android:id="@+id/tv_profile_friends_name"
         android:gravity="center_vertical|start" />

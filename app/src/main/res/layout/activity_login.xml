@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <ProgressBar
@@ -38,7 +38,7 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/or"
                 android:padding="15dp"
-                android:text="or"
+                android:text="@string/login_or_text"
                 android:textAlignment="center"
                 android:textSize="20sp"/>
 

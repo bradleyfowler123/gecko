@@ -23,7 +23,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:adjustViewBounds="true" />
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/image_content_description"/>
 
 
             <LinearLayout
@@ -41,42 +42,48 @@
                     app:srcCompat="@drawable/ic_disabled"
                     android:id="@+id/adi_iconList_disabled"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_family"
                     android:id="@+id/adi_iconList_family"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_indoor"
                     android:id="@+id/adi_iconList_indoor"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_parking"
                     android:id="@+id/adi_iconList_parking"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_pet"
                     android:id="@+id/adi_iconList_pet"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_toilet"
                     android:id="@+id/adi_iconList_toilet"
                     android:visibility="gone"
-                    android:background="#b88c34" />
+                    android:background="#b88c34"
+                    android:contentDescription="@string/image_content_description"/>
 
             </LinearLayout>
 
@@ -142,6 +149,7 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:id="@+id/adi_friendData"
         android:background="#ddff492e"
         android:visibility="gone">
@@ -150,7 +158,8 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:id="@+id/adi_fd_image"/>
+            android:id="@+id/adi_fd_image"
+            android:contentDescription="@string/image_content_description"/>
 
 
         <ImageView
@@ -159,7 +168,8 @@
             android:layout_alignParentEnd="true"
             android:padding="5dp"
             app:srcCompat="@android:drawable/ic_menu_my_calendar"
-            android:id="@+id/adi_add_to_calander" />
+            android:id="@+id/adi_add_to_calander"
+            android:contentDescription="@string/image_content_description"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -196,6 +206,7 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:id="@+id/adi_scheduledView"
         android:background="#ddff492e"
         android:visibility="gone">
@@ -208,7 +219,8 @@
             android:padding="5dp"
             android:layout_marginEnd="10dp"
             app:srcCompat="@android:drawable/ic_menu_edit"
-            android:id="@+id/adi_scheduled_edit" />
+            android:id="@+id/adi_scheduled_edit"
+            android:contentDescription="@string/image_content_description"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -222,7 +234,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:gravity="bottom|start"
-                android:text="Scheduled"
+                android:text="@string/detailedItemActivity_scheduled"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:layout_weight="1.2"
@@ -233,7 +245,6 @@
                 android:layout_height="0dp"
                 android:id="@+id/adi_scheduled_text"
                 android:gravity="center_vertical|top"
-                android:text="You are going at 12:00 on 15, Jun"
                 android:textColor="@android:color/white"
                 android:layout_weight="1" />
 

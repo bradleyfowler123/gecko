@@ -22,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -554,6 +555,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override               // get a single interest
                     public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
                         String friendUid = dataSnapshot.getRef().getParent().getParent().getKey();                  // get this friend's UID
+                        Log.d("!!!!!!!!!1", friendUid);
+                        Log.d("!!!!!!!!!!!2", friendUIDs.toString());
                         int i = friendUIDs.indexOf(friendUid);
                         String ref = dataSnapshot.getValue().toString();
                         if (activityFriendInterestedNumbers.containsKey(ref)) {
