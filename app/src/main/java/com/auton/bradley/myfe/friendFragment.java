@@ -82,6 +82,7 @@ public class FriendFragment extends Fragment {
                 ff_list.setEmptyView(rootView.findViewById(R.id.friend_empty_list_item));
                                 // populate list
                 friendAdapter adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                if (sortedList.size()>0) Log.d("HHHHHHHH1", sortedList.get(0).friendName);
                 ff_list.setAdapter(adapter);
                                 // on list item click show detailed activity view
                 ff_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -166,6 +167,7 @@ public class FriendFragment extends Fragment {
         if (ff_list!=null) {
             if (adapter==null){     // create new adapter to generate list
                 adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                Log.d("HHHHHHHH2", sortedList.get(0).friendName);
                 ff_list.setAdapter(adapter);
             } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
 
@@ -347,6 +349,7 @@ class friendAdapter extends ArrayAdapter<String> {                              
         try {
             Picasso.with(getContext()).load(items.get(position).picUrl).centerCrop().resize(100, 100).placeholder(R.drawable.ic_profilepic).error(R.drawable.ic_profilepic).into(holder.img);
             holder.friends.setText(items.get(position).friendName);
+            Log.d("FFFFFF", items.get(position).friendName);
             holder.activity.setText(items.get(position).activity);
             holder.time.setText(items.get(position).timeAgo);
         }

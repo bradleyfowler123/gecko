@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         callbackManager = CallbackManager.Factory.create();
+
     //    FacebookSdk.sdkInitialize(getApplicationContext());
         // check permissions granted - if one is not add it to a list to request from user
         ArrayList<String> permissions = new ArrayList<>();
@@ -675,7 +676,7 @@ public class MainActivity extends AppCompatActivity {
                                     // get and set activities for around 'cambridge'
     public void getNSetHomeFeedData() {
         // get and set all activities
-        int ItemCount = homeListItems.size();
+        int ItemCount = homeListItems.size(); int offset = 0;
         String eventStart = "", activityStart = "";
         Boolean getActivities = true;
         Boolean getEvents = true;
@@ -727,11 +728,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            if (eventCount >= eventCountDatabase) getEvents = false;
-            if (activityCount >= activityCountDatabase) getActivities = false;
+            if (eventCount >= eventCountDatabase) {getEvents = false; offset = 5;}
+            if (activityCount >= activityCountDatabase) {getActivities = false; offset = 5;}
 
-            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6);
-            orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6);
+            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
+            orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6 + offset);
         }
 
 

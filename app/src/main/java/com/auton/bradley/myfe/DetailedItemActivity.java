@@ -239,7 +239,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     if (activityData.toilet != null && activityData.toilet)
                         findViewById(R.id.adi_iconList_toilet).setVisibility(View.VISIBLE);
                     MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-                    mapFragment.getMapAsync(DetailedItemActivity.this);
+                    if (mapFragment!= null) mapFragment.getMapAsync(DetailedItemActivity.this);
 
 
                 }

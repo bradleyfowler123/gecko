@@ -55,6 +55,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -142,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         // initialise variables
                                     friendFirebaseIDs = new HashMap<>();                          // will hold the list of friend UIDs
                                     friendCount = facebookFriendIDs.size();
-                                    friendFirebaseIDsOnly =  new ArrayList<>(friendCount);
+                                    friendFirebaseIDsOnly =  new ArrayList<>(Collections.nCopies(friendCount, " "));
                                                     // for every facebook friend, get their uid
                                     for (int i = 0; i < facebookFriendIDs.size(); i++) {
                                         DatabaseReference firebaseIDRef = database.child("facebookIDs").child(facebookFriendIDs.get(i));
@@ -151,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                         // store their uid in list
                                                 String theUID = dataSnapshot.getValue().toString();
-                                                int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());
+                                                int index = facebookFriendIDs.indexOf(dataSnapshot.getKey()); // the facebook id
                                                 friendFirebaseIDsOnly.add(index, theUID);
                                                 friendFirebaseIDs.put(theUID,true);
                                                 friendCount = friendCount - 1;
