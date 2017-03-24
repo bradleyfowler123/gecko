@@ -52,8 +52,8 @@
     <string name="search_dialog_enter">Enter</string>
     <string name="search_dialog_cancel">Cancel</string>
     <string name="search_previewCost">Up to £</string>
-    <string name="search_previewDistanceBefore">&lt; </string>
-    <string name="search_previewDistanceAfter"> miles</string>
+    <string name="search_previewDistanceBefore">&lt;&#160;</string>
+    <string name="search_previewDistanceAfter">&#160;km</string>
 
     <!-- Strings related to profile page -->
     <string name="profile_signIp">Sign up to save items to your Agenda! </string>

@@ -22,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -31,6 +30,7 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -89,8 +89,9 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, ArrayList<String>> activityFriendGoingNumbersHolder = new HashMap<>();
     private Map<String, ArrayList<String>> activityFriendInterestedNumbers = new HashMap<>();
     public ArrayList<String> interested = new ArrayList<>();
-    private AgendaClass[] unseenHomeUpdates = new AgendaClass[2];
+    private AgendaClass[] unseenHomeUpdates = new AgendaClass[20];
     private int eventCount = 0; private int activityCount = 0;
+    private int eventCount2 = 0; private int activityCount2 = 0;
     private int eventCountDatabase = 0; private int activityCountDatabase = 0;
 
 
@@ -196,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
         friendFragment = (FriendFragment) getSupportFragmentManager().getFragment(savedInstanceState, "friendFragment");
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(savedInstanceState, "profileFragment");
-        if (homeFragment!=null) homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
-        if (friendFragment!=null) friendFragment.storeData(friendFeedSortedList, friendFeedListItems);
     }
 
     @Override
@@ -265,16 +264,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 // cost filter
-                int limit = data.getIntExtra("cost", 99999999);
-                for (int i = 0; i < filteredHomeListItems.size(); i++) {
-                    if (filteredHomeListItems.get(i).price > limit) {       // remove items above the price threshold set
-                        filteredHomeListItems.remove(i);
-                        filteredHomeListTitles.remove(i);
-                        i = i - 1;
+                try {
+                    int limit = data.getIntExtra("cost", 99999999);
+                    for (int i = 0; i < filteredHomeListItems.size(); i++) {
+                        if (filteredHomeListItems.get(i).price > limit) {       // remove items above the price threshold set
+                            filteredHomeListItems.remove(i);
+                            filteredHomeListTitles.remove(i);
+                            i = i - 1;
+                        }
                     }
+                } catch (Exception e) {
+                         FirebaseCrash.report(e);
                 }
                 // location filter
-        //        location = data.getStringExtra("location");
+                //        location = data.getStringExtra("location");
                 // distance filter
                 double dist = data.getDoubleExtra("distance", 0);
                 for (int i = 0; i < filteredHomeListItems.size(); i++) {
@@ -342,8 +345,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // update list
-                if (homeFragment != null)       // note true on end forces list to update properly
-                    homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+                if (homeFragment != null) { // if no change
+                    if (filteredHomeListTitles.size() == homeListTitles.size())       // note true on end forces list to update properly
+                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+                    else
+                        homeFragment.storeData(filteredHomeListItems, filteredHomeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, true);
+                }
             }
         }
 
@@ -355,16 +362,14 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-      /*  switch (requestCode) {
-            case 13: {          // if any permissions not granted, request them again
-                for (int i = 0; i < permissions.length; i++) {
-                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, new String[]{permissions[i]}, 3);
-                    }
-                }
+        switch (requestCode) {
+            case 13: {          // if location permission granted, get current location
+                LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    currentLoc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);}
             }
         }
-    */}
+    }
 
     @SuppressWarnings("ConstantConditions")
     private void setupTabIcons() {
@@ -665,14 +670,16 @@ public class MainActivity extends AppCompatActivity {
                     eventStart = homeListItems.get(ItemCount - activityRemainder - 1).ref.split("/")[2];
                 }
             }
-            catch (ArrayIndexOutOfBoundsException e) {
+            catch (ArrayIndexOutOfBoundsException e) {  // handle occasions when this runs when list is almost empty
                 getEvents = false;
                 getActivities = false;
             }
 
             // if we have gotten the the end of a list, don't get anymore of them and set an offset so that we continue to get 10 new items each time
-            if (eventCount >= eventCountDatabase) {getEvents = false; offset = 5;}
-            if (activityCount >= activityCountDatabase) {getActivities = false; offset = 5;}
+            if (eventCount >= eventCountDatabase) {
+                getEvents = false; offset = 5;}
+            if (activityCount >= activityCountDatabase) {
+                getActivities = false; offset = 5;}
 
             // form the references
             orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
@@ -698,8 +705,8 @@ public class MainActivity extends AppCompatActivity {
                             else {
                                 agendaItem.event = false;
                                 agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
-                                unseenHomeUpdates[0] = agendaItem;
-                                activityCount = activityCount + 1;
+                                unseenHomeUpdates[activityCount2%10] = agendaItem;
+                                activityCount2 = activityCount2 + 1;
                                 return true;
                             }
                         }
@@ -708,9 +715,10 @@ public class MainActivity extends AppCompatActivity {
                         protected void onPostExecute(Boolean result) {
                             if (result) {
                                 if (homeFragment != null) {
-                                    homeListItems.add(unseenHomeUpdates[0]);
-                                    homeListTitles.add(unseenHomeUpdates[0].activity);
-                                    homeListRefs.add(unseenHomeUpdates[0].ref);
+                                    homeListItems.add(unseenHomeUpdates[activityCount%10]);
+                                    homeListTitles.add(unseenHomeUpdates[activityCount%10].activity);
+                                    homeListRefs.add(unseenHomeUpdates[activityCount%10].ref);
+                                    activityCount = activityCount +1;
                                     homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                                 }
                             }
@@ -795,8 +803,8 @@ public class MainActivity extends AppCompatActivity {
                             else {
                                 agendaItem.event = true;
                                 agendaItem.distAway = getDistanceAway(agendaItem.location);
-                                unseenHomeUpdates[1] = agendaItem;
-                                eventCount = eventCount + 1;
+                                unseenHomeUpdates[eventCount2%10+10] = agendaItem;
+                                eventCount2 = eventCount2 + 1;
                                 return true;
                             }
                         }
@@ -805,9 +813,10 @@ public class MainActivity extends AppCompatActivity {
                         protected void onPostExecute(Boolean result) {
                             if (result) {
                                 if (homeFragment != null) {
-                                    homeListItems.add(unseenHomeUpdates[1]);
-                                    homeListTitles.add(unseenHomeUpdates[1].activity);
-                                    homeListRefs.add(unseenHomeUpdates[1].ref);
+                                    homeListItems.add(unseenHomeUpdates[eventCount%10+10]);
+                                    homeListTitles.add(unseenHomeUpdates[eventCount%10+10].activity);
+                                    homeListRefs.add(unseenHomeUpdates[eventCount%10+10].ref);
+                                    eventCount = eventCount + 1;
                                     homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                                 }
                             }

@@ -481,7 +481,9 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
             @Override
             protected void onPostExecute(Boolean result) {
                     // if location is found
+                View map = findViewById(R.id.map);
                 if(result){
+                    map.setVisibility(View.VISIBLE);
                     // set marker on map
                     googleMap.addMarker(new MarkerOptions()                                     // add pin on google map
                             .position(new LatLng(address.getLatitude(), address.getLongitude()))
@@ -493,7 +495,6 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                 }
                     // otherwise hide map
                 else {
-                    View map = findViewById(R.id.map);
                     map.setVisibility(View.GONE);
                 }
             }

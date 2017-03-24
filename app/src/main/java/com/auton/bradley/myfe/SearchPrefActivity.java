@@ -127,8 +127,10 @@ public class SearchPrefActivity extends AppCompatActivity {
                 else if (costItem.Selected.equals("Any")) cost = 999999999;
                 else if (costItem.Selected.equals("Free")) cost = 0;
                 else         cost = Integer.valueOf(costItem.Selected.substring(7));
+
                 double dist; Item distItem = item.get(3);
                 if (distItem.Selected.equals(distItem.elements.get(distItem.elements.size()-1)))    dist = Double.valueOf(distItem.CustomValue.toString());
+                else if (distItem.Selected.equals("Any")) dist = 999999999;
                 else dist = Double.valueOf(distItem.Selected.substring(2,distItem.Selected.length()-3));
 
                     // pass it back to the main activity
@@ -170,11 +172,12 @@ public class SearchPrefActivity extends AppCompatActivity {
 
         // distance away
         String[] distance = getResources().getStringArray(R.array.elvDistanceItems);
-        Item i5=new Item(distance[0],new ArrayList<>(Collections.singletonList(distance[2])),false);
+        Item i5=new Item(distance[0],new ArrayList<>(Collections.singletonList(distance[4])),false);
         i5.elements.add(distance[1]);
         i5.elements.add(distance[2]);
         i5.elements.add(distance[3]);
         i5.elements.add(distance[4]);
+        i5.elements.add(distance[5]);
 
         // other - disabled access, indoors, etc
         String[] other = getResources().getStringArray(R.array.elvOtherItems);

@@ -69,7 +69,7 @@ public class AddFriendAgendaActivity extends AppCompatActivity {
                 agendaItem.setValue(pushData);
 
                 Snackbar snackbar = Snackbar
-                        .make(findViewById(R.id.activity_detailed_item), "Added to calendar", Snackbar.LENGTH_LONG);
+                        .make(view, "Added to calendar", Snackbar.LENGTH_LONG);
                 snackbar.show();
                 if (checkBox.isChecked()) {
                     // send notification to appropriate friend

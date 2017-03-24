@@ -38,6 +38,7 @@
         <item>&lt; 2 km</item>
         <item>&lt; 10 km</item>
         <item>&lt; 30 km</item>
+        <item>Any</item>
         <item>Custom</item>
     </array>
     <array name="elvOtherItems">

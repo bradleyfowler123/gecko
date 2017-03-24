@@ -30,6 +30,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -166,15 +167,19 @@ public class FriendFragment extends Fragment {
     }
 
                                 // function to update the list items shown in the friend feed
-    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings){
-        sortedList = sortedList2;
-        listItems = strings; // some necessary crap
-        if (ff_list!=null) {
-            if (adapter==null){     // create new adapter to generate list
-                adapter = new friendAdapter(getActivity(), sortedList, listItems);
-                ff_list.setAdapter(adapter);
-            } else {adapter.notifyDataSetChanged();}    // update current adapter (list)
+    public void storeData(ArrayList<AgendaClass> sortedList2, ArrayList<String> strings) {
+        if (strings != null && strings.size() > 0) {
+            sortedList = sortedList2;
+            listItems = strings; // some necessary crap
+            if (ff_list != null) {
+                if (adapter == null) {     // create new adapter to generate list
+                    adapter = new friendAdapter(getActivity(), sortedList, listItems);
+                    ff_list.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }    // update current adapter (list)
 
+            }
         }
     }
 
@@ -314,7 +319,7 @@ public class FriendFragment extends Fragment {
             return bundle;
         }
         catch(JSONException e) {
-            Log.d("idkbbjnm", e.toString());
+            FirebaseCrash.report(e);
             return null;
         }
     }
