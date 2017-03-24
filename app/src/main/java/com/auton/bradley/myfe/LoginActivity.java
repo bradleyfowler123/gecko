@@ -151,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         // store their uid in list
                                                 String theUID = dataSnapshot.getValue().toString();
                                                 int index = facebookFriendIDs.indexOf(dataSnapshot.getKey()); // the facebook id
-                                                friendFirebaseIDsOnly.add(index, theUID);
+                                                friendFirebaseIDsOnly.set(index, theUID);
                                                 friendFirebaseIDs.put(theUID,true);
                                                 friendCount = friendCount - 1;
                                                             // once all UIDs stored, store friends UIDs in user entry of database

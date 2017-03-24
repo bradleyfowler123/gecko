@@ -554,9 +554,7 @@ public class MainActivity extends AppCompatActivity {
                 friendInt.addChildEventListener(new ChildEventListener() {
                     @Override               // get a single interest
                     public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                        String friendUid = dataSnapshot.getRef().getParent().getParent().getKey();                  // get this friend's UID
-                        Log.d("!!!!!!!!!1", friendUid);
-                        Log.d("!!!!!!!!!!!2", friendUIDs.toString());
+                        String friendUid = dataSnapshot.getRef().getParent().getParent().getKey();
                         int i = friendUIDs.indexOf(friendUid);
                         String ref = dataSnapshot.getValue().toString();
                         if (activityFriendInterestedNumbers.containsKey(ref)) {
