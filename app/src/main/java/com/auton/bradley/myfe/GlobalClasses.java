@@ -86,30 +86,30 @@ class TimeDispNRank {
     }
 }
                                 // class used when handling a firebase activity/event
-class AgendaClass implements Parcelable {
+class AgendaClass{
                     // always used
     public String activity;
                     // used when dealing with users or friends stored agenda
     public String date;
     public String time;
-    String ref; String key;
-    int rank;
+    public String ref; public String key;
+    public int rank;
                     // subsection - used when trying to display the agenda data in friend feed only
-    String timeAgo;
-    String friendName;
-    String picUrl;
+    public String timeAgo;
+    public String friendName;
+    public String picUrl;
                     // used when dealing with the activity item in database
     public String location; Double distAway;
-    String activityDescription;
-    String url;
-    Integer price, totalgoing;
-    Boolean familyfriendly; Boolean disabled; Boolean indoor; Boolean parking; Boolean pet; Boolean toilet;
+    public String activityDescription;
+    public String url;
+    public Integer price, totalgoing;
+    public Boolean familyfriendly, disabled, indoor, parking, pet, toilet;
     public Boolean event;
     public String image;
 
     AgendaClass(){
     }
-        // make parcelable
+ /*       // make parcelable
     public int describeContents() { return 0;}
 
     public void writeToParcel(Parcel out, int flags) {
@@ -128,13 +128,34 @@ class AgendaClass implements Parcelable {
             return new AgendaClass[size];
         }
     };
+*/
+  /*  public void setprice(int price) {this.price = price;}
+    public int getprice(){return this.price;}
 
-    private AgendaClass(Parcel in) {
-        activity = in.readString();
-        date = in.readString();
-        time = in.readString();
-    }
+    public void setactivityDescription(String activityDescription){this.activityDescription = activityDescription;}
+    public String getactivityDescription(){return this.activityDescription;}
 
+    public void setdisabled(Boolean disabled){this.disabled = disabled;}
+    public Boolean getdisabled(){return this.disabled;}
+
+    public void setindoor(Boolean indoor){this.indoor = indoor;}
+    public Boolean getindoor(){return this.indoor;}
+
+    public void setparking(Boolean parking){this.parking = parking;}
+    public Boolean getparking(){return this.parking;}
+
+    public void setfamilyfriendly(Boolean familyfriendly){this.familyfriendly = familyfriendly;}
+    public Boolean getfamilyfriendly(){return this.familyfriendly;}
+
+    public void setpet(Boolean pet){this.pet = pet;}
+    public Boolean getpet(){return this.pet;}
+
+    public void settoilet(Boolean toilet){this.toilet = toilet;}
+    public Boolean gettoilet(){return this.toilet;}
+
+    public void seturl(String url){this.url = url;}
+    public String geturl(String url){return this.url;}
+*/
 }
                     // class used to rank a list of agenda items
 class AgendaComparator implements Comparator<AgendaClass> {

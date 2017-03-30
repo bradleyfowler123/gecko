@@ -209,6 +209,7 @@ public class DetailedItemActivity extends AppCompatActivity implements OnMapRead
                     activityData = dataSnapshot.getValue(AgendaClass.class);              // get agenda data
                     activityData.event = refItems[1].equals("events");  // set activity/event data
                     activityData.ref = ref;
+                    activityData.price = 0;
 
                     //  set title, description, url, image
                     Picasso.with(getBaseContext()).load(activityData.image).placeholder(R.drawable.detailedviewrectangle).error(R.drawable.detailedviewrectangle).into(iv_activityImage);

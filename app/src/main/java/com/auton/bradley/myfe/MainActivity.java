@@ -676,10 +676,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // if we have gotten the the end of a list, don't get anymore of them and set an offset so that we continue to get 10 new items each time
-            if (eventCount >= eventCountDatabase) {
-                getEvents = false; offset = 5;}
-            if (activityCount >= activityCountDatabase) {
-                getActivities = false; offset = 5;}
+            if (eventCount >= eventCountDatabase) {getEvents = false; offset = 5;}
+            if (activityCount >= activityCountDatabase) {getActivities = false; offset = 5;}
 
             // form the references
             orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
