@@ -3,6 +3,7 @@ package com.auton.bradley.myfe;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -92,7 +93,11 @@ public class MainActivity extends AppCompatActivity {
     private AgendaClass[] unseenHomeUpdates = new AgendaClass[20];
     private int eventCount = 0; private int activityCount = 0;
     private int eventCount2 = 0; private int activityCount2 = 0;
+    private int indexOfLastActivity = 0, indexOfLastEvent = 0;
     private int eventCountDatabase = 0; private int activityCountDatabase = 0;
+    private String lastActivityRef;
+                                    // static variables
+    public static final String PREFS_NAME = "MyPrefsFile";
 
 
     @Override
@@ -128,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         viewPager = (ViewPager) findViewById(R.id.container);
 
+        // get shared prefs
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        lastActivityRef = prefs.getString("lastActivityRef", null);
 
         // check if firebase is signed in
         if (user != null) {     // if user signed into firebase
@@ -144,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
+                getCounts();
                 getNSetHomeFeedData();          // get home feed data
                 if (facebookConnected) {
                     facebookData = intent.getBundleExtra("fbData");
@@ -175,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout = (TabLayout) findViewById(R.id.tabs);                                            // find tab layout
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
+                getCounts();
                 getNSetHomeFeedData();
             }
 
@@ -186,6 +196,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         viewPager.setCurrentItem(currentTab);
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putString("lastActivityRef", lastActivityRef);
+        // Commit the edits!
+        editor.apply();
     }
 
 /*
@@ -621,18 +642,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-                                    // get and set activities and events for around 'cambridge'
-    public void getNSetHomeFeedData() {
-                // variable declarations
-        int ItemCount = homeListItems.size(); int offset = 0;
-        String eventStart = "", activityStart = "";
-        Boolean getActivities = true;
-        Boolean getEvents = true;
+    private void getCounts(){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
-        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
-
-                // get the number of activities and events in the database
+        // get the number of activities and events in the database
         database.child("activitydata/placeData").child(location).child("activityCount").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -650,40 +662,64 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         });
 
+    }
+
+                                    // get and set activities and events for around 'cambridge'
+    public void getNSetHomeFeedData() {
+                // variable declarations
+        int ItemCount = homeListItems.size(); int offset = 0;
+        String eventStart = "", activityStart = "";
+        Boolean getActivities = true;
+        Boolean getEvents = true;
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
+        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
+
             // work out which items in the event and activity list on firebase we need to get
-        Query orderedActivities, orderedEvents;
-        if (ItemCount < 2) {   // for first iteration just get first 5 from each starting from zero
-            orderedActivities = activityDataRef.orderByKey().limitToFirst(5);
+        Query orderedActivities = null, orderedEvents = null;
+        if (ItemCount < 2) {   // for first iteration
+            if (lastActivityRef == null || lastActivityRef.equals(""))      // if never seen list before or reached end last time
+                orderedActivities = activityDataRef.orderByKey().limitToFirst(5);   // start from beginning
+            else
+                orderedActivities = activityDataRef.orderByKey().startAt(lastActivityRef).limitToFirst(5);  // else get next five in the list
             orderedEvents = eventsDataRef.orderByKey().limitToFirst(5);
         }
         else {                // otherwise determine where to start from
 
-            int activityRemainder = 5 - (activityCount % 5);    // get the number of activities that we have at the end. For e.g. 12 it returns 2
-            int eventRemainder = 5 - (eventCount % 5);
-            Boolean lastItemWasEvent = homeListItems.get(ItemCount - 1).event;
+            int activityRemainder = activityCount % 5;    // get the number of activities that we have at the end. For e.g. 12 it returns 2
+            if (activityRemainder == 0) activityRemainder = 5;
+
             try {
-                if (lastItemWasEvent) {
-                    activityStart = homeListItems.get(ItemCount - eventRemainder - 1).ref.split("/")[2];
-                    eventStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-                } else {
-                    activityStart = homeListItems.get(ItemCount - 1).ref.split("/")[2];
-                    eventStart = homeListItems.get(ItemCount - activityRemainder - 1).ref.split("/")[2];
-                }
+                activityStart = homeListItems.get(indexOfLastActivity).ref.split("/")[2];
+                eventStart = homeListItems.get(indexOfLastEvent).ref.split("/")[2];
             }
-            catch (ArrayIndexOutOfBoundsException e) {  // handle occasions when this runs when list is almost empty
-                getEvents = false;
+            catch (Exception e) {
                 getActivities = false;
+                getEvents = false;
             }
+
 
             // if we have gotten the the end of a list, don't get anymore of them and set an offset so that we continue to get 10 new items each time
-            if (eventCount >= eventCountDatabase) {getEvents = false; offset = 5;}
-            if (activityCount >= activityCountDatabase) {getActivities = false; offset = 5;}
+            if (eventCount >= eventCountDatabase) {
+                getEvents = false;
+                offset = 5;
+            }
+            if (activityCount >= activityCountDatabase) {
+                getActivities = false;
+                offset = 5;
+            }
 
             // form the references
-            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
-            orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6 + offset);
-        }
+            if (activityRemainder < 5 && activityCount < activityCountDatabase) {   // if we have reached the end of the list, but not all of the data, loop back around. Load some more activities from the start
+                orderedActivities = activityDataRef.orderByKey().limitToFirst(5 - activityRemainder + offset);
+                lastActivityRef = "";
+            } else {        // otherwise load some more
+                orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6 + offset);
+                lastActivityRef = activityStart;
+            }
 
+            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
+        }
 
         // get the activity data
         if (getActivities) {
@@ -713,11 +749,14 @@ public class MainActivity extends AppCompatActivity {
                         protected void onPostExecute(Boolean result) {
                             if (result) {
                                 if (homeFragment != null) {
-                                    homeListItems.add(unseenHomeUpdates[activityCount%10]);
-                                    homeListTitles.add(unseenHomeUpdates[activityCount%10].activity);
-                                    homeListRefs.add(unseenHomeUpdates[activityCount%10].ref);
-                                    activityCount = activityCount +1;
-                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                    if (!homeListRefs.contains(unseenHomeUpdates[activityCount % 10].ref)) {
+                                        homeListItems.add(unseenHomeUpdates[activityCount % 10]);
+                                        homeListTitles.add(unseenHomeUpdates[activityCount % 10].activity);
+                                        homeListRefs.add(unseenHomeUpdates[activityCount % 10].ref);
+                                        activityCount = activityCount + 1;
+                                        indexOfLastActivity = homeListTitles.size() - 1;
+                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                    }
                                 }
                             }
                         }
@@ -811,11 +850,14 @@ public class MainActivity extends AppCompatActivity {
                         protected void onPostExecute(Boolean result) {
                             if (result) {
                                 if (homeFragment != null) {
-                                    homeListItems.add(unseenHomeUpdates[eventCount%10+10]);
-                                    homeListTitles.add(unseenHomeUpdates[eventCount%10+10].activity);
-                                    homeListRefs.add(unseenHomeUpdates[eventCount%10+10].ref);
-                                    eventCount = eventCount + 1;
-                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                    if (!homeListRefs.contains(unseenHomeUpdates[eventCount % 10 + 10].ref)) {
+                                        homeListItems.add(unseenHomeUpdates[eventCount % 10 + 10]);
+                                        homeListTitles.add(unseenHomeUpdates[eventCount % 10 + 10].activity);
+                                        homeListRefs.add(unseenHomeUpdates[eventCount % 10 + 10].ref);
+                                        eventCount = eventCount + 1;
+                                        indexOfLastEvent = homeListTitles.size() - 1;
+                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                    }
                                 }
                             }
                         }

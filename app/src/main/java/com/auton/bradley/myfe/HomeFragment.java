@@ -178,6 +178,7 @@ public class HomeFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {return false;}
             @Override               // on text entered
             public boolean onQueryTextChange(String searchQuery) {
+                flag_loading = true;
                 if (yes[0]) {                                                                       // if first list tap, remake list
                     adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
                     home_list.setAdapter(adapter);
@@ -185,6 +186,17 @@ public class HomeFragment extends Fragment {
                 }
                 adapter.filter(searchQuery.trim());                                                 // update the list items
                 home_list.invalidate();                                                             // ensure list refresh
+                return true;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                flag_loading = false;
                 return true;
             }
         });
