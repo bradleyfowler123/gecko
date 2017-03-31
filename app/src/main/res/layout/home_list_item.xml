@@ -6,7 +6,7 @@
     android:id="@+id/home_list_item"
     android:orientation="vertical"
     android:layout_height="250dp"
-    android:padding="10dp">
+    android:paddingTop="10dp">
 
     <ImageView
         android:layout_height="match_parent"
@@ -22,106 +22,119 @@
         android:layout_height="match_parent">
 
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="50dp"
-            android:orientation="vertical"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true"
             android:background="#7f801325"
-            android:padding="5dp">
+            android:padding="10dp"
+            android:baselineAligned="false">
 
             <TextView
+                android:id="@+id/sr_list_item_price"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
                 android:id="@+id/sr_list_item_title"
-                android:maxLines="2"
-                android:maxWidth="200dp"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:gravity="top|start"
                 android:textStyle="normal|bold" />
 
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/sr_list_item_location"
-                android:textSize="15sp"
-                android:textColor="@android:color/white"
-                android:ellipsize="end"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
                 android:maxLines="1"
-                android:gravity="center_vertical" />
+                android:ellipsize="end"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/sr_list_item_price"/>
 
-
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:background="#7f801325"
-            android:baselineAligned="false">
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:baselineAligned="false"
+            android:layout_margin="5dp">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/home_total_going">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
                     app:srcCompat="@drawable/ic_friend_feed_grey"
-                    android:padding="5dp"
                     android:contentDescription="@string/image_content_description"/>
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:textSize="20sp"
                     android:id="@+id/hli_total_going"
-                    android:textColor="@android:color/white"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/home_interested">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
                     android:id="@+id/home_interested_star"
-                    app:srcCompat="@android:drawable/btn_star"
-                    android:padding="5dp"
-                    android:contentDescription="@string/image_content_description"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/image_content_description"
+                    app:srcCompat="@drawable/ic_star_empty" />
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:textSize="20sp"
                     android:id="@+id/hli_friends_interested"
                     android:textColor="@android:color/white"/>
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/sr_add_to_calander"
+                android:orientation="vertical"
                 android:gravity="center_horizontal">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_calendar_white"
-                    android:padding="5dp"
-                    android:contentDescription="@string/image_content_description"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/image_content_description"
+                    app:srcCompat="@mipmap/ic_plus" />
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:textSize="20sp"
                     android:id="@+id/hli_friends_going"
                     android:textColor="@android:color/white"/>

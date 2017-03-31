@@ -214,12 +214,10 @@ class homeAdapter extends ArrayAdapter<String> {                                
         myInterests = interests;
     }                          // class definition used to store different views within the list view to be populated
     private class ViewHolder {
-        TextView activityTitle;
-        TextView activityLocation;
+        TextView activityTitle, activityLocation, activityPrice;
         TextView noFriGoing; TextView noFriInt; TextView noTotGoing;
-        ImageView img;
-        ImageView interestedIV;
-        View addToCal; View interested; View totalGoing;
+        ImageView img, interestedIV;
+        View addToCal,interested,totalGoing;
     }                          // function that generates the list view, runs for every list item
     @Override
     @NonNull
@@ -236,6 +234,7 @@ class homeAdapter extends ArrayAdapter<String> {                                
         final ViewHolder holder = new ViewHolder();
         holder.activityTitle = (TextView) convertView.findViewById(R.id.sr_list_item_title);
         holder.activityLocation = (TextView) convertView.findViewById(R.id.sr_list_item_location);
+        holder.activityPrice = (TextView) convertView.findViewById(R.id.sr_list_item_price);
         holder.noFriGoing = (TextView) convertView.findViewById(R.id.hli_friends_going);
         holder.noFriInt = (TextView) convertView.findViewById(R.id.hli_friends_interested);
         holder.noTotGoing = (TextView) convertView.findViewById(R.id.hli_total_going);
@@ -248,14 +247,21 @@ class homeAdapter extends ArrayAdapter<String> {                                
                                 // populate the texts and images with data for a list item
         AgendaClass listItem = listData.get(position);
         holder.activityTitle.setText(listItem.activity);
-        if (listItem.distAway == -1)
-            holder.activityLocation.setVisibility(View.GONE);
+        if (listItem.distAway == -1) {
+            holder.activityLocation.setText(String.format("%s " + listItem.location.split(",")[0], new String(Character.toChars(0x1F4CD))));
+        }
         else {
-            holder.activityLocation.setVisibility(View.VISIBLE);
-            holder.activityLocation.setText(String.format("%s km away", Double.toString(listItem.distAway)));
+            holder.activityLocation.setText(String.format("%s %s km away", new String(Character.toChars(0x1F4CD)), Double.toString(listItem.distAway)));
+        }
+        if (listItem.price == 0) {
+            holder.activityPrice.setVisibility(View.GONE);
+        }
+        else {
+            holder.activityPrice.setVisibility(View.VISIBLE);
+            holder.activityPrice.setText(String.format("£%s", Integer.toString(listItem.price)));
         }
         RequestCreator activityImg = Picasso.with(getContext()).load(listItem.image).placeholder(R.drawable.homerectangle).error(R.drawable.homerectangle);
-        activityImg.centerCrop().resize(1000,600).into(holder.img);
+        activityImg.centerCrop().resize(1000,700).into(holder.img);
      /*   if (listItem.event) {
             holder.totalGoing.setVisibility(View.VISIBLE);
             holder.noTotGoing.setText(String.format("%s", Integer.toString(listItem.totalgoing)));
@@ -264,8 +270,8 @@ class homeAdapter extends ArrayAdapter<String> {                                
      */       holder.totalGoing.setVisibility(View.GONE);
       //  }
                     // display numbers and stars on bottom banners
-        if (myInterests.contains(listItem.ref)) holder.interestedIV.setImageResource(android.R.drawable.star_on);
-        else holder.interestedIV.setImageResource(android.R.drawable.star_off);
+        if (myInterests.contains(listItem.ref)) holder.interestedIV.setImageResource(R.mipmap.ic_star_fill);
+        else holder.interestedIV.setImageResource(R.mipmap.ic_star_empty);
         if (!activityFriendGoingNumbers.isEmpty()) {
             if (activityFriendGoingNumbers.get(listItem.ref)!=null) {
                 holder.noFriGoing.setText(String.valueOf(activityFriendGoingNumbers.get(listItem.ref).size()));
