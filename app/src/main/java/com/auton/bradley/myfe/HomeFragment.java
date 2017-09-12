@@ -178,15 +178,18 @@ public class HomeFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {return false;}
             @Override               // on text entered
             public boolean onQueryTextChange(String searchQuery) {
-                flag_loading = true;
-                if (yes[0]) {                                                                       // if first list tap, remake list
-                    adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
-                    home_list.setAdapter(adapter);
-                    yes[0] = false;
+                if (listTitles != null && listTitles.size()>1) {
+                    flag_loading = true;
+                    if (yes[0]) {                                                                       // if first list tap, remake list
+                        adapter = new homeAdapter(getActivity(), listItems, listTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, myInterests);
+                        home_list.setAdapter(adapter);
+                        yes[0] = false;
+                    }
+                    adapter.filter(searchQuery.trim());                                                 // update the list items
+                    home_list.invalidate();                                                             // ensure list refresh
+                    return true;
                 }
-                adapter.filter(searchQuery.trim());                                                 // update the list items
-                home_list.invalidate();                                                             // ensure list refresh
-                return true;
+                else return false;
             }
         });
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {

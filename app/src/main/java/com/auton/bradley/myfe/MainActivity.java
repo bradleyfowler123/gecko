@@ -676,13 +676,13 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
 
             // work out which items in the event and activity list on firebase we need to get
-        Query orderedActivities = null, orderedEvents = null;
+        Query orderedActivities, orderedEvents;
         if (ItemCount < 2) {   // for first iteration
             if (lastActivityRef == null || lastActivityRef.equals(""))      // if never seen list before or reached end last time
                 orderedActivities = activityDataRef.orderByKey().limitToFirst(5);   // start from beginning
             else
                 orderedActivities = activityDataRef.orderByKey().startAt(lastActivityRef).limitToFirst(5);  // else get next five in the list
-            orderedEvents = eventsDataRef.orderByKey().limitToFirst(5);
+            orderedEvents = eventsDataRef.orderByChild("date").limitToFirst(5);
         }
         else {                // otherwise determine where to start from
 
@@ -718,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
                 lastActivityRef = activityStart;
             }
 
-            orderedEvents = eventsDataRef.orderByKey().startAt(eventStart).limitToFirst(6 + offset);
+            orderedEvents = eventsDataRef.orderByChild("date").startAt(eventStart).limitToFirst(6 + offset);
         }
 
         // get the activity data
