@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Myfe.iml" filepath="$PROJECT_DIR$/Myfe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gecko.iml" filepath="$PROJECT_DIR$/Gecko.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
