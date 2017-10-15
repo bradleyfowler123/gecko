@@ -150,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                 friendCount = friendCount - 1;
                                                         // store their uid in list
-                                                if (dataSnapshot.getValue() != null) {
+                                                if (dataSnapshot.getValue() != null) {                                  // they may have removed there firebase account
                                                     String theUID = dataSnapshot.getValue().toString();
                                                     int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());   // the facebook id
                                                     friendFirebaseIDsOnly.set(index, theUID);

@@ -105,6 +105,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        /*
                         // when user scrolls and near the bottom load more data
         home_list.setOnScrollListener(new AbsListView.OnScrollListener() {
 
@@ -116,15 +117,19 @@ public class HomeFragment extends Fragment {
                 // offset by 1 list item so start loading on second to last item
                 if(firstVisibleItem+visibleItemCount >= totalItemCount - 1)
                 {       // provided we are not already loading data
-                    if(!flag_loading)
+                    MainActivity mainActivity = (MainActivity) getActivity();
+
+                    if(!mainActivity.activity_loading_flag && !mainActivity.event_loading_flag)
                     {       // load some more items
-                        flag_loading = true; loaded_count = 0;
-                        MainActivity mainActivity = (MainActivity) getActivity();
+                        mainActivity.activity_loading_flag = false;
+                        mainActivity.event_loading_flag = false;
                         mainActivity.getNSetHomeFeedData();
                     }
                 }
             }
         });
+
+        */
 
         return rootView;                                                                            // return the home view (and everything below) to the main activity so it can be shown
     }
@@ -138,10 +143,6 @@ public class HomeFragment extends Fragment {
         activityFriendGoingNumbers = actFriGoNums;
         activityFriendInterestedNumbers = actFriIntNums;
         myInterests = interests;
-
-        // reset loading flag when 5 items have loaded
-        loaded_count = loaded_count +1;
-        if (loaded_count > 4) flag_loading = false;
 
         // update list view with new data
         if (home_list!=null && getActivity()!=null) {

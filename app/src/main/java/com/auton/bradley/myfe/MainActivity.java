@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -54,6 +55,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     private int indexOfLastActivity = 0, indexOfLastEvent = 0;
     private int eventCountDatabase = 0; private int activityCountDatabase = 0;
     private String lastActivityRef;
+    private int activities_to_load;
+    private int activity_random_start;
                                     // static variables
     public static final String PREFS_NAME = "MyPrefsFile";
 
@@ -153,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
                 getCounts();
-                getNSetHomeFeedData();          // get home feed data
                 if (facebookConnected) {
                     facebookData = intent.getBundleExtra("fbData");
                     getNSetFriendData();    // get friends info and show it on home feed
@@ -185,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout.setupWithViewPager(viewPager);                                                    // setup view
                 setupTabIcons();
                 getCounts();
-                getNSetHomeFeedData();
             }
 
                                 // otherwise they are logged out and just opened app, so show them login screen
@@ -649,6 +651,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 activityCountDatabase = ((Long) dataSnapshot.getValue()).intValue();
+                getNSetHomeFeedData();          // get home feed data
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -664,266 +667,203 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-                                    // get and set activities and events for around 'cambridge'
-    public void getNSetHomeFeedData() {
-                // variable declarations
-        int ItemCount = homeListItems.size(); int offset = 0;
-        String eventStart = "", activityStart = "";
-        Boolean getActivities = true;
-        Boolean getEvents = true;
+    private void round2() {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
-        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
-
-            // work out which items in the event and activity list on firebase we need to get
-        Query orderedActivities, orderedEvents;
-        if (ItemCount < 2) {   // for first iteration
-            if (lastActivityRef == null || lastActivityRef.equals(""))      // if never seen list before or reached end last time
-                orderedActivities = activityDataRef.orderByKey().limitToFirst(5);   // start from beginning
-            else
-                orderedActivities = activityDataRef.orderByKey().startAt(lastActivityRef).limitToFirst(5);  // else get next five in the list
-            orderedEvents = eventsDataRef.orderByChild("date").limitToFirst(5);
-        }
-        else {                // otherwise determine where to start from
-
-            int activityRemainder = activityCount % 5;    // get the number of activities that we have at the end. For e.g. 12 it returns 2
-            if (activityRemainder == 0) activityRemainder = 5;
-
-            try {
-                activityStart = homeListItems.get(indexOfLastActivity).ref.split("/")[2];
-                eventStart = homeListItems.get(indexOfLastEvent).ref.split("/")[2];
-            }
-            catch (Exception e) {
-                getActivities = false;
-                getEvents = false;
-            }
-
-
-            // if we have gotten the the end of a list, don't get anymore of them and set an offset so that we continue to get 10 new items each time
-            if (eventCount >= eventCountDatabase) {
-                getEvents = false;
-                offset = 5;
-            }
-            if (activityCount >= activityCountDatabase) {
-                getActivities = false;
-                offset = 5;
-            }
-
-            // form the references
-            if (activityRemainder < 5 && activityCount < activityCountDatabase) {   // if we have reached the end of the list, but not all of the data, loop back around. Load some more activities from the start
-                orderedActivities = activityDataRef.orderByKey().limitToFirst(5 - activityRemainder + offset);
-                lastActivityRef = "";
-            } else {        // otherwise load some more
-                orderedActivities = activityDataRef.orderByKey().startAt(activityStart).limitToFirst(6 + offset);
-                lastActivityRef = activityStart;
-            }
-
-            orderedEvents = eventsDataRef.orderByChild("date").startAt(eventStart).limitToFirst(6 + offset);
-        }
+        Query orderedActivities2 = activityDataRef.orderByKey().limitToFirst(activity_random_start);
 
         // get the activity data
-        if (getActivities) {
-            orderedActivities.addChildEventListener(new ChildEventListener() {
-                @Override
-                // for each activity agenda item, add it and repopulate home list
-                public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                    new AsyncTask<Object, Boolean, Boolean>() {
-                        @Override
-                        protected Boolean doInBackground(Object... params) {
-                            //         homeListItemsHolder = homeListItems; homeListTitlesHolder = homeListTitles;  homeListRefsHolder = homeListRefs;
-                            GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                            };
-                            AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                            agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                            if (homeListRefs.contains(agendaItem.ref)) return false;
-                            else {
-                                agendaItem.event = false;
-                                agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
-                                unseenHomeUpdates[activityCount2%10] = agendaItem;
-                                activityCount2 = activityCount2 + 1;
-                                return true;
-                            }
-                        }
+        orderedActivities2.addChildEventListener(new ChildEventListener() {
+            @Override
+            // for each activity agenda item, add it and repopulate home list
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
 
-                        @Override
-                        protected void onPostExecute(Boolean result) {
-                            if (result) {
-                                if (homeFragment != null) {
-                                    if (!homeListRefs.contains(unseenHomeUpdates[activityCount % 10].ref)) {
-                                        homeListItems.add(unseenHomeUpdates[activityCount % 10]);
-                                        homeListTitles.add(unseenHomeUpdates[activityCount % 10].activity);
-                                        homeListRefs.add(unseenHomeUpdates[activityCount % 10].ref);
-                                        activityCount = activityCount + 1;
-                                        indexOfLastActivity = homeListTitles.size() - 1;
-                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                                    }
-                                }
-                            }
-                        }
-                    }.execute();
-                }
-
-                @Override       // for each activity agenda item, update it and repopulate home list
-                public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
-           /*     new AsyncTask<Object, Boolean, Boolean>() {
+                new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                        homeListItems.remove(index);
-                        homeListTitles.remove(index);
-                        homeListRefs.remove(index);
+                        //         homeListItemsHolder = homeListItems; homeListTitlesHolder = homeListTitles;  homeListRefsHolder = homeListRefs;
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                         };
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                         agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
-                        agendaItem.event = false;
-                        agendaItem.distAway = getDistanceAway(agendaItem.location);
-                        homeListItems.add(agendaItem);
-                        homeListTitles.add(agendaItem.activity);
-                        homeListRefs.add(agendaItem.ref);
-                        return true;
+                        if (homeListRefs.contains(agendaItem.ref)) return false;
+                        else {
+                            agendaItem.event = false;
+                            agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
+                            unseenHomeUpdates[activityCount2%10] = agendaItem;
+                            activityCount2 = activityCount2 + 1;
+                            return true;
+                        }
                     }
+
                     @Override
                     protected void onPostExecute(Boolean result) {
-                        if(result){
-                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                    }
-                }.execute();
-         */
-                }
-
-                @Override       // for each activity agenda item, remove it and repopulate home list
-                public void onChildRemoved(final DataSnapshot dataSnapshot) {
-           /*     new AsyncTask<Object, Boolean, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Object... params) {
-                        int index = homeListRefs.indexOf(location + "/activities/" + dataSnapshot.getKey());
-                        homeListItems.remove(index);
-                        homeListTitles.remove(index);
-                        homeListRefs.remove(index);
-                        return true;
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        if(result){
-                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                    }
-                }.execute();
-       */
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        }
-
-        // get events data
-        if (getEvents) {
-            orderedEvents.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                    new AsyncTask<Object, Boolean, Boolean>() {
-                        @Override
-                        protected Boolean doInBackground(Object... params) {
-                            GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
-                            };
-                            AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
-                            agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                            if (homeListRefs.contains(agendaItem.ref)) return false;
-                            else {
-                                agendaItem.event = true;
-                                agendaItem.distAway = getDistanceAway(agendaItem.location);
-                                unseenHomeUpdates[eventCount2%10+10] = agendaItem;
-                                eventCount2 = eventCount2 + 1;
-                                return true;
-                            }
-                        }
-
-                        @Override
-                        protected void onPostExecute(Boolean result) {
-                            if (result) {
-                                if (homeFragment != null) {
-                                    if (!homeListRefs.contains(unseenHomeUpdates[eventCount % 10 + 10].ref)) {
-                                        homeListItems.add(unseenHomeUpdates[eventCount % 10 + 10]);
-                                        homeListTitles.add(unseenHomeUpdates[eventCount % 10 + 10].activity);
-                                        homeListRefs.add(unseenHomeUpdates[eventCount % 10 + 10].ref);
-                                        eventCount = eventCount + 1;
-                                        indexOfLastEvent = homeListTitles.size() - 1;
-                                        homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                                    }
+                        if (result) {
+                            if (homeFragment != null) {
+                                if (!homeListRefs.contains(unseenHomeUpdates[activityCount % 10].ref)) {
+                                    homeListItems.add(unseenHomeUpdates[activityCount % 10]);
+                                    homeListTitles.add(unseenHomeUpdates[activityCount % 10].activity);
+                                    homeListRefs.add(unseenHomeUpdates[activityCount % 10].ref);
+                                    activityCount = activityCount + 1;
+                                    indexOfLastActivity = homeListTitles.size() - 1;
+                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
                                 }
                             }
                         }
-                    }.execute();
-                }
+                    }
+                }.execute();
+            }
 
-                @Override
-                public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
-              /*  new AsyncTask<Object, Boolean, Boolean>() {
+            @Override       // for each activity agenda item, update it and repopulate home list
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override       // for each activity agenda item, remove it and repopulate home list
+            public void onChildRemoved(final DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("!!!!!!!!!!!!!!!11", databaseError.toString());
+            }
+        });
+    }
+
+
+                                    // get and set activities and events for around 'cambridge'
+    public void getNSetHomeFeedData() {
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference activityDataRef = database.child("activitydata/placeData").child(location).child("activities");
+        DatabaseReference eventsDataRef = database.child("activitydata/placeData").child(location).child("events");
+
+        //lastActivityRef = homeListItems.get(indexOfLastActivity).ref.split("/")[2];
+        Random random = new Random();
+        activity_random_start =  random.nextInt(activityCountDatabase);
+        activities_to_load = activity_random_start;
+        Query orderedActivities = activityDataRef.orderByKey().limitToLast(activityCountDatabase-activity_random_start);
+        Query orderedEvents = eventsDataRef.orderByChild("date");
+
+        // get the activity data
+        orderedActivities.addChildEventListener(new ChildEventListener() {
+            @Override
+            // for each activity agenda item, add it and repopulate home list
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+
+                new AsyncTask<Object, Boolean, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Object... params) {
-                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
-                        homeListItems.remove(index);
-                        homeListTitles.remove(index);
-                        homeListRefs.remove(index);
+                        //         homeListItemsHolder = homeListItems; homeListTitlesHolder = homeListTitles;  homeListRefsHolder = homeListRefs;
+                        GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
+                        };
+                        AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
+                        agendaItem.ref = location + "/activities/" + dataSnapshot.getKey();
+                        if (homeListRefs.contains(agendaItem.ref)) return false;
+                        else {
+                            agendaItem.event = false;
+                            agendaItem.distAway = getDistanceAway(agendaItem.location);                         // get distance away
+                            unseenHomeUpdates[activityCount2%10] = agendaItem;
+                            activityCount2 = activityCount2 + 1;
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        if (result) {
+                            if (homeFragment != null) {
+                                if (!homeListRefs.contains(unseenHomeUpdates[activityCount % 10].ref)) {
+                                    homeListItems.add(unseenHomeUpdates[activityCount % 10]);
+                                    homeListTitles.add(unseenHomeUpdates[activityCount % 10].activity);
+                                    homeListRefs.add(unseenHomeUpdates[activityCount % 10].ref);
+                                    activityCount = activityCount + 1;
+                                    indexOfLastActivity = homeListTitles.size() - 1;
+                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+
+                                    activities_to_load = activities_to_load - 1;
+                                    if (activities_to_load == 0) round2();
+                                }
+                            }
+                        }
+                    }
+                }.execute();
+            }
+
+            @Override       // for each activity agenda item, update it and repopulate home list
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override       // for each activity agenda item, remove it and repopulate home list
+            public void onChildRemoved(final DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("!!!!!!!!!!!!!!!!!!1", databaseError.toString());
+            }
+        });
+
+        // get events data
+        orderedEvents.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
+                new AsyncTask<Object, Boolean, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Object... params) {
                         GenericTypeIndicator<AgendaClass> t = new GenericTypeIndicator<AgendaClass>() {
                         };
                         AgendaClass agendaItem = dataSnapshot.getValue(t);              // get agenda data
                         agendaItem.ref = location + "/events/" + dataSnapshot.getKey();
-                        agendaItem.event = true;
-                        agendaItem.distAway = getDistanceAway(agendaItem.location);
-                        homeListItems.add(agendaItem);
-                        homeListTitles.add(agendaItem.activity);
-                        homeListRefs.add(agendaItem.ref);
-                        return true;
+                        if (homeListRefs.contains(agendaItem.ref)) return false;
+                        else {
+                            agendaItem.event = true;
+                            agendaItem.distAway = getDistanceAway(agendaItem.location);
+                            unseenHomeUpdates[eventCount2%10+10] = agendaItem;
+                            eventCount2 = eventCount2 + 1;
+                            return true;
+                        }
                     }
+
                     @Override
                     protected void onPostExecute(Boolean result) {
-                        if(result){
-                            homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                        if (result) {
+                            if (homeFragment != null) {
+                                if (!homeListRefs.contains(unseenHomeUpdates[eventCount % 10 + 10].ref)) {
+                                    homeListItems.add(unseenHomeUpdates[eventCount % 10 + 10]);
+                                    homeListTitles.add(unseenHomeUpdates[eventCount % 10 + 10].activity);
+                                    homeListRefs.add(unseenHomeUpdates[eventCount % 10 + 10].ref);
+                                    eventCount = eventCount + 1;
+                                    indexOfLastEvent = homeListTitles.size() - 1;
+                                    homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
+                                }
+                            }
                         }
                     }
                 }.execute();
-         */
-                }
+            }
 
-                @Override
-                public void onChildRemoved(final DataSnapshot dataSnapshot) {
-       /*         new AsyncTask<Object, Boolean, Boolean>() {
-                    @Override
-                    protected Boolean doInBackground(Object... params) {
-                        int index = homeListRefs.indexOf(location + "/events/" + dataSnapshot.getKey());
-                        homeListItems.remove(index);
-                        homeListTitles.remove(index);
-                        homeListRefs.remove(index);
-                        return true;
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        if(result){
-                             homeFragment.storeData(homeListItems, homeListTitles, activityFriendGoingNumbers, activityFriendInterestedNumbers, interested, false);
-                        }
-                    }
-                }.execute();
-     */
-                }
+            @Override
+            public void onChildChanged(final DataSnapshot dataSnapshot, String s) {}
 
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
+            @Override
+            public void onChildRemoved(final DataSnapshot dataSnapshot) {}
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
 

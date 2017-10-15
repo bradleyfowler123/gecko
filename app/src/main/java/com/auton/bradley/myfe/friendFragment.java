@@ -46,6 +46,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 
 /*
     fragment that handles the friend feed tab
@@ -60,7 +62,9 @@ public class FriendFragment extends Fragment {
     private friendAdapter adapter;
     private ArrayList<AgendaClass> sortedList = new ArrayList<>();
     private ArrayList<String> listItems = new ArrayList<>(); // some necessary crap
-    private ArrayList<String> friendFirebaseIDs; private int friendCount;
+    private HashMap<String, Boolean> friendFirebaseIDs;
+    private ArrayList<String> friendFirebaseIDsOnly;
+    private int friendCount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -244,11 +248,10 @@ public class FriendFragment extends Fragment {
                 // else store friends UIDs in the users friend list on firebase
         else {
             // initialise variables
-            friendFirebaseIDs = new ArrayList<>();                          // will hold the list of friend UIDs
-            for (int i = 0; i < facebookFriendIDs.size(); i++) {
-                friendFirebaseIDs.add(i, "");
-            }
             friendCount = facebookFriendIDs.size();
+            friendFirebaseIDs = new HashMap<>();                          // will hold the list of friend UIDs
+            friendFirebaseIDsOnly =  new ArrayList<>(Collections.nCopies(friendCount, " "));
+
 
             // for every facebook friend, get their uid
             for (int i = 0; i < facebookFriendIDs.size(); i++) {
@@ -256,15 +259,20 @@ public class FriendFragment extends Fragment {
                 firebaseIDRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // store their uid in list
-                        int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());
-                        friendFirebaseIDs.set(index, dataSnapshot.getValue().toString());
                         friendCount = friendCount - 1;
+                        // store their uid in list
+                        if (dataSnapshot.getValue() != null) {
+                            String theUID = dataSnapshot.getValue().toString();
+                            int index = facebookFriendIDs.indexOf(dataSnapshot.getKey());            // the facebook id
+                            friendFirebaseIDsOnly.set(index, theUID);
+                            friendFirebaseIDs.put(theUID, true);
+
+                        }
                         // once all UIDs stored, store friends UIDs in user entry of database
                         if (friendCount == 0) {
                             DatabaseReference friends = database.child("users").child(user.getUid()).child("friendUIDs");
                             friends.setValue(friendFirebaseIDs);
-                            FacebookData.putStringArrayList("friendUids", friendFirebaseIDs);
+                            FacebookData.putStringArrayList("friendUids", friendFirebaseIDsOnly);
 
                             // restart main activity to display new user state
                             MainActivity activity = (MainActivity) getActivity();
